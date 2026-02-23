@@ -11,7 +11,7 @@ A mobile-first web application for digitizing the judging process at the **Inter
 | Layer | Technology |
 |---|---|
 | Frontend Framework | Angular v19 |
-| Component Architecture | NgModule (traditional) |
+| Component Architecture | Standalone Components (no NgModule) |
 | Styling | SCSS + Tailwind CSS |
 | State Management | Angular Signals + Services |
 | Backend / Database | Firebase Firestore |
@@ -320,7 +320,7 @@ Letter spacing for uppercase labels (captions): `0.05em`
 ## Code Style & Formatting
 
 - **Prettier** is configured for consistent formatting — run before committing
-- Follow Angular style guide for all component, service, and module structure
+- Follow Angular style guide for all component, service, and standalone structure
 - TypeScript: **standard mode** (no strict mode, no `strictNullChecks` enforced)
 - Keep components **thin** — move business logic to services
 - Use `async` pipe in templates instead of manual subscription management where possible
@@ -355,7 +355,7 @@ ng generate service services/scoring
 
 - Always check this file before writing any code
 - Never call Firestore directly from a component — always go through a service
-- When generating a new page, create it under `pages/` and register it in the appropriate NgModule
+- When generating a new page, create it under `pages/` and add it to the route config in `app.routes.ts` — all components are standalone, no NgModule registration needed
 - When adding a new constant (scoring criteria, limits, step values), add it to `shared/` — never hardcode values in components
 - If models/interfaces location has been decided, update the **TBD note** in the Folder Structure section above
 - Mobile-first always — test layouts at 375px width minimum
