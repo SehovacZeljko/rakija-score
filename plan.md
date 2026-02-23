@@ -12,7 +12,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ## Phase 1 — Project Setup
 
-### [ ] 1.1 Install and Configure Tailwind CSS
+### [x] 1.1 Install and Configure Tailwind CSS
 **Files:** `tailwind.config.js`, `src/styles.scss`, `src/index.html`, `package.json`
 
 - `npm install -D tailwindcss@3 postcss autoprefixer && npx tailwindcss init`
