@@ -5,7 +5,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 **Architecture decisions confirmed:**
 - Standalone components (no NgModules) — keep existing scaffold
-- TypeScript strict mode: OFF (`"strict": false` in tsconfig.json)
+- TypeScript strict mode: ON (`"strict": true` in tsconfig.json)
 - Update CLAUDE.md to reflect both of these decisions
 
 ---
@@ -381,8 +381,8 @@ Update all pages with empty state messages (Serbian) for no-data scenarios:
 | `src/app/shared/scoring.constants.ts` | Single source of truth for scoring criteria |
 | `src/styles.scss` | Tailwind directives + CSS custom properties + global font |
 | `tailwind.config.js` | Design token colors |
-| `tsconfig.json` | Set `"strict": false` in Feature 1.4 |
-| `CLAUDE.md` | Update: standalone arch, models location, strict mode OFF |
+| `tsconfig.json` | Set `"strict": true` in Feature 1.4 |
+| `CLAUDE.md` | Update: standalone arch, models location, strict mode ON |
 
 ---
 

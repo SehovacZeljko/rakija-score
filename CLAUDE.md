@@ -321,7 +321,7 @@ Letter spacing for uppercase labels (captions): `0.05em`
 
 - **Prettier** is configured for consistent formatting — run before committing
 - Follow Angular style guide for all component, service, and standalone structure
-- TypeScript: **standard mode** (no strict mode, no `strictNullChecks` enforced)
+- TypeScript: **standard mode** (strict mode, `strictNullChecks` enforced)
 - Keep components **thin** — move business logic to services
 - Use `async` pipe in templates instead of manual subscription management where possible
 
