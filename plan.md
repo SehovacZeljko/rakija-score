@@ -81,7 +81,8 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 - `currentUser = toSignal(currentUser$)` — call `toSignal()` in constructor
 - `isAuthenticated = computed(() => !!this.currentUser())`
 - `login(email, password): Promise<void>` — calls `signInWithEmailAndPassword`
-- `register(email, password, fullName): Promise<void>` — calls `createUserWithEmailAndPassword`, then writes `users/{uid}` doc with `{ fullName, role: 'judge', createdAt }`
+- `register(email, password, username): Promise<void>` — calls `createUserWithEmailAndPassword`, then writes `users/{uid}` doc with `{ username, email, role: 'judge', createdAt }`
+- `resetPassword(email): Promise<void>` — calls `sendPasswordResetEmail`; Firebase handles the reset link and hosted reset UI
 - `logout(): Promise<void>` — calls `signOut`, navigates to `/login`
 
 **Verify:** `ng build` passes; inject into AppComponent and log currentUser$ — emits null.
@@ -103,7 +104,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 **Files:** `src/app/pages/register/register.component.ts`, `.html`, `.scss`
 
 - Standalone component using `ReactiveFormsModule`
-- Form: full name, email, password fields; Serbian labels ("Ime i prezime", "Email adresa", "Lozinka")
+- Form: username, email, password fields; Serbian labels ("Korisničko ime", "Email adresa", "Lozinka")
 - Signals: `isLoading`, `errorMessage`
 - On submit: calls `authService.register()`, navigates to `/login` on success
 - On error: display Serbian error message (e.g., "Email adresa je već u upotrebi")
@@ -122,14 +123,31 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 - Signals: `isLoading`, `errorMessage`
 - On submit: calls `authService.login()`, navigates to `/dashboard` on success
 - On error: sets Serbian error message ("Pogrešni podaci za prijavu")
-- Mobile-first layout: centered card on `bg-bg-app`, primary button "Prijavi se"; link to `/register` ("Nemate nalog? Registrujte se")
+- Mobile-first layout: centered card on `bg-bg-app`, primary button "Prijavi se"; link to `/register` ("Nemate nalog? Registrujte se"); link to `/forgot-password` ("Zaboravili ste lozinku?")
 - Add route: `{ path: 'login', loadComponent: ... }` + default redirect
 
 **Verify:** Visit `/login`; wrong credentials show error; correct credentials navigate to `/dashboard` (404 for now — expected).
 
 ---
 
-### [ ] 2.5 Register All Routes + Stub Pages
+### [ ] 2.5 Forgot Password Page
+**Files:** `src/app/pages/forgot-password/forgot-password.component.ts`, `.html`, `.scss`
+
+- Standalone component using `ReactiveFormsModule`
+- Form: single email field; Serbian label ("Email adresa")
+- Signals: `isLoading`, `errorMessage`, `successMessage`
+- On submit: calls `authService.resetPassword(email)`
+- On success: hide form, show confirmation ("Link za resetovanje lozinke je poslat na vašu email adresu") + link back to `/login`
+- On error: inline error message ("Korisnik sa ovom email adresom nije pronađen")
+- Mobile-first layout: same centered card style as login; link to `/login` ("Nazad na prijavu")
+- Add route: `{ path: 'forgot-password', loadComponent: ... }` in `app.routes.ts`
+- Note: no custom `/reset-password` page needed — Firebase hosts the actual password reset UI after the user clicks the email link
+
+**Verify:** Enter registered email → success message shown; enter unknown email → error shown; Firebase sends reset email to inbox.
+
+---
+
+### [ ] 2.6 Register All Routes + Stub Pages
 **Files:** `src/app/app.routes.ts`, stub components for all pages
 
 Create stub components (single `<p>` template) for:
@@ -147,6 +165,7 @@ Wire full `app.routes.ts` with guards and lazy `loadComponent`:
 ```
 /login            → LoginComponent (public)
 /register         → RegisterComponent (public)
+/forgot-password  → ForgotPasswordComponent (public)
 /dashboard        → DashboardComponent (authGuard)
 /category/:id     → CategoryDetailComponent (authGuard)
 /scoring/:cid/:sid → ScoringComponent (authGuard)
@@ -168,7 +187,7 @@ Wire full `app.routes.ts` with guards and lazy `loadComponent`:
 
 **Header component:**
 - `@Input() title: string`
-- Shows judge full name (from `authService.currentUser()`)
+- Shows judge username (from `authService.currentUser()`)
 - Logout icon button (right) → calls `authService.logout()`
 - Background `bg-primary`, text white, height 56px, fixed top
 
@@ -340,7 +359,7 @@ If `isLocked`: read-only banner "Kategorija je zaključana. Ocjena se ne može m
 - `assignJudgeToCategory(judgeId, categoryId): Promise<void>` — creates `judgeAssignments/{judgeId}_{categoryId}`
 - `removeJudgeFromCategory(judgeId, categoryId): Promise<void>` — checks no scores exist first
 
-**UI:** Searchable user list (client-side signal filter); each user shows full name + email; category dropdown to select which category to assign; assign/unassign toggle per user. No user creation form — admins only work with already-registered accounts.
+**UI:** Searchable user list (client-side signal filter); each user shows username + email; category dropdown to select which category to assign; assign/unassign toggle per user. No user creation form — admins only work with already-registered accounts.
 
 **Verify:** Assign judge → appears on judge's dashboard; unassign → disappears; can't unassign if scores exist.
 

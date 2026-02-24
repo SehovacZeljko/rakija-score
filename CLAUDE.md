@@ -32,6 +32,7 @@ src/
     ├── pages/            # Full page/route components
     │   ├── login/
     │   ├── register/
+    │   ├── forgot-password/
     │   ├── dashboard/        # Categories dashboard (judge view)
     │   ├── category-detail/  # Samples list within a category
     │   ├── scoring/          # Scoring form for a single sample
@@ -72,6 +73,7 @@ Two route guards protect access:
 ```
 /login                         → LoginPage (public)
 /register                      → RegisterPage (public)
+/forgot-password               → ForgotPasswordPage (public)
 /dashboard                     → DashboardPage (AuthGuard)
 /category/:categoryId          → CategoryDetailPage (AuthGuard)
 /scoring/:categoryId/:sampleId → ScoringPage (AuthGuard)
@@ -88,8 +90,8 @@ Two route guards protect access:
 ## Application Flow (Judge)
 
 ### 1. Register (`/register`)
-- Full name, email, and password fields; Serbian labels ("Ime i prezime", "Email adresa", "Lozinka")
-- On success: creates Firebase Auth user + writes `users/{uid}` Firestore doc with `role: 'judge'`
+- Username, email, and password fields; Serbian labels ("Korisničko ime", "Email adresa", "Lozinka")
+- On success: creates Firebase Auth user + writes `users/{uid}` Firestore doc with `username`, `email`, and `role: 'judge'`
 - Redirects to `/login` after successful registration
 - Link to `/login` for users who already have an account
 - New accounts have no category assignments until an admin assigns them — dashboard will show empty state
@@ -99,8 +101,15 @@ Two route guards protect access:
 - On success → redirect to `/dashboard`
 - On failure → display inline error message
 - Link to `/register` for new users
+- Link to `/forgot-password` for password recovery
 
-### 3. Categories Dashboard (`/dashboard`)
+### 3. Forgot Password (`/forgot-password`)
+- Single email field; Serbian label ("Email adresa")
+- Calls Firebase `sendPasswordResetEmail()` — Firebase sends the reset link, no custom reset page needed in the app
+- On success → shows confirmation message ("Link za resetovanje lozinke je poslat na vašu email adresu") and link back to `/login`
+- On error → inline error (e.g., email not found)
+
+### 4. Categories Dashboard (`/dashboard`)
 - Displays all categories assigned to the logged-in judge
 - Each category card shows:
   - Category name
@@ -108,7 +117,7 @@ Two route guards protect access:
   - Locked status indicator (lock icon when judge has locked the category)
 - Festival year and judge name displayed in header
 
-### 4. Category Detail (`/category/:categoryId`)
+### 5. Category Detail (`/category/:categoryId`)
 - Grid of sample cards for the selected category
 - Each sample card shows:
   - Sequential number
@@ -119,7 +128,7 @@ Two route guards protect access:
 - Clicking a sample card navigates to the scoring form
 - Already-scored samples can be re-edited **until the category is locked**
 
-### 5. Scoring Form (`/scoring/:categoryId/:sampleId`)
+### 6. Scoring Form (`/scoring/:categoryId/:sampleId`)
 - Displays sample info: code, category, year, alcohol strength
 - Scoring criteria with individual controls:
 
@@ -181,7 +190,7 @@ Core admin responsibilities:
 ## Collections and their fields:
 
 - festivals → festivalId, name, status (active|inactive), createdAt
-- users → userId, username, fullName, role (admin|judge), createdAt
+- users → userId, username, email, role (admin|judge), createdAt
 - producers → producerId, name, contactPerson, email, phone, address, region, country, createdAt
 - events → eventId, festivalId (FK), name, year, status, closedAt, createdAt
 - categories → categoryId, eventId (FK), name, status (active|inactive), createdAt
