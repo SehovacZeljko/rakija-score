@@ -33,6 +33,7 @@ src/
     │   ├── login/
     │   ├── register/
     │   ├── forgot-password/
+    │   ├── reset-password/   # Custom password reset form (oobCode from email link)
     │   ├── dashboard/        # Categories dashboard (judge view)
     │   ├── category-detail/  # Samples list within a category
     │   ├── scoring/          # Scoring form for a single sample
@@ -74,6 +75,7 @@ Two route guards protect access:
 /login                         → LoginPage (public)
 /register                      → RegisterPage (public)
 /forgot-password               → ForgotPasswordPage (public)
+/reset-password                → ResetPasswordPage (public, oobCode via query param)
 /dashboard                     → DashboardPage (AuthGuard)
 /category/:categoryId          → CategoryDetailPage (AuthGuard)
 /scoring/:categoryId/:sampleId → ScoringPage (AuthGuard)
@@ -105,9 +107,19 @@ Two route guards protect access:
 
 ### 3. Forgot Password (`/forgot-password`)
 - Single email field; Serbian label ("Email adresa")
-- Calls Firebase `sendPasswordResetEmail()` — Firebase sends the reset link, no custom reset page needed in the app
+- Calls Firebase `sendPasswordResetEmail()` — Firebase sends the reset link pointing to the app's custom `/reset-password` page
 - On success → shows confirmation message ("Link za resetovanje lozinke je poslat na vašu email adresu") and link back to `/login`
 - On error → inline error (e.g., email not found)
+- **Firebase Console setup required:** Authentication → Templates → Password reset → Customize action URL → set to `{appDomain}/reset-password`
+
+### 3a. Reset Password (`/reset-password`)
+- Reached via the link in the Firebase password reset email; `oobCode` arrives as a URL query param
+- On init: calls `verifyPasswordResetCode(oobCode)` to validate the code and retrieve the associated email
+- If code is invalid or expired → shows error state with link to `/forgot-password` ("Zatražite novi link")
+- Form: new password + confirm password fields; Serbian labels ("Nova lozinka", "Potvrdi lozinku")
+- On submit: calls `confirmPasswordReset(oobCode, newPassword)`
+- On success: shows confirmation ("Lozinka je uspješno promijenjena") + link to `/login`
+- On error: inline error ("Link je istekao ili je već iskorišten. Zatražite novi.")
 
 ### 4. Categories Dashboard (`/dashboard`)
 - Displays all categories assigned to the logged-in judge

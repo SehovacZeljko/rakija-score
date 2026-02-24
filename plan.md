@@ -130,7 +130,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ---
 
-### [ ] 2.5 Forgot Password Page
+### [x] 2.5 Forgot Password Page
 **Files:** `src/app/pages/forgot-password/forgot-password.component.ts`, `.html`, `.scss`
 
 - Standalone component using `ReactiveFormsModule`
@@ -141,13 +141,36 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 - On error: inline error message ("Korisnik sa ovom email adresom nije pronađen")
 - Mobile-first layout: same centered card style as login; link to `/login` ("Nazad na prijavu")
 - Add route: `{ path: 'forgot-password', loadComponent: ... }` in `app.routes.ts`
-- Note: no custom `/reset-password` page needed — Firebase hosts the actual password reset UI after the user clicks the email link
+- **Firebase Console setup required:** Authentication → Templates → Password reset → Customize action URL → set to `{appDomain}/reset-password`
 
-**Verify:** Enter registered email → success message shown; enter unknown email → error shown; Firebase sends reset email to inbox.
+**Verify:** Enter registered email → success message shown; Firebase sends reset email whose link points to `/reset-password`.
 
 ---
 
-### [ ] 2.6 Register All Routes + Stub Pages
+### [ ] 2.6 Reset Password Page
+**Files:** `src/app/pages/reset-password/reset-password.component.ts`, `.html`, `.scss`
+
+**AuthService additions:**
+- `verifyResetCode(oobCode: string): Promise<string>` — wraps Firebase `verifyPasswordResetCode()`; returns email associated with the code
+- `confirmPasswordReset(oobCode: string, newPassword: string): Promise<void>` — wraps Firebase `confirmPasswordReset()`
+
+**ResetPasswordComponent:**
+- Standalone component using `ReactiveFormsModule`
+- Reads `oobCode` from URL query params via `ActivatedRoute` on init
+- Signals: `isLoading`, `isVerifying`, `errorMessage`, `successMessage`, `associatedEmail`
+- On init: calls `authService.verifyResetCode(oobCode)` → sets `associatedEmail`; if code invalid/expired → sets error state, form not shown
+- Form: new password + confirm password fields; Serbian labels ("Nova lozinka", "Potvrdi lozinku"); client-side match validation
+- On submit: calls `authService.confirmPasswordReset(oobCode, newPassword)`
+- On success: show confirmation ("Lozinka je uspješno promijenjena") + link to `/login`
+- On error: inline error ("Link je istekao ili je već iskorišten. Zatražite novi link.") + link to `/forgot-password`
+- Mobile-first layout: same centered card style as login
+- Add route: `{ path: 'reset-password', loadComponent: ... }` in `app.routes.ts`
+
+**Verify:** Click email link → code verified, email shown, form visible; submit valid password → success + navigates to `/login`; expired/used link → error state with link to `/forgot-password`.
+
+---
+
+### [ ] 2.7 Register All Routes + Stub Pages
 **Files:** `src/app/app.routes.ts`, stub components for all pages
 
 Create stub components (single `<p>` template) for:
@@ -166,6 +189,7 @@ Wire full `app.routes.ts` with guards and lazy `loadComponent`:
 /login            → LoginComponent (public)
 /register         → RegisterComponent (public)
 /forgot-password  → ForgotPasswordComponent (public)
+/reset-password   → ResetPasswordComponent (public)
 /dashboard        → DashboardComponent (authGuard)
 /category/:id     → CategoryDetailComponent (authGuard)
 /scoring/:cid/:sid → ScoringComponent (authGuard)
