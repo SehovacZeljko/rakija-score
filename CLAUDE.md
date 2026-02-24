@@ -38,10 +38,11 @@ src/
     ├── pipes/            # Custom Angular pipes
     ├── resolvers/        # Route resolvers
     ├── services/         # Business logic, Firestore data access
+    ├── models/           # TypeScript interfaces and models (one file per entity)
     └── shared/           # App-wide constants
 ```
 
-> **Note:** Location for TypeScript interfaces and models (dedicated `models/` folder vs `shared/` vs co-located) is **TBD** — decide at project start and document here.
+> **Decision:** Models and interfaces are located in `src/app/models/` — one file per entity (e.g., `festival.model.ts`, `score.model.ts`).
 
 ---
 
