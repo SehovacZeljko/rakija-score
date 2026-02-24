@@ -26,7 +26,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ---
 
-### [ ] 1.2 Install Firebase and AngularFire
+### [x] 1.2 Install Firebase and AngularFire
 **Files:** `src/app/config/firebase.config.ts`, `src/app/app.config.ts`, `package.json`
 
 - `npm install firebase @angular/fire`
@@ -38,7 +38,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ---
 
-### [ ] 1.3 Configure Prettier
+### [x] 1.3 Configure Prettier
 **Files:** `.prettierrc`, `.prettierignore`, `package.json`, `.vscode/settings.json`
 
 - `npm install -D prettier`
@@ -51,7 +51,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ---
 
-### [ ] 1.4 Create Folder Structure, Models, and Constants
+### [x] 1.4 Create Folder Structure, Models, and Constants
 **Files:** `src/app/models/*.ts`, `src/app/shared/scoring.constants.ts`, `tsconfig.json`
 
 - Set `"strict": false` in `tsconfig.json`
