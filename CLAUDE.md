@@ -213,8 +213,9 @@ Core admin responsibilities:
 ## Styling Guidelines
 
 - **Mobile-first** — design for phone screens first (minimum 375px), then scale up
-- Use **Tailwind utility classes** for layout and spacing
-- Use **SCSS** for component-specific styles, custom theming, animations, and anything Tailwind cannot handle cleanly
+- **Prefer Tailwind utility classes for all styling** — use them for layout, spacing, typography, colors, borders, shadows, states (hover, focus, disabled), and responsive variants whenever possible
+- Only use **SCSS** when Tailwind genuinely cannot handle the case cleanly: complex pseudo-element rules, custom keyframe animations, deeply nested overrides of third-party components, or browser-specific hacks
+- **Never write a CSS/SCSS rule if a Tailwind utility class can do the same job**
 - Keep component styles scoped — use Angular's `ViewEncapsulation` defaults
 
 ---
@@ -382,4 +383,5 @@ ng generate service services/scoring
 - When adding a new constant (scoring criteria, limits, step values), add it to `shared/` — never hardcode values in components
 - If models/interfaces location has been decided, update the **TBD note** in the Folder Structure section above
 - Mobile-first always — test layouts at 375px width minimum
+- **Tailwind first** — always reach for a Tailwind utility class before writing any SCSS; only fall back to SCSS for things Tailwind genuinely cannot express
 - The app UI language is **Serbian** (labels, buttons, field names) but all code, comments, and this file are in **English**
