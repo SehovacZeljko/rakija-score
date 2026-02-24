@@ -4,10 +4,12 @@ import { Router } from '@angular/router';
 import {
   Auth,
   authState,
+  confirmPasswordReset as firebaseConfirmPasswordReset,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
+  verifyPasswordResetCode,
 } from '@angular/fire/auth';
 import { Firestore, doc, docData, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Observable, of, switchMap, map } from 'rxjs';
@@ -54,6 +56,14 @@ export class AuthService {
 
   async resetPassword(email: string): Promise<void> {
     await sendPasswordResetEmail(this.auth, email);
+  }
+
+  async verifyResetCode(oobCode: string): Promise<string> {
+    return verifyPasswordResetCode(this.auth, oobCode);
+  }
+
+  async confirmPasswordReset(oobCode: string, newPassword: string): Promise<void> {
+    await firebaseConfirmPasswordReset(this.auth, oobCode, newPassword);
   }
 
   async logout(): Promise<void> {

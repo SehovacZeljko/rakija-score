@@ -147,7 +147,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ---
 
-### [ ] 2.6 Reset Password Page
+### [x] 2.6 Reset Password Page
 **Files:** `src/app/pages/reset-password/reset-password.component.ts`, `.html`, `.scss`
 
 **AuthService additions:**
