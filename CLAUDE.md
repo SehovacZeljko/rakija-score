@@ -325,6 +325,7 @@ Letter spacing for uppercase labels (captions): `0.05em`
 - TypeScript: **standard mode** (strict mode, `strictNullChecks` enforced)
 - Keep components **thin** — move business logic to services
 - Use `async` pipe in templates instead of manual subscription management where possible
+- **Prefer `async/await` over `.then()` chains** for all Promise-based code — more readable, easier to add `try/catch`, and consistent across the codebase
 
 ---
 

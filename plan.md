@@ -73,7 +73,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ## Phase 2 — Auth Infrastructure
 
-### [ ] 2.1 AuthService
+### [x] 2.1 AuthService
 **File:** `src/app/services/auth.service.ts`
 
 - Inject `Auth` (AngularFire) and `Firestore`
