@@ -1,8 +1,15 @@
 import { Injectable, Signal, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { Auth, authState, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
-import { Firestore, doc, docData } from '@angular/fire/firestore';
+import {
+  Auth,
+  authState,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+} from '@angular/fire/auth';
+import { Firestore, doc, docData, setDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Observable, of, switchMap, map } from 'rxjs';
 
 import { User } from '../models/user.model';
@@ -32,6 +39,21 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<void> {
     await signInWithEmailAndPassword(this.auth, email, password);
+  }
+
+  async register(email: string, password: string, username: string): Promise<void> {
+    const credential = await createUserWithEmailAndPassword(this.auth, email, password);
+    await setDoc(doc(this.firestore, `users/${credential.user.uid}`), {
+      userId: credential.user.uid,
+      username,
+      email,
+      role: 'judge',
+      createdAt: serverTimestamp(),
+    });
+  }
+
+  async resetPassword(email: string): Promise<void> {
+    await sendPasswordResetEmail(this.auth, email);
   }
 
   async logout(): Promise<void> {
