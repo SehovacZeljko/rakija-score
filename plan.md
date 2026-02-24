@@ -87,7 +87,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ---
 
-### [ ] 2.2 AuthGuard and AdminGuard
+### [x] 2.2 AuthGuard and AdminGuard
 **Files:** `src/app/guards/auth.guard.ts`, `src/app/guards/admin.guard.ts`
 
 - Functional guards (`CanActivateFn`) — Angular 19 standard, no class-based guards
