@@ -81,6 +81,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 - `currentUser = toSignal(currentUser$)` — call `toSignal()` in constructor
 - `isAuthenticated = computed(() => !!this.currentUser())`
 - `login(email, password): Promise<void>` — calls `signInWithEmailAndPassword`
+- `register(email, password, fullName): Promise<void>` — calls `createUserWithEmailAndPassword`, then writes `users/{uid}` doc with `{ fullName, role: 'judge', createdAt }`
 - `logout(): Promise<void>` — calls `signOut`, navigates to `/login`
 
 **Verify:** `ng build` passes; inject into AppComponent and log currentUser$ — emits null.
@@ -98,7 +99,22 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ---
 
-### [ ] 2.3 Login Page
+### [ ] 2.3 Register Page
+**Files:** `src/app/pages/register/register.component.ts`, `.html`, `.scss`
+
+- Standalone component using `ReactiveFormsModule`
+- Form: full name, email, password fields; Serbian labels ("Ime i prezime", "Email adresa", "Lozinka")
+- Signals: `isLoading`, `errorMessage`
+- On submit: calls `authService.register()`, navigates to `/login` on success
+- On error: display Serbian error message (e.g., "Email adresa je već u upotrebi")
+- Mobile-first layout: same centered card style as login; link to `/login` ("Već imate nalog? Prijavite se")
+- Add route: `{ path: 'register', loadComponent: ... }` in `app.routes.ts`
+
+**Verify:** Visit `/register`; submit with a new email → user doc created in Firestore with `role: 'judge'`; duplicate email shows error; success navigates to `/login`.
+
+---
+
+### [ ] 2.4 Login Page
 **Files:** `src/app/pages/login/login.component.ts`, `.html`, `.scss`, `src/app/app.routes.ts`
 
 - Standalone component using `ReactiveFormsModule`
@@ -106,14 +122,14 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 - Signals: `isLoading`, `errorMessage`
 - On submit: calls `authService.login()`, navigates to `/dashboard` on success
 - On error: sets Serbian error message ("Pogrešni podaci za prijavu")
-- Mobile-first layout: centered card on `bg-bg-app`, primary button "Prijavi se"
+- Mobile-first layout: centered card on `bg-bg-app`, primary button "Prijavi se"; link to `/register` ("Nemate nalog? Registrujte se")
 - Add route: `{ path: 'login', loadComponent: ... }` + default redirect
 
 **Verify:** Visit `/login`; wrong credentials show error; correct credentials navigate to `/dashboard` (404 for now — expected).
 
 ---
 
-### [ ] 2.4 Register All Routes + Stub Pages
+### [ ] 2.5 Register All Routes + Stub Pages
 **Files:** `src/app/app.routes.ts`, stub components for all pages
 
 Create stub components (single `<p>` template) for:
@@ -130,6 +146,7 @@ Create stub components (single `<p>` template) for:
 Wire full `app.routes.ts` with guards and lazy `loadComponent`:
 ```
 /login            → LoginComponent (public)
+/register         → RegisterComponent (public)
 /dashboard        → DashboardComponent (authGuard)
 /category/:id     → CategoryDetailComponent (authGuard)
 /scoring/:cid/:sid → ScoringComponent (authGuard)
@@ -317,13 +334,13 @@ If `isLocked`: read-only banner "Kategorija je zaključana. Ocjena se ne može m
 ### [ ] 5.6 Admin: Judge Management
 **Files:** `src/app/pages/admin/judges/`, `src/app/services/user.service.ts`, extend `category.service.ts`
 
-**UserService:** `getAllUsers`, `updateUserRole`
+**UserService:** `getAllUsers(): Observable<User[]>` — reads all docs from `users` collection (admins do not create users; accounts are self-registered)
 
 **CategoryService additions:**
 - `assignJudgeToCategory(judgeId, categoryId): Promise<void>` — creates `judgeAssignments/{judgeId}_{categoryId}`
 - `removeJudgeFromCategory(judgeId, categoryId): Promise<void>` — checks no scores exist first
 
-**UI:** User list with role chips + "Postavi sudiom" button; category dropdown + judge assignment checkboxes.
+**UI:** Searchable user list (client-side signal filter); each user shows full name + email; category dropdown to select which category to assign; assign/unassign toggle per user. No user creation form — admins only work with already-registered accounts.
 
 **Verify:** Assign judge → appears on judge's dashboard; unassign → disappears; can't unassign if scores exist.
 

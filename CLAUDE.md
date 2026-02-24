@@ -31,6 +31,7 @@ src/
     ├── helpers/          # Utility functions and helper methods
     ├── pages/            # Full page/route components
     │   ├── login/
+    │   ├── register/
     │   ├── dashboard/        # Categories dashboard (judge view)
     │   ├── category-detail/  # Samples list within a category
     │   ├── scoring/          # Scoring form for a single sample
@@ -70,6 +71,7 @@ Two route guards protect access:
 
 ```
 /login                         → LoginPage (public)
+/register                      → RegisterPage (public)
 /dashboard                     → DashboardPage (AuthGuard)
 /category/:categoryId          → CategoryDetailPage (AuthGuard)
 /scoring/:categoryId/:sampleId → ScoringPage (AuthGuard)
@@ -85,12 +87,20 @@ Two route guards protect access:
 
 ## Application Flow (Judge)
 
-### 1. Login (`/login`)
+### 1. Register (`/register`)
+- Full name, email, and password fields; Serbian labels ("Ime i prezime", "Email adresa", "Lozinka")
+- On success: creates Firebase Auth user + writes `users/{uid}` Firestore doc with `role: 'judge'`
+- Redirects to `/login` after successful registration
+- Link to `/login` for users who already have an account
+- New accounts have no category assignments until an admin assigns them — dashboard will show empty state
+
+### 2. Login (`/login`)
 - Email/password login via Firebase Auth
 - On success → redirect to `/dashboard`
 - On failure → display inline error message
+- Link to `/register` for new users
 
-### 2. Categories Dashboard (`/dashboard`)
+### 3. Categories Dashboard (`/dashboard`)
 - Displays all categories assigned to the logged-in judge
 - Each category card shows:
   - Category name
@@ -98,7 +108,7 @@ Two route guards protect access:
   - Locked status indicator (lock icon when judge has locked the category)
 - Festival year and judge name displayed in header
 
-### 3. Category Detail (`/category/:categoryId`)
+### 4. Category Detail (`/category/:categoryId`)
 - Grid of sample cards for the selected category
 - Each sample card shows:
   - Sequential number
@@ -109,7 +119,7 @@ Two route guards protect access:
 - Clicking a sample card navigates to the scoring form
 - Already-scored samples can be re-edited **until the category is locked**
 
-### 4. Scoring Form (`/scoring/:categoryId/:sampleId`)
+### 5. Scoring Form (`/scoring/:categoryId/:sampleId`)
 - Displays sample info: code, category, year, alcohol strength
 - Scoring criteria with individual controls:
 
@@ -138,20 +148,22 @@ Core admin responsibilities:
 - Manage categories (create, edit — deletion restricted once judging begins)
 - Register producers of beverages
 - Register samples and assign them to categories
-- Search all users and assign judge role to them, and assign judges to specific categories of the active festival
+- Search all self-registered users and assign them to specific categories of the active festival
 
 ---
 
 ## Business Rules
 
 1. **One active festival at a time** — the system enforces a single active festival globally.
-2. **Judge assignments are per category** — a judge only sees categories they are assigned to, not all categories.
-3. **Category locking** — a judge can lock a category only after scoring **all** samples in that category. Locking is per-judge, not global.
-4. **No edits after lock** — once a judge locks a category, no score modifications are allowed for that judge.
-5. **Score range** — each criterion has a defined minimum and maximum. The `−` button must not go below the minimum; `+` must not exceed the maximum.
-6. **Score step** — all adjustments are in increments of **0.05**.
-7. **Category deletion** — categories cannot be deleted after judging has started (at least one score exists).
-8. **Score calculation** — total score is always **calculated on the fly** from individual criteria values, never stored as a pre-computed sum (to avoid inconsistency).
+2. **Self-registration is open** — any user can register via `/register`; new accounts are automatically assigned `role: 'judge'`.
+3. **Admins do not create user accounts** — user management in the admin panel is limited to browsing registered users and assigning them to categories.
+4. **Judge assignments are per category** — a judge only sees categories they are assigned to, not all categories. A newly registered judge sees an empty dashboard until an admin assigns them.
+5. **Category locking** — a judge can lock a category only after scoring **all** samples in that category. Locking is per-judge, not global.
+6. **No edits after lock** — once a judge locks a category, no score modifications are allowed for that judge.
+7. **Score range** — each criterion has a defined minimum and maximum. The `−` button must not go below the minimum; `+` must not exceed the maximum.
+8. **Score step** — all adjustments are in increments of **0.05**.
+9. **Category deletion** — categories cannot be deleted after judging has started (at least one score exists).
+10. **Score calculation** — total score is always **calculated on the fly** from individual criteria values, never stored as a pre-computed sum (to avoid inconsistency).
 
 ---
 
