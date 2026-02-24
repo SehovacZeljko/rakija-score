@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"/Users/macmini/work projects/rakija-score\" && ng build 2>&1 | tail -20)"
+    ]
+  }
+}
