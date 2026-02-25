@@ -397,3 +397,4 @@ ng generate service services/scoring
 - Mobile-first always — test layouts at 375px width minimum
 - **Tailwind first** — always reach for a Tailwind utility class before writing any SCSS; only fall back to SCSS for things Tailwind genuinely cannot express
 - The app UI language is **Serbian** (labels, buttons, field names) but all code, comments, and this file are in **English**
+- **Always use separate files for components** — never use inline `template` or `styles` in `@Component`. Every component must have its own `.html` and `.scss` file referenced via `templateUrl` and `styleUrl`. Use the Angular CLI (`ng generate component`) to scaffold components correctly.
