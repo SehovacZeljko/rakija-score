@@ -1,1 +1,93 @@
-<p>admin-festivals works!</p>
+<div class="p-4">
+  <!-- Page header -->
+  <div class="mb-4 flex items-center justify-between">
+    <h1 class="text-xl font-semibold text-text-primary">Festivali</h1>
+    @if (!showForm()) {
+      <button
+        type="button"
+        (click)="showForm.set(true)"
+        class="flex items-center gap-1.5 rounded-[10px] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark active:bg-primary-dark"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Novi festival
+      </button>
+    }
+  </div>
+
+  <!-- Create form -->
+  @if (showForm()) {
+    <div class="mb-4 rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+      <label class="mb-1.5 block text-sm font-medium text-text-secondary">Naziv festivala</label>
+      <input
+        type="text"
+        [value]="newFestivalName()"
+        (input)="onNameInput($event)"
+        placeholder="npr. Rakijada 2026"
+        class="w-full rounded-lg border border-border-default bg-bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
+      />
+      <div class="mt-3 flex gap-2">
+        <button
+          type="button"
+          (click)="createFestival()"
+          [disabled]="isSaving() || !newFestivalName().trim()"
+          class="rounded-[10px] bg-primary px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ isSaving() ? 'Čuvanje...' : 'Sačuvaj' }}
+        </button>
+        <button
+          type="button"
+          (click)="cancelCreate()"
+          class="rounded-[10px] bg-bg-surface px-5 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
+        >
+          Otkaži
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Festival list -->
+  @for (festival of festivals(); track festival.festivalId) {
+    <div class="mb-3 rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="truncate font-semibold text-text-primary">{{ festival.name }}</p>
+          <span
+            class="mt-1 inline-block rounded-[6px] px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.05em]"
+            [class.bg-accent]="festival.status === 'active'"
+            [class.text-text-on-accent]="festival.status === 'active'"
+            [class.bg-bg-surface]="festival.status === 'inactive'"
+            [class.text-text-secondary]="festival.status === 'inactive'"
+          >
+            {{ festival.status === 'active' ? 'Aktivan' : 'Neaktivan' }}
+          </span>
+        </div>
+
+        @if (festival.status === 'inactive') {
+          <button
+            type="button"
+            (click)="setActive(festival.festivalId)"
+            [disabled]="activatingId() !== null"
+            class="shrink-0 rounded-[10px] border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {{ activatingId() === festival.festivalId ? '...' : 'Postavi aktivnim' }}
+          </button>
+        }
+      </div>
+    </div>
+  } @empty {
+    <p class="mt-8 text-center text-sm text-text-muted">Nema festivala. Dodajte prvi festival.</p>
+  }
+</div>
