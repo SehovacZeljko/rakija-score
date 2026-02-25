@@ -3,7 +3,9 @@
     <h1 class="text-xl font-semibold text-text-primary">Sudije</h1>
   </div>
 
-  @if (!activeFestival()) {
+  @if (!dataReady()) {
+    <app-loading-spinner />
+  } @else if (!activeFestival()) {
     <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
       <p class="text-sm text-text-secondary">Nema aktivnog festivala.</p>
       <p class="mt-1 text-xs text-text-muted">Postavite aktivan festival u sekciji Festivali.</p>

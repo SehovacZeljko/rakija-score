@@ -1,10 +1,11 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { distinctUntilChanged, filter, map, of, shareReplay, switchMap } from 'rxjs';
+import { distinctUntilChanged, filter, map, of, shareReplay, switchMap, take } from 'rxjs';
 
 import { BottomNavComponent, NavItem } from '../../components/bottom-nav/bottom-nav.component';
 import { HeaderComponent } from '../../components/header/header.component';
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../services/auth.service';
 import { CategoryService } from '../../services/category.service';
 import { FestivalService } from '../../services/festival.service';
@@ -14,7 +15,7 @@ import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [HeaderComponent, BottomNavComponent],
+  imports: [HeaderComponent, BottomNavComponent, LoadingSpinnerComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -48,6 +49,11 @@ export class DashboardComponent {
   );
 
   readonly assignments = toSignal(this.assignments$, { initialValue: [] });
+
+  readonly dataReady = toSignal(
+    this.assignments$.pipe(take(1), map(() => true)),
+    { initialValue: false },
+  );
 
   private readonly categoryIds$ = this.assignments$.pipe(
     map((a) => a.map((x) => x.categoryId)),

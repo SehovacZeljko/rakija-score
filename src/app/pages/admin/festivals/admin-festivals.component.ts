@@ -1,18 +1,24 @@
 import { Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { map, shareReplay, take } from 'rxjs';
 
+import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { FestivalService } from '../../../services/festival.service';
 
 @Component({
   selector: 'app-admin-festivals',
-  imports: [],
+  imports: [LoadingSpinnerComponent],
   templateUrl: './admin-festivals.component.html',
   styleUrl: './admin-festivals.component.scss',
 })
 export class AdminFestivalsComponent {
   private readonly festivalService = inject(FestivalService);
 
-  readonly festivals = toSignal(this.festivalService.getAllFestivals(), { initialValue: [] });
+  private readonly festivals$ = this.festivalService.getAllFestivals().pipe(shareReplay(1));
+  readonly festivals = toSignal(this.festivals$, { initialValue: [] });
+  readonly dataReady = toSignal(this.festivals$.pipe(take(1), map(() => true)), {
+    initialValue: false,
+  });
   readonly showForm = signal(false);
   readonly newFestivalName = signal('');
   readonly isSaving = signal(false);

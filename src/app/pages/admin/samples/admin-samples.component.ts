@@ -1,18 +1,19 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { of, shareReplay, switchMap } from 'rxjs';
+import { map, of, shareReplay, switchMap, take } from 'rxjs';
 
 import { Sample } from '../../../models/sample.model';
 import { CategoryService } from '../../../services/category.service';
 import { EventService } from '../../../services/event.service';
 import { FestivalService } from '../../../services/festival.service';
 import { ProducerService } from '../../../services/producer.service';
+import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { SampleData, SampleService } from '../../../services/sample.service';
 
 @Component({
   selector: 'app-admin-samples',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, LoadingSpinnerComponent],
   templateUrl: './admin-samples.component.html',
   styleUrl: './admin-samples.component.scss',
 })
@@ -26,6 +27,9 @@ export class AdminSamplesComponent {
 
   private readonly activeFestival$ = this.festivalService.getActiveFestival().pipe(shareReplay(1));
   readonly activeFestival = toSignal(this.activeFestival$, { initialValue: null });
+  readonly dataReady = toSignal(this.activeFestival$.pipe(take(1), map(() => true)), {
+    initialValue: false,
+  });
 
   private readonly events$ = this.activeFestival$.pipe(
     switchMap((f) => (f ? this.eventService.getEventsForFestival(f.festivalId) : of([]))),

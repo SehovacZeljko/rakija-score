@@ -9,10 +9,12 @@ import {
   of,
   shareReplay,
   switchMap,
+  take,
 } from 'rxjs';
 
 import { BottomNavComponent, NavItem } from '../../components/bottom-nav/bottom-nav.component';
 import { HeaderComponent } from '../../components/header/header.component';
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../services/auth.service';
 import { CategoryService } from '../../services/category.service';
 import { SampleService } from '../../services/sample.service';
@@ -21,7 +23,7 @@ import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-category-detail',
-  imports: [HeaderComponent, BottomNavComponent],
+  imports: [HeaderComponent, BottomNavComponent, LoadingSpinnerComponent],
   templateUrl: './category-detail.component.html',
   styleUrl: './category-detail.component.scss',
 })
@@ -64,6 +66,11 @@ export class CategoryDetailComponent {
     .pipe(shareReplay(1));
 
   readonly samples = toSignal(this.samples$, { initialValue: [] });
+
+  readonly dataReady = toSignal(
+    this.samples$.pipe(take(1), map(() => true)),
+    { initialValue: false },
+  );
 
   private readonly scores$ = combineLatest([this.uid$, this.samples$]).pipe(
     switchMap(([uid, samples]) => {

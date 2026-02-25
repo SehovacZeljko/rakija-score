@@ -1,7 +1,8 @@
 import { NgClass } from '@angular/common';
+import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { of, shareReplay, switchMap } from 'rxjs';
+import { map, of, shareReplay, switchMap, take } from 'rxjs';
 
 import { Category } from '../../../models/category.model';
 import { JudgeAssignment } from '../../../models/judge-assignment.model';
@@ -16,7 +17,7 @@ const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-admin-judges',
-  imports: [NgClass],
+  imports: [NgClass, LoadingSpinnerComponent],
   templateUrl: './admin-judges.component.html',
   styleUrl: './admin-judges.component.scss',
 })
@@ -30,6 +31,9 @@ export class AdminJudgesComponent {
 
   private readonly activeFestival$ = this.festivalService.getActiveFestival().pipe(shareReplay(1));
   readonly activeFestival = toSignal(this.activeFestival$, { initialValue: null });
+  readonly dataReady = toSignal(this.activeFestival$.pipe(take(1), map(() => true)), {
+    initialValue: false,
+  });
 
   private readonly events$ = this.activeFestival$.pipe(
     switchMap((f) => (f ? this.eventService.getEventsForFestival(f.festivalId) : of([]))),

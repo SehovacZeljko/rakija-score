@@ -3,16 +3,18 @@ import { inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../services/auth.service';
 import { CategoryService } from '../../services/category.service';
 import { SampleService } from '../../services/sample.service';
 import { ScoreService } from '../../services/score.service';
+import { ToastService } from '../../services/toast.service';
 import { Sample } from '../../models/sample.model';
 import { SCORE_STEP, SCORING_CRITERIA } from '../../shared/scoring.constants';
 
 @Component({
   selector: 'app-scoring',
-  imports: [],
+  imports: [LoadingSpinnerComponent],
   templateUrl: './scoring.component.html',
   styleUrl: './scoring.component.scss',
 })
@@ -23,6 +25,7 @@ export class ScoringComponent {
   private readonly categoryService = inject(CategoryService);
   private readonly sampleService = inject(SampleService);
   private readonly scoreService = inject(ScoreService);
+  private readonly toastService = inject(ToastService);
 
   readonly SCORING_CRITERIA = SCORING_CRITERIA;
   readonly SCORE_STEP = SCORE_STEP;
@@ -127,6 +130,7 @@ export class ScoringComponent {
         taste: this.taste(),
         comment: this.comment(),
       });
+      this.toastService.show('Ocjena sačuvana');
       this.router.navigate(['/category', this.categoryId]);
     } finally {
       this.isSaving.set(false);

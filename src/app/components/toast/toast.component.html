@@ -1,0 +1,44 @@
+<div class="pointer-events-none fixed bottom-20 left-0 right-0 z-[60] flex flex-col items-center gap-2 px-4">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div
+      class="toast-enter pointer-events-auto flex w-full max-w-sm items-center justify-between gap-3 rounded-xl px-4 py-3 shadow-lg"
+      [ngClass]="{
+        'bg-status-success': toast.type === 'success',
+        'bg-status-error': toast.type === 'error',
+        'bg-status-info': toast.type === 'info'
+      }"
+    >
+      <div class="flex items-center gap-2">
+        @if (toast.type === 'success') {
+          <svg class="shrink-0 text-white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        } @else if (toast.type === 'error') {
+          <svg class="shrink-0 text-white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        } @else {
+          <svg class="shrink-0 text-white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        }
+        <p class="text-sm font-medium text-white">{{ toast.message }}</p>
+      </div>
+      <button
+        type="button"
+        (click)="toastService.dismiss(toast.id)"
+        class="ml-1 shrink-0 text-white/70 transition-colors hover:text-white"
+        aria-label="Zatvori"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+  }
+</div>

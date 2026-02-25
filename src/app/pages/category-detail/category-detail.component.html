@@ -3,6 +3,10 @@
 <main class="min-h-screen bg-bg-app pb-[60px] pt-14">
   <div class="p-4">
 
+    @if (!dataReady()) {
+      <app-loading-spinner />
+    }
+
     <!-- Locked banner -->
     @if (isLocked()) {
       <div class="mb-4 flex items-center gap-2 rounded-xl bg-status-locked/10 px-4 py-3">

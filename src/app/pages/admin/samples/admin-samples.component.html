@@ -1,6 +1,10 @@
 <!-- LIST VIEW -->
 @if (mode() === 'list') {
   <div class="p-4">
+    @if (!dataReady()) {
+      <app-loading-spinner />
+    }
+
     <!-- Page header -->
     <div class="mb-4 flex items-center justify-between">
       <h1 class="text-xl font-semibold text-text-primary">Uzorci</h1>

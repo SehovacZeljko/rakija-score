@@ -1,7 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { of, shareReplay, switchMap } from 'rxjs';
+import { map, of, shareReplay, switchMap, take } from 'rxjs';
 
+import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Category } from '../../../models/category.model';
 import { CategoryService } from '../../../services/category.service';
 import { EventService } from '../../../services/event.service';
@@ -9,7 +10,7 @@ import { FestivalService } from '../../../services/festival.service';
 
 @Component({
   selector: 'app-admin-categories',
-  imports: [],
+  imports: [LoadingSpinnerComponent],
   templateUrl: './admin-categories.component.html',
   styleUrl: './admin-categories.component.scss',
 })
@@ -21,6 +22,9 @@ export class AdminCategoriesComponent {
   private readonly activeFestival$ = this.festivalService.getActiveFestival().pipe(shareReplay(1));
 
   readonly activeFestival = toSignal(this.activeFestival$, { initialValue: null });
+  readonly dataReady = toSignal(this.activeFestival$.pipe(take(1), map(() => true)), {
+    initialValue: false,
+  });
 
   private readonly events$ = this.activeFestival$.pipe(
     switchMap((f) => (f ? this.eventService.getEventsForFestival(f.festivalId) : of([]))),
