@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cd \"/Users/macmini/work projects/rakija-score\" && ng build 2>&1 | tail -20)"
+      "Bash(cd \"/Users/macmini/work projects/rakija-score\" && ng build 2>&1 | tail -20)",
+      "Bash(cd \"/Users/macmini/work projects/rakija-score\" && cat angular.json | python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('projects',{}\\).get\\('rakija-score',{}\\).get\\('schematics',{}\\), indent=2\\)\\)\")",
+      "Bash(cd \"/Users/macmini/work projects/rakija-score\" && \\\\\nng generate component pages/dashboard --skip-tests && \\\\\nng generate component pages/category-detail --skip-tests && \\\\\nng generate component pages/scoring --skip-tests && \\\\\nng generate component pages/admin/admin-layout --flat --skip-tests && \\\\\nng generate component pages/admin/festivals/admin-festivals --flat --skip-tests && \\\\\nng generate component pages/admin/categories/admin-categories --flat --skip-tests && \\\\\nng generate component pages/admin/producers/admin-producers --flat --skip-tests && \\\\\nng generate component pages/admin/samples/admin-samples --flat --skip-tests && \\\\\nng generate component pages/admin/judges/admin-judges --flat --skip-tests)",
+      "Bash(cd \"/Users/macmini/work projects/rakija-score\" && ng build 2>&1)"
     ]
   }
 }
