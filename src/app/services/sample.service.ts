@@ -4,6 +4,7 @@ import {
   collection,
   collectionData,
   doc,
+  docData,
   query,
   serverTimestamp,
   setDoc,
@@ -20,6 +21,12 @@ export type SampleData = Omit<Sample, 'sampleId' | 'createdAt'>;
 export class SampleService {
   private readonly firestore = inject(Firestore);
   private readonly samplesRef = collection(this.firestore, 'samples');
+
+  getSampleById(sampleId: string): Observable<Sample | null> {
+    return (
+      docData(doc(this.firestore, `samples/${sampleId}`)) as Observable<Sample | undefined>
+    ).pipe(map((s) => s ?? null));
+  }
 
   getAllSamples(): Observable<Sample[]> {
     return (collectionData(this.samplesRef) as Observable<Sample[]>).pipe(
