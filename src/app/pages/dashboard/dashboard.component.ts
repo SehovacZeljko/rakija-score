@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { BottomNavComponent, NavItem } from '../../components/bottom-nav/bottom-nav.component';
 import { HeaderComponent } from '../../components/header/header.component';
 
 @Component({
@@ -9,4 +9,6 @@ import { HeaderComponent } from '../../components/header/header.component';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent {}
+export class DashboardComponent {
+  readonly navItems: NavItem[] = [{ route: '/dashboard', label: 'Početna', icon: 'home' }];
+}
