@@ -11,6 +11,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
@@ -69,6 +70,20 @@ export class CategoryService {
     await deleteDoc(doc(this.firestore, `categories/${categoryId}`));
   }
 
+  getJudgeAssignments(judgeId: string): Observable<JudgeAssignment[]> {
+    const q = query(
+      collection(this.firestore, 'judgeAssignments'),
+      where('judgeId', '==', judgeId),
+    );
+    return collectionData(q) as Observable<JudgeAssignment[]>;
+  }
+
+  getCategoriesByIds(categoryIds: string[]): Observable<Category[]> {
+    if (categoryIds.length === 0) return of([]);
+    const q = query(this.categoriesRef, where(documentId(), 'in', categoryIds.slice(0, 30)));
+    return collectionData(q) as Observable<Category[]>;
+  }
+
   getAssignmentsForCategories(categoryIds: string[]): Observable<JudgeAssignment[]> {
     if (categoryIds.length === 0) return of([]);
     const q = query(
@@ -85,6 +100,12 @@ export class CategoryService {
       judgeId,
       categoryId,
       status: 'active',
+    });
+  }
+
+  async lockCategory(judgeId: string, categoryId: string): Promise<void> {
+    await updateDoc(doc(this.firestore, `judgeAssignments/${judgeId}_${categoryId}`), {
+      status: 'finished',
     });
   }
 

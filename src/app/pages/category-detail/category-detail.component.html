@@ -1,1 +1,125 @@
-<p>category-detail works!</p>
+<app-header [title]="category()?.name ?? ''" />
+
+<main class="min-h-screen bg-bg-app pb-[60px] pt-14">
+  <div class="p-4">
+
+    <!-- Locked banner -->
+    @if (isLocked()) {
+      <div class="mb-4 flex items-center gap-2 rounded-xl bg-status-locked/10 px-4 py-3">
+        <svg
+          class="shrink-0 text-status-locked"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+        <p class="text-sm text-status-locked">Kategorija je zaključana.</p>
+      </div>
+    }
+
+    <!-- Samples grid -->
+    @if (samples().length === 0) {
+      <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+        <p class="text-sm text-text-secondary">Nema uzoraka u ovoj kategoriji.</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-3 gap-3">
+        @for (sample of samples(); track sample.sampleId; let i = $index) {
+          <button
+            type="button"
+            (click)="navigateToScoring(sample.sampleId)"
+            class="rounded-xl bg-bg-card p-3 text-left shadow-[0_1px_4px_rgba(0,0,0,0.08)] transition-colors active:bg-bg-surface"
+          >
+            <!-- Sequential number -->
+            <p class="text-xs text-text-muted">{{ i + 1 }}</p>
+
+            <!-- Sample code -->
+            <p class="mt-0.5 text-sm font-semibold text-text-primary">{{ sample.sampleCode }}</p>
+
+            <!-- Score value + status icon -->
+            <div class="mt-1.5 flex items-center justify-between gap-1">
+              <span
+                class="text-sm font-bold"
+                [class.text-status-success]="scoreMap().has(sample.sampleId)"
+                [class.text-status-error]="!scoreMap().has(sample.sampleId)"
+              >
+                {{ (scoreMap().get(sample.sampleId) ?? 0).toFixed(2) }}
+              </span>
+              @if (isLocked()) {
+                <svg
+                  class="shrink-0 text-status-locked"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              } @else if (scoreMap().has(sample.sampleId)) {
+                <svg
+                  class="shrink-0 text-status-success"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              }
+            </div>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Lock button -->
+    @if (!isLocked()) {
+      <div class="mt-6">
+        <button
+          type="button"
+          (click)="lockCategory()"
+          [disabled]="!isAllScored() || isLocking()"
+          class="w-full rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          @if (isLocking()) {
+            <span class="flex items-center justify-center gap-2">
+              <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              Zaključavanje...
+            </span>
+          } @else {
+            Zaključaj kategoriju
+          }
+        </button>
+        @if (!isAllScored() && samples().length > 0) {
+          <p class="mt-2 text-center text-xs text-text-muted">
+            Ocijenite sve uzorke da biste zaključali kategoriju.
+          </p>
+        }
+      </div>
+    }
+
+  </div>
+</main>
+
+<app-bottom-nav [items]="navItems" />

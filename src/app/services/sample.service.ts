@@ -10,7 +10,7 @@ import {
   updateDoc,
   where,
 } from '@angular/fire/firestore';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 
 import { Sample } from '../models/sample.model';
 
@@ -23,6 +23,14 @@ export class SampleService {
 
   getAllSamples(): Observable<Sample[]> {
     return (collectionData(this.samplesRef) as Observable<Sample[]>).pipe(
+      map((samples) => samples.sort((a, b) => a.order - b.order)),
+    );
+  }
+
+  getSamplesForCategories(categoryIds: string[]): Observable<Sample[]> {
+    if (categoryIds.length === 0) return of([]);
+    const q = query(this.samplesRef, where('categoryId', 'in', categoryIds.slice(0, 30)));
+    return (collectionData(q) as Observable<Sample[]>).pipe(
       map((samples) => samples.sort((a, b) => a.order - b.order)),
     );
   }
