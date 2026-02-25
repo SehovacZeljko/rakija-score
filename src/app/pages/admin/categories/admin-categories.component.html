@@ -1,1 +1,226 @@
-<p>admin-categories works!</p>
+<div class="p-4">
+  <!-- Page header -->
+  <div class="mb-4 flex items-center justify-between">
+    <h1 class="text-xl font-semibold text-text-primary">Kategorije</h1>
+    @if (activeFestival() && !showEventForm()) {
+      <button
+        type="button"
+        (click)="showEventForm.set(true)"
+        class="flex items-center gap-1.5 rounded-[10px] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark active:bg-primary-dark"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Novi dogadjaj
+      </button>
+    }
+  </div>
+
+  <!-- No active festival -->
+  @if (!activeFestival()) {
+    <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+      <p class="text-sm text-text-secondary">Nema aktivnog festivala.</p>
+      <p class="mt-1 text-xs text-text-muted">Postavite aktivan festival u sekciji Festivali.</p>
+    </div>
+  } @else {
+    <!-- Active festival badge -->
+    <div class="mb-4 flex items-center gap-2">
+      <span class="rounded-[6px] bg-accent px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.05em] text-text-on-accent">
+        Aktivan
+      </span>
+      <span class="text-sm font-medium text-text-primary">{{ activeFestival()!.name }}</span>
+    </div>
+
+    <!-- New event form -->
+    @if (showEventForm()) {
+      <div class="mb-4 rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+        <p class="mb-3 text-sm font-semibold text-text-primary">Novi dogadjaj</p>
+        <div class="flex gap-2">
+          <div class="flex-1">
+            <label class="mb-1 block text-xs font-medium text-text-secondary">Naziv</label>
+            <input
+              type="text"
+              [value]="newEventName()"
+              (input)="onEventNameInput($event)"
+              placeholder="npr. Šljivovica"
+              class="w-full rounded-lg border border-border-default bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
+            />
+          </div>
+          <div class="w-24">
+            <label class="mb-1 block text-xs font-medium text-text-secondary">Godina</label>
+            <input
+              type="number"
+              [value]="newEventYear()"
+              (input)="onEventYearInput($event)"
+              class="w-full rounded-lg border border-border-default bg-bg-surface px-3 py-2 text-sm text-text-primary focus:border-border-focus focus:outline-none"
+            />
+          </div>
+        </div>
+        <div class="mt-3 flex gap-2">
+          <button
+            type="button"
+            (click)="createEvent()"
+            [disabled]="isSavingEvent() || !newEventName().trim()"
+            class="rounded-[10px] bg-primary px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {{ isSavingEvent() ? 'Čuvanje...' : 'Sačuvaj' }}
+          </button>
+          <button
+            type="button"
+            (click)="cancelEventForm()"
+            class="rounded-[10px] bg-bg-surface px-5 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
+          >
+            Otkaži
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Events list -->
+    @for (event of events(); track event.eventId) {
+      <div class="mb-4 rounded-xl bg-bg-card shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+        <!-- Event header -->
+        <div class="flex items-center justify-between border-b border-border-default px-4 py-3">
+          <div>
+            <p class="font-semibold text-text-primary">{{ event.name }}</p>
+            <p class="text-xs text-text-muted">{{ event.year }}</p>
+          </div>
+          <span class="text-xs text-text-muted">
+            {{ categoriesForEvent(event.eventId).length }}
+            {{ categoriesForEvent(event.eventId).length === 1 ? 'kategorija' : 'kategorije' }}
+          </span>
+        </div>
+
+        <!-- Categories -->
+        @for (category of categoriesForEvent(event.eventId); track category.categoryId) {
+          <div class="border-b border-border-default px-4 py-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-text-primary">{{ category.name }}</span>
+              <button
+                type="button"
+                (click)="deleteCategory(category.categoryId)"
+                [disabled]="deletingCategoryId() !== null"
+                class="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-status-error/10 hover:text-status-error disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Obriši kategoriju"
+              >
+                @if (deletingCategoryId() === category.categoryId) {
+                  <svg
+                    class="animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                  </svg>
+                } @else {
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                    <path d="M10 11v6" />
+                    <path d="M14 11v6" />
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                  </svg>
+                }
+              </button>
+            </div>
+            @if (deleteErrorCategoryId() === category.categoryId) {
+              <p class="mt-1 text-xs text-status-error">
+                Nije moguće obrisati — postoje ocjene za ovu kategoriju.
+              </p>
+            }
+          </div>
+        } @empty {
+          <div class="px-4 py-3">
+            <p class="text-sm text-text-muted">Nema kategorija.</p>
+          </div>
+        }
+
+        <!-- Add category row -->
+        <div class="px-4 py-3">
+          @if (activeCategoryFormEventId() === event.eventId) {
+            <div class="flex items-center gap-2">
+              <input
+                type="text"
+                [value]="newCategoryName()"
+                (input)="onCategoryNameInput($event)"
+                placeholder="Naziv kategorije"
+                class="flex-1 rounded-lg border border-border-default bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
+              />
+              <button
+                type="button"
+                (click)="createCategory()"
+                [disabled]="isSavingCategory() || !newCategoryName().trim()"
+                class="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {{ isSavingCategory() ? '...' : 'Dodaj' }}
+              </button>
+              <button
+                type="button"
+                (click)="cancelCategoryForm()"
+                class="rounded-lg bg-bg-surface px-3 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
+              >
+                Otkaži
+              </button>
+            </div>
+          } @else {
+            <button
+              type="button"
+              (click)="openCategoryForm(event.eventId)"
+              class="flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary-dark"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Dodaj kategoriju
+            </button>
+          }
+        </div>
+      </div>
+    } @empty {
+      @if (!showEventForm()) {
+        <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+          <p class="text-sm text-text-secondary">Nema dogadjaja za ovaj festival.</p>
+          <p class="mt-1 text-xs text-text-muted">Dodajte prvi dogadjaj.</p>
+        </div>
+      }
+    }
+  }
+</div>
