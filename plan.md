@@ -374,18 +374,27 @@ If `isLocked`: read-only banner "Kategorija je zaključana. Ocjena se ne može m
 
 ---
 
-### [ ] 5.6 Admin: Judge Management
+### [x] 5.6 Admin: Judge Management
 **Files:** `src/app/pages/admin/judges/`, `src/app/services/user.service.ts`, extend `category.service.ts`
 
-**UserService:** `getAllUsers(): Observable<User[]>` — reads all docs from `users` collection (admins do not create users; accounts are self-registered)
+**UserService:** `getAllUsers(): Observable<User[]>` — reads all docs from `users` collection sorted by username (admins do not create users; accounts are self-registered)
 
 **CategoryService additions:**
 - `assignJudgeToCategory(judgeId, categoryId): Promise<void>` — creates `judgeAssignments/{judgeId}_{categoryId}`
 - `removeJudgeFromCategory(judgeId, categoryId): Promise<void>` — checks no scores exist first
 
-**UI:** Searchable user list (client-side signal filter); each user shows username + email; category dropdown to select which category to assign; assign/unassign toggle per user. No user creation form — admins only work with already-registered accounts.
+**UI:**
+- Search bar (client-side, filters by username or email)
+- Filter chips: **Svi (N)** | **Nedodijeljeni (N)** | **Dodijeljeni (N)** — counts based on all non-admin users regardless of search
+- Admin accounts excluded from the list entirely
+- Each judge card shows username + email; assigned categories listed inline with remove button; "Dodijeli" button opens category dropdown inline
+- Pagination: `PAGE_SIZE = 10`, client-side slice; prev/next buttons + "X / Y" counter; page resets to 1 on search or filter change
+- Result count: "Prikazano X–Y od Z" shown above the list
 
-**Verify:** Assign judge → appears on judge's dashboard; unassign → disappears; can't unassign if scores exist.
+**Computed signal chain:**
+`users → nonAdminUsers → searchFiltered → filteredUsers (by activeFilter) → paginatedUsers (slice)`
+
+**Verify:** Assign judge → appears on judge's dashboard; unassign → disappears; can't unassign if scores exist; filter chips update counts live; pagination hides when ≤ 10 results.
 
 ---
 

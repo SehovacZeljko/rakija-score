@@ -5,6 +5,7 @@ import {
   collectionData,
   deleteDoc,
   doc,
+  documentId,
   getDocs,
   limit,
   query,
@@ -15,6 +16,7 @@ import {
 import { Observable, of } from 'rxjs';
 
 import { Category } from '../models/category.model';
+import { JudgeAssignment } from '../models/judge-assignment.model';
 
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
@@ -65,5 +67,43 @@ export class CategoryService {
     const canDelete = await this.canDeleteCategory(categoryId);
     if (!canDelete) throw new Error('DELETE_BLOCKED');
     await deleteDoc(doc(this.firestore, `categories/${categoryId}`));
+  }
+
+  getAssignmentsForCategories(categoryIds: string[]): Observable<JudgeAssignment[]> {
+    if (categoryIds.length === 0) return of([]);
+    const q = query(
+      collection(this.firestore, 'judgeAssignments'),
+      where('categoryId', 'in', categoryIds.slice(0, 30)),
+    );
+    return collectionData(q) as Observable<JudgeAssignment[]>;
+  }
+
+  async assignJudgeToCategory(judgeId: string, categoryId: string): Promise<void> {
+    const assignmentId = `${judgeId}_${categoryId}`;
+    await setDoc(doc(this.firestore, `judgeAssignments/${assignmentId}`), {
+      assignmentId,
+      judgeId,
+      categoryId,
+      status: 'active',
+    });
+  }
+
+  async removeJudgeFromCategory(judgeId: string, categoryId: string): Promise<void> {
+    const samplesSnap = await getDocs(
+      query(collection(this.firestore, 'samples'), where('categoryId', '==', categoryId)),
+    );
+
+    if (!samplesSnap.empty) {
+      const scoreIds = samplesSnap.docs.map((d) => `${judgeId}_${d.data()['sampleId']}`);
+      for (let i = 0; i < scoreIds.length; i += 30) {
+        const chunk = scoreIds.slice(i, i + 30);
+        const scoresSnap = await getDocs(
+          query(collection(this.firestore, 'scores'), where(documentId(), 'in', chunk), limit(1)),
+        );
+        if (!scoresSnap.empty) throw new Error('UNASSIGN_BLOCKED');
+      }
+    }
+
+    await deleteDoc(doc(this.firestore, `judgeAssignments/${judgeId}_${categoryId}`));
   }
 }

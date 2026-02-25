@@ -1,1 +1,230 @@
-<p>admin-judges works!</p>
+<div class="p-4">
+  <div class="mb-4">
+    <h1 class="text-xl font-semibold text-text-primary">Sudije</h1>
+  </div>
+
+  @if (!activeFestival()) {
+    <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+      <p class="text-sm text-text-secondary">Nema aktivnog festivala.</p>
+      <p class="mt-1 text-xs text-text-muted">Postavite aktivan festival u sekciji Festivali.</p>
+    </div>
+  } @else {
+
+    <!-- Search -->
+    <div class="relative mb-3">
+      <svg
+        class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      <input
+        type="search"
+        [value]="searchQuery()"
+        (input)="onSearchInput($event)"
+        placeholder="Pretraži sudije..."
+        class="w-full rounded-xl border border-border-default bg-bg-card py-2.5 pl-9 pr-4 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
+      />
+    </div>
+
+    <!-- Filter chips -->
+    <div class="mb-4 flex gap-2">
+      <button
+        type="button"
+        (click)="setFilter('all')"
+        class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+        [class.bg-primary]="activeFilter() === 'all'"
+        [class.text-white]="activeFilter() === 'all'"
+        [class.bg-bg-surface]="activeFilter() !== 'all'"
+        [class.text-text-secondary]="activeFilter() !== 'all'"
+      >
+        Svi ({{ countAll() }})
+      </button>
+      <button
+        type="button"
+        (click)="setFilter('unassigned')"
+        class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+        [class.bg-primary]="activeFilter() === 'unassigned'"
+        [class.text-white]="activeFilter() === 'unassigned'"
+        [class.bg-bg-surface]="activeFilter() !== 'unassigned'"
+        [class.text-text-secondary]="activeFilter() !== 'unassigned'"
+      >
+        Nedodijeljeni ({{ countUnassigned() }})
+      </button>
+      <button
+        type="button"
+        (click)="setFilter('assigned')"
+        class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+        [class.bg-primary]="activeFilter() === 'assigned'"
+        [class.text-white]="activeFilter() === 'assigned'"
+        [class.bg-bg-surface]="activeFilter() !== 'assigned'"
+        [class.text-text-secondary]="activeFilter() !== 'assigned'"
+      >
+        Dodijeljeni ({{ countAssigned() }})
+      </button>
+    </div>
+
+    <!-- Result count -->
+    @if (filteredUsers().length > 0) {
+      <p class="mb-3 text-xs text-text-muted">
+        Prikazano {{ (currentPage() - 1) * PAGE_SIZE + 1 }}–{{ pageEnd() }} od {{ filteredUsers().length }}
+      </p>
+    }
+
+    <!-- User list -->
+    @for (user of paginatedUsers(); track user.userId) {
+      <div class="mb-3 overflow-hidden rounded-xl bg-bg-card shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+
+        <!-- User row -->
+        <div class="flex items-start justify-between gap-2 p-4">
+          <div class="min-w-0">
+            <p class="font-semibold text-text-primary">{{ user.username }}</p>
+            <p class="mt-0.5 truncate text-sm text-text-secondary">{{ user.email }}</p>
+          </div>
+          <button
+            type="button"
+            (click)="toggleAssignForm(user.userId)"
+            class="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+            [class.bg-primary]="selectedUserId() !== user.userId"
+            [class.text-white]="selectedUserId() !== user.userId"
+            [class.bg-bg-surface]="selectedUserId() === user.userId"
+            [class.text-text-secondary]="selectedUserId() === user.userId"
+          >
+            {{ selectedUserId() === user.userId ? 'Otkaži' : 'Dodijeli' }}
+          </button>
+        </div>
+
+        <!-- Assignments list -->
+        @if (assignmentsForUser(user.userId).length > 0) {
+          <div class="border-t border-border-default">
+            <p class="px-4 pb-1 pt-2.5 text-xs font-medium uppercase tracking-[0.05em] text-text-muted">
+              Dodijeljene kategorije
+            </p>
+            @for (assignment of assignmentsForUser(user.userId); track assignment.assignmentId) {
+              <div
+                class="flex items-center justify-between border-b border-border-default px-4 py-2.5 last:border-0"
+                [ngClass]="{ 'bg-status-error/5': removeErrorKey() === assignmentKey(user.userId, assignment.categoryId) }"
+              >
+                <div class="min-w-0">
+                  <span
+                    class="text-sm font-medium"
+                    [class.text-text-primary]="removeErrorKey() !== assignmentKey(user.userId, assignment.categoryId)"
+                    [class.text-status-error]="removeErrorKey() === assignmentKey(user.userId, assignment.categoryId)"
+                  >
+                    {{ categoryMap().get(assignment.categoryId) ?? assignment.categoryId }}
+                  </span>
+                  @if (assignment.status === 'finished') {
+                    <span class="ml-2 text-xs text-status-locked">Zaključana</span>
+                  }
+                  @if (removeErrorKey() === assignmentKey(user.userId, assignment.categoryId)) {
+                    <p class="mt-0.5 text-xs text-status-error">
+                      Nije moguće ukloniti — postoje ocjene.
+                    </p>
+                  }
+                </div>
+
+                @if (assignment.status !== 'finished') {
+                  <button
+                    type="button"
+                    (click)="removeAssignment(user.userId, assignment.categoryId)"
+                    [disabled]="removingKey() !== null"
+                    class="ml-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-status-error/10 hover:text-status-error disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Ukloni dodjelu"
+                  >
+                    @if (removingKey() === assignmentKey(user.userId, assignment.categoryId)) {
+                      <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                      </svg>
+                    } @else {
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    }
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Assign form -->
+        @if (selectedUserId() === user.userId) {
+          <div class="border-t border-border-default px-4 py-3">
+            @if (availableCategoriesForUser(user.userId).length === 0) {
+              <p class="text-sm text-text-muted">Sve kategorije su već dodijeljene ovoj sudiji.</p>
+            } @else {
+              <div class="flex gap-2">
+                <select
+                  (change)="onAssignCategoryChange($event)"
+                  class="flex-1 rounded-lg border border-border-default bg-bg-surface px-3 py-2 text-sm text-text-primary focus:border-border-focus focus:outline-none"
+                >
+                  <option value="">Odaberi kategoriju</option>
+                  @for (cat of availableCategoriesForUser(user.userId); track cat.categoryId) {
+                    <option [value]="cat.categoryId">{{ cat.name }}</option>
+                  }
+                </select>
+                <button
+                  type="button"
+                  (click)="assignCategory()"
+                  [disabled]="!assignCategoryId() || isAssigning()"
+                  class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {{ isAssigning() ? '...' : 'Dodijeli' }}
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    } @empty {
+      <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+        @if (searchQuery()) {
+          <p class="text-sm text-text-secondary">Nema korisnika za "{{ searchQuery() }}".</p>
+        } @else if (activeFilter() === 'unassigned') {
+          <p class="text-sm text-text-secondary">Sve sudije su dodijeljene kategorijama.</p>
+        } @else if (activeFilter() === 'assigned') {
+          <p class="text-sm text-text-secondary">Nema dodijeljenih sudija.</p>
+        } @else {
+          <p class="text-sm text-text-secondary">Nema registrovanih korisnika.</p>
+        }
+      </div>
+    }
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="mt-4 flex items-center justify-between">
+        <button
+          type="button"
+          (click)="prevPage()"
+          [disabled]="currentPage() === 1"
+          class="rounded-lg border border-border-default bg-bg-card px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-bg-surface disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          ← Prethodna
+        </button>
+        <span class="text-sm text-text-secondary">
+          {{ currentPage() }} / {{ totalPages() }}
+        </span>
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage() === totalPages()"
+          class="rounded-lg border border-border-default bg-bg-card px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-bg-surface disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Sljedeća →
+        </button>
+      </div>
+    }
+
+  }
+</div>
