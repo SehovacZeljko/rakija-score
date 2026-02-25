@@ -100,7 +100,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ---
 
-### [ ] 2.3 Register Page
+### [x] 2.3 Register Page
 **Files:** `src/app/pages/register/register.component.ts`, `.html`, `.scss`
 
 - Standalone component using `ReactiveFormsModule`
@@ -115,7 +115,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ---
 
-### [ ] 2.4 Login Page
+### [x] 2.4 Login Page
 **Files:** `src/app/pages/login/login.component.ts`, `.html`, `.scss`, `src/app/app.routes.ts`
 
 - Standalone component using `ReactiveFormsModule`
@@ -170,7 +170,7 @@ The rakija-score project is a bare Angular 19 scaffold with no application code.
 
 ---
 
-### [ ] 2.7 Register All Routes + Stub Pages
+### [x] 2.7 Register All Routes + Stub Pages
 **Files:** `src/app/app.routes.ts`, stub components for all pages
 
 Create stub components (single `<p>` template) for:
