@@ -398,3 +398,4 @@ ng generate service services/scoring
 - **Tailwind first** — always reach for a Tailwind utility class before writing any SCSS; only fall back to SCSS for things Tailwind genuinely cannot express
 - The app UI language is **Serbian** (labels, buttons, field names) but all code, comments, and this file are in **English**
 - **Always use separate files for components** — never use inline `template` or `styles` in `@Component`. Every component must have its own `.html` and `.scss` file referenced via `templateUrl` and `styleUrl`. Use the Angular CLI (`ng generate component`) to scaffold components correctly.
+- **Max-width container standard** — all page content is constrained to `max-w-5xl` via the `app.component.html` wrapper. Fixed elements (header, bottom-nav) are outside the document flow, so they need their own inner wrapper: `<div class="mx-auto w-full max-w-5xl ...">`. Always use `mx-auto w-full max-w-5xl` for any element that needs to match this constraint.

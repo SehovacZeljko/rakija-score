@@ -1,4 +1,5 @@
-<header class="fixed left-0 right-0 top-0 z-50 flex h-14 items-center justify-between bg-primary px-4">
+<header class="fixed left-0 right-0 top-0 z-50 h-14 bg-primary">
+  <div class="mx-auto flex h-full max-w-5xl items-center justify-between px-4">
   <div class="flex flex-col leading-tight">
     <span class="text-base font-semibold text-white">{{ title }}</span>
     @if (authService.currentUser()?.username) {
@@ -29,4 +30,5 @@
       <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   </button>
+  </div>
 </header>
