@@ -49,17 +49,6 @@
     <div class="mb-4 flex gap-2">
       <button
         type="button"
-        (click)="setFilter('all')"
-        class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
-        [class.bg-primary]="activeFilter() === 'all'"
-        [class.text-white]="activeFilter() === 'all'"
-        [class.bg-bg-surface]="activeFilter() !== 'all'"
-        [class.text-text-secondary]="activeFilter() !== 'all'"
-      >
-        Svi ({{ countAll() }})
-      </button>
-      <button
-        type="button"
         (click)="setFilter('unassigned')"
         class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
         [class.bg-primary]="activeFilter() === 'unassigned'"
@@ -202,10 +191,8 @@
           <p class="text-sm text-text-secondary">Nema korisnika za "{{ searchQuery() }}".</p>
         } @else if (activeFilter() === 'unassigned') {
           <p class="text-sm text-text-secondary">Sve sudije su dodijeljene kategorijama.</p>
-        } @else if (activeFilter() === 'assigned') {
-          <p class="text-sm text-text-secondary">Nema dodijeljenih sudija.</p>
         } @else {
-          <p class="text-sm text-text-secondary">Nema registrovanih korisnika.</p>
+          <p class="text-sm text-text-secondary">Nema dodijeljenih sudija.</p>
         }
       </div>
     }

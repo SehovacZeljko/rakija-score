@@ -10,10 +10,9 @@ import { JudgeAssignment } from '../../../models/judge-assignment.model';
 import { CategoryService } from '../../../services/category.service';
 import { FestivalContextService } from '../../../services/festival-context.service';
 import { UserService } from '../../../services/user.service';
+import { PAGE_SIZE } from '../../../shared/pagination.constants';
 
-type JudgeFilter = 'all' | 'unassigned' | 'assigned';
-
-const PAGE_SIZE = 10;
+type JudgeFilter = 'unassigned' | 'assigned';
 
 @Component({
   selector: 'app-admin-judges',
@@ -61,7 +60,7 @@ export class AdminJudgesComponent {
   private readonly nonAdminUsers = computed(() => this.users().filter((u) => u.role !== 'admin'));
 
   readonly searchQuery = signal('');
-  readonly activeFilter = signal<JudgeFilter>('all');
+  readonly activeFilter = signal<JudgeFilter>('unassigned');
   readonly currentPage = signal(1);
 
   private readonly searchFiltered = computed(() => {
@@ -75,14 +74,10 @@ export class AdminJudgesComponent {
   readonly filteredUsers = computed(() => {
     const assignedIds = this.assignedJudgeIds();
     const users = this.searchFiltered();
-    switch (this.activeFilter()) {
-      case 'assigned':
-        return users.filter((u) => assignedIds.has(u.userId));
-      case 'unassigned':
-        return users.filter((u) => !assignedIds.has(u.userId));
-      default:
-        return users;
+    if (this.activeFilter() === 'assigned') {
+      return users.filter((u) => assignedIds.has(u.userId));
     }
+    return users.filter((u) => !assignedIds.has(u.userId));
   });
 
   readonly totalPages = computed(() => Math.ceil(this.filteredUsers().length / PAGE_SIZE));
