@@ -336,19 +336,26 @@ If `isLocked`: read-only banner "Kategorija je zaključana. Ocjena se ne može m
 
 ---
 
-### [ ] 5.3 Admin: Category Management
-**Files:** `src/app/pages/admin/categories/`, `src/app/services/event.service.ts` (new), extend `category.service.ts`
+### [x] 5.3 Admin: Category Management
+**Files:** `src/app/pages/admin/categories/`, `src/app/services/event.service.ts`, extend `category.service.ts`
 
-**EventService:** `getEventsForFestival`, `createEvent`
+**EventService:**
+- `getEventsForFestival(festivalId)`, `createEvent(festivalId, name, year)` — new events created as `inactive`
+- `getActiveEvent(festivalId): Observable<FestivalEvent | null>` — queries `status == 'active'`, limit 1
+- `setActiveEvent(festivalId, eventId): Promise<void>` — batch: deactivates all events for festival, activates target (same pattern as `setActiveFestival`)
 
 **CategoryService additions:**
 - `createCategory(eventId, name): Promise<void>`
 - `canDeleteCategory(categoryId): Promise<boolean>` — checks if any score exists for samples in this category
 - `deleteCategory(categoryId): Promise<void>` — guards with `canDeleteCategory`
 
-**UI:** Grouped by event; create category form per event; delete icon (blocks if scores exist).
+**New shared infrastructure:**
+- `FestivalContextService` (`src/app/services/festival-context.service.ts`) — root singleton, exposes `activeFestival$`, `activeEvent$`, `activeFestival`, `activeEvent`, `dataReady` signals; single source of truth for Samples + Judges pages
+- `ActiveFestivalBannerComponent` (`src/app/components/active-festival-banner/`) — read-only banner showing active festival name + event name/year; shows error hint if no active event
 
-**Verify:** Category with scores cannot be deleted; category without scores deletes cleanly.
+**UI:** Grouped by event; each event card shows `Aktivan` accent chip when active; inactive events show `Aktiviraj` button (one active at a time, batch enforced); create category form per event; delete icon (blocks if scores exist).
+
+**Verify:** Category with scores cannot be deleted; category without scores deletes cleanly; activating event deactivates previous one atomically.
 
 ---
 
@@ -363,14 +370,14 @@ If `isLocked`: read-only banner "Kategorija je zaključana. Ocjena se ne može m
 
 ---
 
-### [ ] 5.5 Admin: Sample Management
+### [x] 5.5 Admin: Sample Management
 **Files:** `src/app/pages/admin/samples/`, extend `src/app/services/sample.service.ts`
 
 **SampleService additions:** `getAllSamples`, `createSample`, `updateSample`
 
-**UI:** Filter by category; list with producer name resolved; create form (producer dropdown, category dropdown, sampleCode, year, alcoholStrength, order).
+**UI:** Injects `FestivalContextService`; `ActiveFestivalBannerComponent` shown at top; categories scoped to active event only (`toObservable(ctx.activeEvent).pipe(switchMap(...), startWith([]))`); filter by category; list with producer name resolved; "Novi uzorak" button only shown when active festival + event set; create/edit form (producer dropdown, category dropdown, sampleCode, year, alcoholStrength, order). Shows "no active event" state when event not activated.
 
-**Verify:** Create sample; filter by category works.
+**Verify:** Create sample; filter by category works; switching active event updates category dropdown instantly.
 
 ---
 
@@ -384,6 +391,8 @@ If `isLocked`: read-only banner "Kategorija je zaključana. Ocjena se ne može m
 - `removeJudgeFromCategory(judgeId, categoryId): Promise<void>` — checks no scores exist first
 
 **UI:**
+- Injects `FestivalContextService`; `ActiveFestivalBannerComponent` shown at top; categories + assignments scoped to active event only
+- Shows "no active event" state when event not activated
 - Search bar (client-side, filters by username or email)
 - Filter chips: **Svi (N)** | **Nedodijeljeni (N)** | **Dodijeljeni (N)** — counts based on all non-admin users regardless of search
 - Admin accounts excluded from the list entirely
@@ -394,7 +403,7 @@ If `isLocked`: read-only banner "Kategorija je zaključana. Ocjena se ne može m
 **Computed signal chain:**
 `users → nonAdminUsers → searchFiltered → filteredUsers (by activeFilter) → paginatedUsers (slice)`
 
-**Verify:** Assign judge → appears on judge's dashboard; unassign → disappears; can't unassign if scores exist; filter chips update counts live; pagination hides when ≤ 10 results.
+**Verify:** Assign judge → appears on judge's dashboard; unassign → disappears; can't unassign if scores exist; filter chips update counts live; pagination hides when ≤ 10 results; switching active event refreshes judge assignments instantly.
 
 ---
 

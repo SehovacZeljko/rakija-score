@@ -1,44 +1,37 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { map, of, shareReplay, switchMap, take } from 'rxjs';
+import { of, startWith, switchMap } from 'rxjs';
 
+import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
+import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Sample } from '../../../models/sample.model';
 import { CategoryService } from '../../../services/category.service';
-import { EventService } from '../../../services/event.service';
-import { FestivalService } from '../../../services/festival.service';
+import { FestivalContextService } from '../../../services/festival-context.service';
 import { ProducerService } from '../../../services/producer.service';
-import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { SampleData, SampleService } from '../../../services/sample.service';
 
 @Component({
   selector: 'app-admin-samples',
-  imports: [ReactiveFormsModule, LoadingSpinnerComponent],
+  imports: [ReactiveFormsModule, LoadingSpinnerComponent, ActiveFestivalBannerComponent],
   templateUrl: './admin-samples.component.html',
   styleUrl: './admin-samples.component.scss',
 })
 export class AdminSamplesComponent {
-  private readonly festivalService = inject(FestivalService);
-  private readonly eventService = inject(EventService);
+  private readonly ctx = inject(FestivalContextService);
   private readonly categoryService = inject(CategoryService);
   private readonly producerService = inject(ProducerService);
   private readonly sampleService = inject(SampleService);
   private readonly fb = inject(FormBuilder);
 
-  private readonly activeFestival$ = this.festivalService.getActiveFestival().pipe(shareReplay(1));
-  readonly activeFestival = toSignal(this.activeFestival$, { initialValue: null });
-  readonly dataReady = toSignal(this.activeFestival$.pipe(take(1), map(() => true)), {
-    initialValue: false,
-  });
+  readonly activeFestival = this.ctx.activeFestival;
+  readonly activeEvent = this.ctx.activeEvent;
+  readonly dataReady = this.ctx.dataReady;
 
-  private readonly events$ = this.activeFestival$.pipe(
-    switchMap((f) => (f ? this.eventService.getEventsForFestival(f.festivalId) : of([]))),
-  );
-
-  private readonly categories$ = this.events$.pipe(
-    switchMap((events) => {
-      const ids = events.map((e) => e.eventId);
-      return this.categoryService.getCategoriesForEvents(ids);
+  private readonly categories$ = toObservable(this.ctx.activeEvent).pipe(
+    switchMap((event) => {
+      if (!event) return of([]);
+      return this.categoryService.getCategoriesForEvents([event.eventId]).pipe(startWith([]));
     }),
   );
 

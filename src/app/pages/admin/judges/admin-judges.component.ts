@@ -1,14 +1,14 @@
 import { NgClass } from '@angular/common';
+import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map, of, shareReplay, switchMap, take } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { of, startWith, switchMap } from 'rxjs';
 
 import { Category } from '../../../models/category.model';
 import { JudgeAssignment } from '../../../models/judge-assignment.model';
 import { CategoryService } from '../../../services/category.service';
-import { EventService } from '../../../services/event.service';
-import { FestivalService } from '../../../services/festival.service';
+import { FestivalContextService } from '../../../services/festival-context.service';
 import { UserService } from '../../../services/user.service';
 
 type JudgeFilter = 'all' | 'unassigned' | 'assigned';
@@ -17,44 +17,36 @@ const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-admin-judges',
-  imports: [NgClass, LoadingSpinnerComponent],
+  imports: [NgClass, LoadingSpinnerComponent, ActiveFestivalBannerComponent],
   templateUrl: './admin-judges.component.html',
   styleUrl: './admin-judges.component.scss',
 })
 export class AdminJudgesComponent {
-  private readonly festivalService = inject(FestivalService);
-  private readonly eventService = inject(EventService);
+  private readonly ctx = inject(FestivalContextService);
   private readonly categoryService = inject(CategoryService);
   private readonly userService = inject(UserService);
 
   readonly PAGE_SIZE = PAGE_SIZE;
 
-  private readonly activeFestival$ = this.festivalService.getActiveFestival().pipe(shareReplay(1));
-  readonly activeFestival = toSignal(this.activeFestival$, { initialValue: null });
-  readonly dataReady = toSignal(this.activeFestival$.pipe(take(1), map(() => true)), {
-    initialValue: false,
-  });
+  readonly activeFestival = this.ctx.activeFestival;
+  readonly activeEvent = this.ctx.activeEvent;
+  readonly dataReady = this.ctx.dataReady;
 
-  private readonly events$ = this.activeFestival$.pipe(
-    switchMap((f) => (f ? this.eventService.getEventsForFestival(f.festivalId) : of([]))),
-  );
-
-  private readonly categories$ = this.events$.pipe(
-    switchMap((events) => {
-      const ids = events.map((e) => e.eventId);
-      return this.categoryService.getCategoriesForEvents(ids);
+  private readonly categories$ = toObservable(this.ctx.activeEvent).pipe(
+    switchMap((event) => {
+      if (!event) return of([]);
+      return this.categoryService.getCategoriesForEvents([event.eventId]).pipe(startWith([]));
     }),
   );
-
-  readonly categories = toSignal(this.categories$, { initialValue: [] });
 
   private readonly assignments$ = this.categories$.pipe(
     switchMap((cats) => {
       const ids = cats.map((c) => c.categoryId);
-      return this.categoryService.getAssignmentsForCategories(ids);
+      return this.categoryService.getAssignmentsForCategories(ids).pipe(startWith([]));
     }),
   );
 
+  readonly categories = toSignal(this.categories$, { initialValue: [] });
   readonly assignments = toSignal(this.assignments$, { initialValue: [] });
   readonly users = toSignal(this.userService.getAllUsers(), { initialValue: [] });
 

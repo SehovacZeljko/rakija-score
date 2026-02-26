@@ -10,7 +10,14 @@
       <p class="text-sm text-text-secondary">Nema aktivnog festivala.</p>
       <p class="mt-1 text-xs text-text-muted">Postavite aktivan festival u sekciji Festivali.</p>
     </div>
+  } @else if (!activeEvent()) {
+    <app-active-festival-banner />
+    <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+      <p class="text-sm text-text-secondary">Nema aktivnog dogadjaja.</p>
+      <p class="mt-1 text-xs text-text-muted">Aktivirajte dogadjaj u sekciji Kategorije.</p>
+    </div>
   } @else {
+    <app-active-festival-banner />
 
     <!-- Search -->
     <div class="relative mb-3">

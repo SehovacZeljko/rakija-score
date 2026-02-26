@@ -47,6 +47,9 @@ export class AdminCategoriesComponent {
   readonly newEventYear = signal(new Date().getFullYear());
   readonly isSavingEvent = signal(false);
 
+  // Event activate state
+  readonly activatingEventId = signal<string | null>(null);
+
   // Category form state — stores eventId of the event whose form is open
   readonly activeCategoryFormEventId = signal<string | null>(null);
   readonly newCategoryName = signal('');
@@ -93,6 +96,17 @@ export class AdminCategoriesComponent {
     this.newEventName.set('');
     this.newEventYear.set(new Date().getFullYear());
     this.showEventForm.set(false);
+  }
+
+  async setActiveEvent(eventId: string): Promise<void> {
+    const festivalId = this.activeFestival()?.festivalId;
+    if (!festivalId) return;
+    this.activatingEventId.set(eventId);
+    try {
+      await this.eventService.setActiveEvent(festivalId, eventId);
+    } finally {
+      this.activatingEventId.set(null);
+    }
   }
 
   openCategoryForm(eventId: string): void {

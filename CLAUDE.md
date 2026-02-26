@@ -176,7 +176,8 @@ Core admin responsibilities:
 ## Business Rules
 
 1. **One active festival at a time** — the system enforces a single active festival globally.
-2. **Self-registration is open** — any user can register via `/register`; new accounts are automatically assigned `role: 'judge'`.
+2. **One active event per festival** — each festival has exactly one active event at a time. Activated via the Kategorije admin page (same batch-deactivate pattern as festivals). Samples and Judges pages only display data for the active event.
+3. **Self-registration is open** — any user can register via `/register`; new accounts are automatically assigned `role: 'judge'`.
 3. **Admins do not create user accounts** — user management in the admin panel is limited to browsing registered users and assigning them to categories.
 4. **Judge assignments are per category** — a judge only sees categories they are assigned to, not all categories. A newly registered judge sees an empty dashboard until an admin assigns them.
 5. **Category locking** — a judge can lock a category only after scoring **all** samples in that category. Locking is per-judge, not global.
@@ -204,7 +205,7 @@ Core admin responsibilities:
 - festivals → festivalId, name, status (active|inactive), createdAt
 - users → userId, username, email, role (admin|judge), createdAt
 - producers → producerId, name, contactPerson, email, phone, address, region, country, createdAt
-- events → eventId, festivalId (FK), name, year, status, closedAt, createdAt
+- events → eventId, festivalId (FK), name, year, status (active|inactive), closedAt, createdAt  → only one event per festival can be active at a time; new events are created as inactive
 - categories → categoryId, eventId (FK), name, status (active|inactive), createdAt
 - judgeAssignments → assignmentId, judgeId (FK), categoryId (FK), status (active|finished) →  document ID should be {judgeId}_{categoryId}
 
@@ -219,6 +220,8 @@ Core admin responsibilities:
 - Services expose data as **Signals or Observables** depending on use case:
   - Signals → local/component UI state
   - Observables → Firestore real-time streams
+- **`FestivalContextService`** (`src/app/services/festival-context.service.ts`) is the single source of truth for the active festival and active event. Inject this instead of creating per-component chains. Exposes: `activeFestival$`, `activeEvent$`, `activeFestival` signal, `activeEvent` signal, `dataReady` signal.
+- Use `toObservable(ctx.activeEvent).pipe(switchMap(...), startWith([]))` in components that derive Firestore data from the active event — `startWith([])` prevents stale data during festival/event switches.
 
 ---
 
