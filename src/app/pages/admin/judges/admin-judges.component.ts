@@ -2,7 +2,7 @@ import { NgClass } from '@angular/common';
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Component, computed, inject, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { of, startWith, switchMap } from 'rxjs';
 
 import { Category } from '../../../models/category.model';
@@ -32,7 +32,7 @@ export class AdminJudgesComponent {
   readonly activeEvent = this.ctx.activeEvent;
   readonly dataReady = this.ctx.dataReady;
 
-  private readonly categories$ = toObservable(this.ctx.activeEvent).pipe(
+  private readonly categories$ = this.ctx.activeEvent$.pipe(
     switchMap((event) => {
       if (!event) return of([]);
       return this.categoryService.getCategoriesForEvents([event.eventId]).pipe(startWith([]));

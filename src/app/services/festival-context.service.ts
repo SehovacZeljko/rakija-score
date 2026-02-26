@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { combineLatest, map, of, shareReplay, switchMap, take } from 'rxjs';
+import { Observable, catchError, map, of, shareReplay, switchMap, take } from 'rxjs';
 
+import { FestivalEvent } from '../models/event.model';
+import { Festival } from '../models/festival.model';
 import { EventService } from './event.service';
 import { FestivalService } from './festival.service';
 
@@ -10,10 +12,14 @@ export class FestivalContextService {
   private readonly festivalService = inject(FestivalService);
   private readonly eventService = inject(EventService);
 
-  readonly activeFestival$ = this.festivalService.getActiveFestival().pipe(shareReplay(1));
+  readonly activeFestival$: Observable<Festival | null> = this.festivalService.getActiveFestival().pipe(
+    catchError(() => of(null)),
+    shareReplay(1),
+  );
 
-  readonly activeEvent$ = this.activeFestival$.pipe(
+  readonly activeEvent$: Observable<FestivalEvent | null> = this.activeFestival$.pipe(
     switchMap((f) => (f ? this.eventService.getActiveEvent(f.festivalId) : of(null))),
+    catchError(() => of(null)),
     shareReplay(1),
   );
 
@@ -21,7 +27,7 @@ export class FestivalContextService {
   readonly activeEvent = toSignal(this.activeEvent$, { initialValue: null });
 
   readonly dataReady = toSignal(
-    combineLatest([this.activeFestival$, this.activeEvent$]).pipe(
+    this.activeFestival$.pipe(
       take(1),
       map(() => true),
     ),

@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { of, startWith, switchMap } from 'rxjs';
 
@@ -28,7 +28,7 @@ export class AdminSamplesComponent {
   readonly activeEvent = this.ctx.activeEvent;
   readonly dataReady = this.ctx.dataReady;
 
-  private readonly categories$ = toObservable(this.ctx.activeEvent).pipe(
+  private readonly categories$ = this.ctx.activeEvent$.pipe(
     switchMap((event) => {
       if (!event) return of([]);
       return this.categoryService.getCategoriesForEvents([event.eventId]).pipe(startWith([]));

@@ -5,7 +5,6 @@ import {
   collectionData,
   doc,
   getDocs,
-  limit,
   query,
   serverTimestamp,
   setDoc,
@@ -27,14 +26,9 @@ export class EventService {
   }
 
   getActiveEvent(festivalId: string): Observable<FestivalEvent | null> {
-    const q = query(
-      this.eventsRef,
-      where('festivalId', '==', festivalId),
-      where('status', '==', 'active'),
-      limit(1),
-    );
+    const q = query(this.eventsRef, where('festivalId', '==', festivalId));
     return (collectionData(q) as Observable<FestivalEvent[]>).pipe(
-      map((events) => events[0] ?? null),
+      map((events) => events.find((e) => e.status === 'active') ?? null),
     );
   }
 
