@@ -161,23 +161,27 @@
             @if (availableCategoriesForUser(user.userId).length === 0) {
               <p class="text-sm text-text-muted">Sve kategorije su već dodijeljene ovoj sudiji.</p>
             } @else {
-              <div class="flex gap-2">
-                <select
-                  (change)="onAssignCategoryChange($event)"
-                  class="flex-1 rounded-lg border border-border-default bg-bg-surface px-3 py-2 text-sm text-text-primary focus:border-border-focus focus:outline-none"
-                >
-                  <option value="">Odaberi kategoriju</option>
-                  @for (cat of availableCategoriesForUser(user.userId); track cat.categoryId) {
-                    <option [value]="cat.categoryId">{{ cat.name }}</option>
-                  }
-                </select>
+              <div class="max-h-48 overflow-y-auto rounded-lg border border-border-default bg-bg-surface">
+                @for (cat of availableCategoriesForUser(user.userId); track cat.categoryId) {
+                  <label class="flex cursor-pointer items-center gap-3 border-b border-border-default px-3 py-2.5 last:border-0 hover:bg-bg-card">
+                    <input
+                      type="checkbox"
+                      [checked]="isCategorySelected(cat.categoryId)"
+                      (change)="toggleCategorySelection(cat.categoryId)"
+                      class="h-4 w-4 rounded accent-primary"
+                    />
+                    <span class="text-sm text-text-primary">{{ cat.name }}</span>
+                  </label>
+                }
+              </div>
+              <div class="mt-3 flex justify-end">
                 <button
                   type="button"
                   (click)="assignCategory()"
-                  [disabled]="!assignCategoryId() || isAssigning()"
+                  [disabled]="selectedCategoryIds().size === 0 || isAssigning()"
                   class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {{ isAssigning() ? '...' : 'Dodijeli' }}
+                  {{ isAssigning() ? '...' : 'Dodijeli (' + selectedCategoryIds().size + ')' }}
                 </button>
               </div>
             }

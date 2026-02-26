@@ -100,7 +100,7 @@ export class AdminJudgesComponent {
   );
 
   readonly selectedUserId = signal<string | null>(null);
-  readonly assignCategoryId = signal('');
+  readonly selectedCategoryIds = signal<Set<string>>(new Set());
   readonly isAssigning = signal(false);
 
   readonly removingKey = signal<string | null>(null);
@@ -110,7 +110,7 @@ export class AdminJudgesComponent {
     this.activeFilter.set(filter);
     this.currentPage.set(1);
     this.selectedUserId.set(null);
-    this.assignCategoryId.set('');
+    this.selectedCategoryIds.set(new Set());
   }
 
   prevPage(): void {
@@ -126,8 +126,16 @@ export class AdminJudgesComponent {
     this.currentPage.set(1);
   }
 
-  onAssignCategoryChange(event: Event): void {
-    this.assignCategoryId.set((event.target as HTMLSelectElement).value);
+  toggleCategorySelection(categoryId: string): void {
+    this.selectedCategoryIds.update((prev) => {
+      const next = new Set(prev);
+      next.has(categoryId) ? next.delete(categoryId) : next.add(categoryId);
+      return next;
+    });
+  }
+
+  isCategorySelected(categoryId: string): boolean {
+    return this.selectedCategoryIds().has(categoryId);
   }
 
   assignmentKey(judgeId: string, categoryId: string): string {
@@ -146,22 +154,23 @@ export class AdminJudgesComponent {
   toggleAssignForm(userId: string): void {
     if (this.selectedUserId() === userId) {
       this.selectedUserId.set(null);
-      this.assignCategoryId.set('');
     } else {
       this.selectedUserId.set(userId);
-      this.assignCategoryId.set('');
     }
+    this.selectedCategoryIds.set(new Set());
   }
 
   async assignCategory(): Promise<void> {
     const judgeId = this.selectedUserId();
-    const categoryId = this.assignCategoryId();
-    if (!judgeId || !categoryId) return;
+    const categoryIds = [...this.selectedCategoryIds()];
+    if (!judgeId || categoryIds.length === 0) return;
 
     this.isAssigning.set(true);
     try {
-      await this.categoryService.assignJudgeToCategory(judgeId, categoryId);
-      this.assignCategoryId.set('');
+      await Promise.all(
+        categoryIds.map((catId) => this.categoryService.assignJudgeToCategory(judgeId, catId)),
+      );
+      this.selectedCategoryIds.set(new Set());
       this.selectedUserId.set(null);
     } finally {
       this.isAssigning.set(false);
