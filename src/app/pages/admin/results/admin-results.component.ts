@@ -167,10 +167,54 @@ export class AdminResultsComponent {
     { initialValue: [] as CategoryResult[] },
   );
 
-  readonly expandedSampleId = signal<string | null>(null);
+  readonly expandedSampleIds = signal<Set<string>>(new Set());
+  readonly expandedCategoryIds = signal<Set<string>>(new Set());
 
   toggleExpand(sampleId: string): void {
-    this.expandedSampleId.update((id) => (id === sampleId ? null : sampleId));
+    this.expandedSampleIds.update((s) => {
+      const next = new Set(s);
+      next.has(sampleId) ? next.delete(sampleId) : next.add(sampleId);
+      return next;
+    });
+  }
+
+  expandAllSamples(): void {
+    const ids = this.categoryResults().flatMap((cr) => cr.samples.map((sr) => sr.sample.sampleId));
+    this.expandedSampleIds.set(new Set(ids));
+  }
+
+  collapseAllSamples(): void {
+    this.expandedSampleIds.set(new Set());
+  }
+
+  get allSamplesExpanded(): boolean {
+    const allSamples = this.categoryResults().flatMap((cr) => cr.samples);
+    return allSamples.length > 0 && allSamples.every((sr) => this.expandedSampleIds().has(sr.sample.sampleId));
+  }
+
+  toggleCategory(categoryId: string): void {
+    this.expandedCategoryIds.update((s) => {
+      const next = new Set(s);
+      next.has(categoryId) ? next.delete(categoryId) : next.add(categoryId);
+      return next;
+    });
+  }
+
+  expandAllCategories(): void {
+    const ids = this.categoryResults().map((cr) => cr.category.categoryId);
+    this.expandedCategoryIds.set(new Set(ids));
+  }
+
+  collapseAllCategories(): void {
+    this.expandedCategoryIds.set(new Set());
+  }
+
+  get allCategoriesExpanded(): boolean {
+    const results = this.categoryResults();
+    return (
+      results.length > 0 &&
+      results.every((cr) => this.expandedCategoryIds().has(cr.category.categoryId))
+    );
   }
 
   scoreTotal(score: Score): number {

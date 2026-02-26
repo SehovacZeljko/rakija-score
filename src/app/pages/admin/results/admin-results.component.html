@@ -24,44 +24,89 @@
 
   <!-- Page header -->
   <h1 class="mb-1 text-xl font-semibold text-text-primary">Rezultati</h1>
-  @if (event()) {
-    <p class="mb-5 text-sm text-text-secondary">{{ event()!.name }} · {{ event()!.year }}</p>
-  }
+  <div class="mb-5 flex items-center justify-between">
+    @if (event()) {
+      <p class="text-sm text-text-secondary">{{ event()!.name }} · {{ event()!.year }}</p>
+    } @else {
+      <span></span>
+    }
+    @if (categoryResults().length > 0) {
+      <div class="flex gap-2">
+        <button
+          type="button"
+          (click)="allCategoriesExpanded ? collapseAllCategories() : expandAllCategories()"
+          class="rounded-lg bg-bg-surface px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-border-default"
+        >
+          {{ allCategoriesExpanded ? 'Skupi kategorije' : 'Proširi kategorije' }}
+        </button>
+        <button
+          type="button"
+          (click)="allSamplesExpanded ? collapseAllSamples() : expandAllSamples()"
+          class="rounded-lg bg-bg-surface px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-border-default"
+        >
+          {{ allSamplesExpanded ? 'Skupi uzorke' : 'Proširi uzorke' }}
+        </button>
+      </div>
+    }
+  </div>
 
   <!-- Category sections -->
   @for (cr of categoryResults(); track cr.category.categoryId) {
     <div class="mb-6 rounded-xl bg-bg-card shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
-      <!-- Category header -->
-      <div class="border-b border-border-default px-4 py-3">
+      <!-- Category header (clickable) -->
+      <button
+        type="button"
+        (click)="toggleCategory(cr.category.categoryId)"
+        class="flex w-full items-center justify-between border-b border-border-default px-4 py-3 text-left transition-colors hover:bg-bg-surface"
+      >
         <p class="font-semibold text-text-primary">{{ cr.category.name }}</p>
-      </div>
-
-      <!-- Column headers -->
-      @if (cr.samples.length > 0) {
-        <div
-          class="flex items-center gap-2 border-b border-border-default bg-bg-surface px-4 py-1.5"
-        >
-          <span class="w-5"></span>
-          <span class="w-14 text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
-            >Šifra</span
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-text-muted">{{ cr.samples.length }} uzoraka</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="shrink-0 text-text-muted transition-transform"
+            [class.rotate-180]="expandedCategoryIds().has(cr.category.categoryId)"
           >
-          <span class="flex-1 text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
-            >Proizvođač</span
-          >
-          <span
-            class="w-10 text-right text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
-            >Sudije</span
-          >
-          <span
-            class="w-12 text-right text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
-            >Prosjek</span
-          >
-          <span class="w-4"></span>
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </div>
-      }
+      </button>
 
-      <!-- Sample rows -->
-      @for (sr of cr.samples; track sr.sample.sampleId; let i = $index) {
+      @if (expandedCategoryIds().has(cr.category.categoryId)) {
+        <!-- Column headers -->
+        @if (cr.samples.length > 0) {
+          <div
+            class="flex items-center gap-2 border-b border-border-default bg-bg-surface px-4 py-1.5"
+          >
+            <span class="w-5"></span>
+            <span class="w-14 text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
+              >Šifra</span
+            >
+            <span class="flex-1 text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
+              >Proizvođač</span
+            >
+            <span
+              class="w-10 text-right text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
+              >Sudije</span
+            >
+            <span
+              class="w-12 text-right text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
+              >Prosjek</span
+            >
+            <span class="w-4"></span>
+          </div>
+        }
+
+        <!-- Sample rows -->
+        @for (sr of cr.samples; track sr.sample.sampleId; let i = $index) {
         <!-- Summary row -->
         <button
           type="button"
@@ -94,7 +139,7 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               class="w-4 shrink-0 text-text-muted transition-transform"
-              [class.rotate-180]="expandedSampleId() === sr.sample.sampleId"
+              [class.rotate-180]="expandedSampleIds().has(sr.sample.sampleId)"
             >
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -102,7 +147,7 @@
         </button>
 
         <!-- Per-judge breakdown -->
-        @if (expandedSampleId() === sr.sample.sampleId) {
+        @if (expandedSampleIds().has(sr.sample.sampleId)) {
           <div class="border-b border-border-default bg-bg-surface px-4 py-2 last:border-0">
             @for (score of sr.scores; track score.judgeId) {
               <div class="py-1.5">
@@ -165,6 +210,7 @@
         <div class="px-4 py-3">
           <p class="text-sm text-text-muted">Nema uzoraka u ovoj kategoriji.</p>
         </div>
+      }
       }
     </div>
   } @empty {
