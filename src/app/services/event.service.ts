@@ -4,6 +4,7 @@ import {
   collection,
   collectionData,
   doc,
+  docData,
   getDocs,
   query,
   serverTimestamp,
@@ -19,6 +20,13 @@ import { FestivalEvent } from '../models/event.model';
 export class EventService {
   private readonly firestore = inject(Firestore);
   private readonly eventsRef = collection(this.firestore, 'events');
+
+  getEventById(eventId: string): Observable<FestivalEvent | null> {
+    const docRef = doc(this.firestore, `events/${eventId}`);
+    return (docData(docRef) as Observable<FestivalEvent | undefined>).pipe(
+      map((event) => event ?? null),
+    );
+  }
 
   getEventsForFestival(festivalId: string): Observable<FestivalEvent[]> {
     const q = query(this.eventsRef, where('festivalId', '==', festivalId));

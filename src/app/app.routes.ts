@@ -90,6 +90,13 @@ export const routes: Routes = [
             (m) => m.AdminJudgesComponent,
           ),
       },
+      {
+        path: 'results/:eventId',
+        loadComponent: () =>
+          import('./pages/admin/results/admin-results.component').then(
+            (m) => m.AdminResultsComponent,
+          ),
+      },
     ],
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' },

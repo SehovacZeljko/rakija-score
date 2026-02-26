@@ -114,6 +114,12 @@
               {{ categoriesForEvent(event.eventId).length }}
               {{ categoriesForEvent(event.eventId).length === 1 ? 'kategorija' : 'kategorije' }}
             </span>
+            <a
+              [routerLink]="['/admin/results', event.eventId]"
+              class="rounded-lg bg-bg-surface px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-border-default"
+            >
+              Rezultati →
+            </a>
             @if (event.status !== 'active') {
               <button
                 type="button"

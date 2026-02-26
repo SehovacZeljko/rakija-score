@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { map, of, shareReplay, switchMap, take } from 'rxjs';
 
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
@@ -10,7 +11,7 @@ import { FestivalService } from '../../../services/festival.service';
 
 @Component({
   selector: 'app-admin-categories',
-  imports: [LoadingSpinnerComponent],
+  imports: [LoadingSpinnerComponent, RouterLink],
   templateUrl: './admin-categories.component.html',
   styleUrl: './admin-categories.component.scss',
 })

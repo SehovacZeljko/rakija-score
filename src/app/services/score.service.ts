@@ -12,7 +12,7 @@ import {
   setDoc,
   where,
 } from '@angular/fire/firestore';
-import { Observable, map, of } from 'rxjs';
+import { Observable, combineLatest, map, of } from 'rxjs';
 
 import { Score } from '../models/score.model';
 
@@ -60,5 +60,18 @@ export class ScoreService {
     if (docIds.length === 0) return of([]);
     const q = query(this.scoresRef, where(documentId(), 'in', docIds.slice(0, 30)));
     return collectionData(q) as Observable<Score[]>;
+  }
+
+  getScoresForSampleIds(sampleIds: string[]): Observable<Score[]> {
+    if (sampleIds.length === 0) return of([]);
+    const chunks: string[][] = [];
+    for (let i = 0; i < sampleIds.length; i += 30) {
+      chunks.push(sampleIds.slice(i, i + 30));
+    }
+    const queries = chunks.map((chunk) => {
+      const q = query(this.scoresRef, where('sampleId', 'in', chunk));
+      return collectionData(q) as Observable<Score[]>;
+    });
+    return combineLatest(queries).pipe(map((results) => results.flat()));
   }
 }
