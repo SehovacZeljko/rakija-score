@@ -7,7 +7,7 @@
 
     <!-- Page header -->
     <div class="mb-4 flex items-center justify-between">
-      <h1 class="text-xl font-semibold text-text-primary">Producenti</h1>
+      <h1 class="text-xl font-semibold text-text-primary">Proizvođači</h1>
       <button
         type="button"
         (click)="openCreate()"
@@ -27,7 +27,7 @@
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
-        Novi producent
+        Dodaj Proizvođača
       </button>
     </div>
 
@@ -68,11 +68,14 @@
           <div class="min-w-0">
             <p class="truncate font-semibold text-text-primary">{{ producer.name }}</p>
             @if (producer.contactPerson) {
-              <p class="mt-0.5 truncate text-sm text-text-secondary">{{ producer.contactPerson }}</p>
+              <p class="mt-0.5 truncate text-sm text-text-secondary">
+                {{ producer.contactPerson }}
+              </p>
             }
             @if (producer.region || producer.country) {
               <p class="mt-1 text-xs text-text-muted">
-                {{ producer.region }}{{ producer.region && producer.country ? ', ' : '' }}{{ producer.country }}
+                {{ producer.region }}{{ producer.region && producer.country ? ', ' : ''
+                }}{{ producer.country }}
               </p>
             }
           </div>
@@ -98,7 +101,7 @@
         @if (searchQuery()) {
           <p class="text-sm text-text-secondary">Nema rezultata za "{{ searchQuery() }}".</p>
         } @else {
-          <p class="text-sm text-text-secondary">Nema producenata. Dodajte prvog producenta.</p>
+          <p class="text-sm text-text-secondary">Nema producenata. Dodajte prvog Proizvođača.</p>
         }
       </div>
     }
