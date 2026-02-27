@@ -1,0 +1,39 @@
+.criterion-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    #c8d93a var(--progress, 0%),
+    #f0ebe5 var(--progress, 0%)
+  );
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #c8d93a;
+    box-shadow: 0 2px 6px rgba(200, 217, 58, 0.45);
+    cursor: pointer;
+  }
+
+  &::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background: #c8d93a;
+    box-shadow: 0 2px 6px rgba(200, 217, 58, 0.45);
+    cursor: pointer;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}

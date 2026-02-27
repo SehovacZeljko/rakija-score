@@ -10,7 +10,7 @@ import { SampleService } from '../../services/sample.service';
 import { ScoreService } from '../../services/score.service';
 import { ToastService } from '../../services/toast.service';
 import { Sample } from '../../models/sample.model';
-import { SCORE_STEP, SCORING_CRITERIA } from '../../shared/scoring.constants';
+import { SCORE_STEP, SCORING_CRITERIA, ScoringCriterion } from '../../shared/scoring.constants';
 
 @Component({
   selector: 'app-scoring',
@@ -111,6 +111,12 @@ export class ScoringComponent {
     const sig = this.writableSignals[key];
     if (!sig) return;
     sig.set(Math.min(criterion.max, Math.max(criterion.min, value)));
+  }
+
+  getProgressPercent(criterion: ScoringCriterion): number {
+    const value = this.getCriterionValue(criterion.key);
+    const range = criterion.max - criterion.min;
+    return range > 0 ? ((value - criterion.min) / range) * 100 : 0;
   }
 
   onCommentInput(event: Event): void {
