@@ -11,9 +11,9 @@ export interface ScoringCriterion {
 }
 
 export const SCORING_CRITERIA: ScoringCriterion[] = [
-  { key: 'color', labelSr: 'Boja', defaultValue: 1.0, max: 1.0, min: 0.0 },
-  { key: 'clarity', labelSr: 'Bistrina', defaultValue: 1.0, max: 1.0, min: 0.0 },
-  { key: 'typicality', labelSr: 'Tipičnost', defaultValue: 2.0, max: 2.0, min: 0.0 },
-  { key: 'aroma', labelSr: 'Miris', defaultValue: 5.0, max: 5.0, min: 0.0 },
-  { key: 'taste', labelSr: 'Ukus', defaultValue: 8.0, max: 8.0, min: 0.0 },
+  { key: 'color', labelSr: 'Boja', defaultValue: 0.5, max: 1.0, min: 0.0 },
+  { key: 'clarity', labelSr: 'Bistrina', defaultValue: 0.5, max: 1.0, min: 0.0 },
+  { key: 'typicality', labelSr: 'Tipičnost', defaultValue: 1.0, max: 2.0, min: 0.0 },
+  { key: 'aroma', labelSr: 'Miris', defaultValue: 2.5, max: 5.0, min: 0.0 },
+  { key: 'taste', labelSr: 'Ukus', defaultValue: 4.0, max: 8.0, min: 0.0 },
 ];
