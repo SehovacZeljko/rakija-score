@@ -107,110 +107,231 @@
 
         <!-- Sample rows -->
         @for (sr of cr.samples; track sr.sample.sampleId; let i = $index) {
-        <!-- Summary row -->
-        <button
-          type="button"
-          (click)="toggleExpand(sr.sample.sampleId)"
-          class="w-full border-b border-border-default px-4 py-3 text-left last:border-0 transition-colors hover:bg-bg-surface"
-        >
-          <div class="flex items-center gap-2">
-            <span class="w-5 shrink-0 text-center text-xs font-bold text-text-muted">{{
-              i + 1
-            }}</span>
-            <span class="w-14 shrink-0 text-sm font-semibold text-text-primary">{{
-              sr.sample.sampleCode
-            }}</span>
-            <span class="flex-1 truncate text-sm text-text-secondary">{{ sr.producerName }}</span>
-            <span class="shrink-0 text-xs text-text-muted"
-              >{{ sr.judgesScored }}/{{ sr.totalJudges }}</span
-            >
-            <span class="w-12 shrink-0 text-right text-sm font-bold text-text-primary">
-              {{ sr.avgTotal | number: '1.2-2' }}
-            </span>
-            <!-- Chevron -->
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="w-4 shrink-0 text-text-muted transition-transform"
-              [class.rotate-180]="expandedSampleIds().has(sr.sample.sampleId)"
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-        </button>
+          <!-- Summary row -->
+          <button
+            type="button"
+            (click)="toggleExpand(sr.sample.sampleId)"
+            class="w-full border-b border-border-default px-4 py-3 text-left last:border-0 transition-colors hover:bg-bg-surface"
+          >
+            <div class="flex items-center gap-2">
+              <span class="w-5 shrink-0 text-center text-xs font-bold text-text-muted">{{
+                i + 1
+              }}</span>
+              <span class="w-14 shrink-0 text-sm font-semibold text-text-primary">{{
+                sr.sample.sampleCode
+              }}</span>
+              <span class="flex-1 truncate text-sm text-text-secondary">{{ sr.producerName }}</span>
+              <span class="shrink-0 text-xs text-text-muted"
+                >{{ sr.judgesScored }}/{{ sr.totalJudges }}</span
+              >
+              <span class="w-12 shrink-0 text-right text-sm font-bold text-text-primary">
+                {{ sr.avgTotal | number: '1.2-2' }}
+              </span>
+              <!-- Chevron -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="w-4 shrink-0 text-text-muted transition-transform"
+                [class.rotate-180]="expandedSampleIds().has(sr.sample.sampleId)"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+          </button>
 
-        <!-- Per-judge breakdown -->
-        @if (expandedSampleIds().has(sr.sample.sampleId)) {
-          <div class="border-b border-border-default bg-bg-surface px-4 py-2 last:border-0">
-            @for (score of sr.scores; track score.judgeId) {
-              <div class="py-1.5">
-                <!-- Line 1: icon + name + total -->
-                <div class="flex items-center gap-1.5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="13"
-                    height="13"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="shrink-0 text-text-muted"
-                  >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                  <span class="flex-1 truncate text-xs font-medium text-text-secondary">
-                    {{ judgeNameMap().get(score.judgeId) ?? score.judgeId }}
-                  </span>
-                  @if (cr.lockedJudgeIds.has(score.judgeId)) {
+          <!-- Per-judge breakdown -->
+          @if (expandedSampleIds().has(sr.sample.sampleId)) {
+            <div class="border-b border-border-default bg-bg-surface px-4 py-2 last:border-0">
+              @for (score of sr.scores; track score.judgeId) {
+                <div class="py-1.5">
+                  <!-- Line 1: icon + name + total -->
+                  <div class="flex items-center gap-1.5">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
+                      width="13"
+                      height="13"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2.5"
+                      stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      class="shrink-0 text-status-success"
+                      class="shrink-0 text-text-muted"
                     >
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
                     </svg>
-                  }
+                    <span class="flex-1 truncate text-xs font-medium text-text-secondary">
+                      {{ judgeNameMap().get(score.judgeId) ?? score.judgeId }}
+                    </span>
+                    @if (cr.lockedJudgeIds.has(score.judgeId)) {
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="shrink-0 text-status-success"
+                      >
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                    }
+                  </div>
+                  <!-- Line 2: criteria with icons -->
+                  <div class="mt-2 flex items-start gap-4 pl-[21px] text-text-muted">
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="flex-none"
+                        >
+                          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                        </svg>
+                        <span>Bo</span>
+                      </div>
+                      <span class="text-[10px] font-medium text-text-primary">{{
+                        score.color | number: '1.2-2'
+                      }}</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="flex-none"
+                        >
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        <span>Bi</span>
+                      </div>
+                      <span class="text-[10px] font-medium text-text-primary">{{
+                        score.clarity | number: '1.2-2'
+                      }}</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="flex-none"
+                        >
+                          <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                          />
+                        </svg>
+                        <span>Ti</span>
+                      </div>
+                      <span class="text-[10px] font-medium text-text-primary">{{
+                        score.typicality | number: '1.2-2'
+                      }}</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="flex-none"
+                        >
+                          <path d="M9.59 4.59A2 2 0 1 1 11 8H2" />
+                          <path d="M10.59 19.41A2 2 0 1 0 14 16H2" />
+                          <path d="M15.73 3.73A2.5 2.5 0 1 1 19.5 7H2" />
+                        </svg>
+                        <span>Mi</span>
+                      </div>
+                      <span class="text-[10px] font-medium text-text-primary">{{
+                        score.aroma | number: '1.2-2'
+                      }}</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="flex-none"
+                        >
+                          <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                          <line x1="6" y1="1" x2="6" y2="4" />
+                          <line x1="10" y1="1" x2="10" y2="4" />
+                          <line x1="14" y1="1" x2="14" y2="4" />
+                        </svg>
+                        <span>Uk</span>
+                      </div>
+                      <span class="text-[10px] font-medium text-text-primary">{{
+                        score.taste | number: '1.2-2'
+                      }}</span>
+                    </div>
+
+                    <div class="ml-auto flex flex-col items-end self-end pb-[1px]">
+                      <span class="text-[12px] font-bold text-text-primary leading-none">
+                        {{ scoreTotal(score) | number: '1.2-2' }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <!-- Line 2: abbreviated criteria -->
-                <div class="mt-0.5 flex gap-3 pl-[21px] text-[10px] text-text-muted">
-                  <span>Bo: {{ score.color | number: '1.2-2' }}</span>
-                  <span>Bi: {{ score.clarity | number: '1.2-2' }}</span>
-                  <span>Ti: {{ score.typicality | number: '1.2-2' }}</span>
-                  <span>Mi: {{ score.aroma | number: '1.2-2' }}</span>
-                  <span>Uk: {{ score.taste | number: '1.2-2' }}</span>
-                  <span class="ml-auto shrink-0 text-xs font-bold text-text-primary">
-                    {{ scoreTotal(score) | number: '1.2-2' }}
-                  </span>
-                </div>
-              </div>
-            } @empty {
-              <p class="py-1 text-xs text-text-muted">Nema ocjena.</p>
-            }
+              } @empty {
+                <p class="py-1 text-xs text-text-muted">Nema ocjena.</p>
+              }
+            </div>
+          }
+        } @empty {
+          <div class="px-4 py-3">
+            <p class="text-sm text-text-muted">Nema uzoraka u ovoj kategoriji.</p>
           </div>
         }
-      } @empty {
-        <div class="px-4 py-3">
-          <p class="text-sm text-text-muted">Nema uzoraka u ovoj kategoriji.</p>
-        </div>
-      }
       }
     </div>
   } @empty {
