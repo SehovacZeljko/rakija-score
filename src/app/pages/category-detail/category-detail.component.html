@@ -1,10 +1,20 @@
-<app-header [title]="category()?.name ?? ''" />
+<app-header title="Sudija" />
 
 <main class="min-h-screen bg-bg-app pb-[60px] pt-14">
   <div class="p-4">
 
     @if (!dataReady()) {
       <app-loading-spinner />
+    }
+
+    <!-- Active festival banner -->
+    <app-active-festival-banner />
+
+    <!-- Category name -->
+    @if (category()) {
+      <div class="mb-4">
+        <h1 class="text-xl font-semibold text-text-primary">{{ category()!.name }}</h1>
+      </div>
     }
 
     <!-- Locked banner -->

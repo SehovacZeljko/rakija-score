@@ -12,6 +12,7 @@ import {
   take,
 } from 'rxjs';
 
+import { ActiveFestivalBannerComponent } from '../../components/active-festival-banner/active-festival-banner.component';
 import { BottomNavComponent, NavItem } from '../../components/bottom-nav/bottom-nav.component';
 import { HeaderComponent } from '../../components/header/header.component';
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component';
@@ -23,7 +24,7 @@ import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-category-detail',
-  imports: [HeaderComponent, BottomNavComponent, LoadingSpinnerComponent],
+  imports: [HeaderComponent, BottomNavComponent, LoadingSpinnerComponent, ActiveFestivalBannerComponent],
   templateUrl: './category-detail.component.html',
   styleUrl: './category-detail.component.scss',
 })
