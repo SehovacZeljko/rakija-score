@@ -37,7 +37,11 @@ export class AdminSamplesComponent {
 
   readonly categories = toSignal(this.categories$, { initialValue: [] });
   readonly producers = toSignal(this.producerService.getAllProducers(), { initialValue: [] });
-  readonly allSamples = toSignal(this.sampleService.getAllSamples(), { initialValue: [] });
+  private readonly eventSamples$ = this.categories$.pipe(
+    switchMap((cats) => this.sampleService.getSamplesForCategories(cats.map((c) => c.categoryId))),
+    startWith([]),
+  );
+  readonly allSamples = toSignal(this.eventSamples$, { initialValue: [] });
 
   readonly producerMap = computed(
     () => new Map(this.producers().map((p) => [p.producerId, p.name])),
