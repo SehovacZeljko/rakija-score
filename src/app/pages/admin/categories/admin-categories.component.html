@@ -5,7 +5,7 @@
 
   <!-- Page header -->
   <div class="mb-4 flex items-center justify-between">
-    <h1 class="text-xl font-semibold text-text-primary">Kategorije</h1>
+    <h1 class="text-xl font-semibold text-text-primary">Dogadjaji i Kategorije</h1>
     @if (activeFestival() && !showEventForm()) {
       <button
         type="button"
@@ -40,10 +40,13 @@
   } @else {
     <!-- Active festival badge -->
     <div class="mb-4 flex items-center gap-2">
-      <span class="rounded-[6px] bg-accent px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.05em] text-text-on-accent">
+      <span class="text-sm font-medium text-text-primary">Festival:</span>
+      <span class="text-sm font-medium text-text-primary">{{ activeFestival()!.name }}</span>
+      <span
+        class="rounded-[6px] bg-accent px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.05em] text-text-on-accent"
+      >
         Aktivan
       </span>
-      <span class="text-sm font-medium text-text-primary">{{ activeFestival()!.name }}</span>
     </div>
 
     <!-- New event form -->
@@ -98,6 +101,7 @@
         <div class="flex items-center justify-between border-b border-border-default px-4 py-3">
           <div class="min-w-0">
             <div class="flex items-center gap-2">
+              <p class="truncate font-semibold text-text-primary">{{ event.name }}</p>
               @if (event.status === 'active') {
                 <span
                   class="shrink-0 rounded-[6px] bg-accent px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.05em] text-text-on-accent"
@@ -105,7 +109,6 @@
                   Aktivan
                 </span>
               }
-              <p class="truncate font-semibold text-text-primary">{{ event.name }}</p>
             </div>
             <p class="text-xs text-text-muted">{{ event.year }}</p>
           </div>
