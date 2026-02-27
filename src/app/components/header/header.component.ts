@@ -17,6 +17,10 @@ export class HeaderComponent {
 
   protected readonly authService = inject(AuthService);
 
+  get homeRoute(): string {
+    return this.authService.currentUser()?.role === 'admin' ? '/admin/festivals' : '/dashboard';
+  }
+
   logout(): void {
     this.authService.logout();
   }
