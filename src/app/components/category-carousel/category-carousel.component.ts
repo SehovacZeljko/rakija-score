@@ -46,7 +46,21 @@ export class CategoryCarouselComponent implements AfterViewInit, OnDestroy {
   private readonly containerWidth = signal(0);
   private resizeObserver: ResizeObserver | null = null;
 
-  readonly cardWidth = computed(() => Math.max(0, this.containerWidth() - 2 * PEEK));
+  // Number of fully visible cards based on container width:
+  // < 600px → 1 card (mobile), 600–899px → 2 cards (tablet), ≥ 900px → 3 cards (desktop)
+  private readonly visibleCount = computed(() => {
+    const width = this.containerWidth();
+    if (width >= 900) return 3;
+    if (width >= 600) return 2;
+    return 1;
+  });
+
+  readonly cardWidth = computed(() => {
+    const count = this.visibleCount();
+    const width = this.containerWidth();
+    if (!width) return 0;
+    return Math.max(0, (width - 2 * PEEK - (count - 1) * GAP) / count);
+  });
 
   readonly trackTransform = computed(() => {
     const width = this.cardWidth();
