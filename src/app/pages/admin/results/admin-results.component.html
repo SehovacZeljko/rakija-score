@@ -344,7 +344,33 @@
                     </div>
                   </div>
                 </div>
-              } @empty {
+              }
+              @for (judgeId of sr.unscoredJudgeIds; track judgeId) {
+                <div class="py-1.5">
+                  <div class="flex items-center gap-1.5">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="shrink-0 text-text-muted"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span class="flex-1 truncate text-xs font-medium text-text-secondary">
+                      {{ judgeNameMap().get(judgeId) ?? judgeId }}
+                    </span>
+                    <span class="text-xs italic text-text-muted">nisu ocjenili</span>
+                  </div>
+                </div>
+              }
+              @if (sr.scores.length === 0 && sr.unscoredJudgeIds.length === 0) {
                 <p class="py-1 text-xs text-text-muted">Nema ocjena.</p>
               }
             </div>

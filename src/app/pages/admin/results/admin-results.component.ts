@@ -29,6 +29,7 @@ interface SampleResult {
   avgTotal: number;
   judgesScored: number;
   totalJudges: number;
+  unscoredJudgeIds: string[];
 }
 
 interface CategoryResult {
@@ -136,6 +137,9 @@ export class AdminResultsComponent {
         return categories.map((cat): CategoryResult => {
           const catSamples = samples.filter((s) => s.categoryId === cat.categoryId);
           const totalJudges = assignments.filter((a) => a.categoryId === cat.categoryId).length;
+          const allAssignedJudgeIds = assignments
+            .filter((a) => a.categoryId === cat.categoryId)
+            .map((a) => a.judgeId);
 
           const sampleResults: SampleResult[] = catSamples.map((sample): SampleResult => {
             const judgeScores = scoresBySampleId.get(sample.sampleId) ?? [];
@@ -149,6 +153,9 @@ export class AdminResultsComponent {
             const avgAroma = avgField('aroma');
             const avgTaste = avgField('taste');
 
+            const scoredJudgeIds = new Set(judgeScores.map((s) => s.judgeId));
+            const unscoredJudgeIds = allAssignedJudgeIds.filter((jId) => !scoredJudgeIds.has(jId));
+
             return {
               sample,
               producerName: producerMap.get(sample.producerId) ?? '—',
@@ -161,6 +168,7 @@ export class AdminResultsComponent {
               avgTotal: avgColor + avgClarity + avgTypicality + avgAroma + avgTaste,
               judgesScored: judgeScores.length,
               totalJudges,
+              unscoredJudgeIds,
             };
           });
 
