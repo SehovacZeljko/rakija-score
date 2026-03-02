@@ -10,11 +10,14 @@
     <!-- Active festival banner -->
     <app-active-festival-banner />
 
-    <!-- Category name -->
-    @if (category()) {
-      <div class="mb-4">
-        <h1 class="text-xl font-semibold text-text-primary">{{ category()!.name }}</h1>
-      </div>
+    <!-- Category carousel -->
+    @if (categoryCards().length > 0) {
+      <app-category-carousel
+        [cards]="categoryCards()"
+        [activeCategoryId]="categoryId()"
+        (cardClick)="onCategoryClick($event)"
+        class="mb-4 block"
+      />
     }
 
     <!-- Locked banner -->

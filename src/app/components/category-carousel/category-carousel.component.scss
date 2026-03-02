@@ -1,0 +1,6 @@
+:host {
+  display: block;
+  // Tells the browser to hand all touch gestures to JS, enabling swipe detection
+  // and preventing page scroll from competing with horizontal carousel drag
+  touch-action: none;
+}
