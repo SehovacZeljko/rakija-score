@@ -35,6 +35,7 @@ interface CategoryResult {
   category: Category;
   samples: SampleResult[];
   lockedJudgeIds: Set<string>;
+  totalJudges: number;
 }
 
 @Component({
@@ -101,6 +102,17 @@ export class AdminResultsComponent {
     () => new Map(this.users().map((u) => [u.userId, u.username])),
   );
 
+  readonly eventJudgeStats = computed(() => {
+    const results = this.categoryResults();
+    let totalLocked = 0;
+    let totalAssignments = 0;
+    for (const cr of results) {
+      totalLocked += cr.lockedJudgeIds.size;
+      totalAssignments += cr.totalJudges;
+    }
+    return { totalLocked, totalAssignments };
+  });
+
   readonly categoryResults = toSignal(
     combineLatest([
       this.categories$,
@@ -160,7 +172,7 @@ export class AdminResultsComponent {
               .map((a) => a.judgeId),
           );
 
-          return { category: cat, samples: sampleResults, lockedJudgeIds };
+          return { category: cat, samples: sampleResults, lockedJudgeIds, totalJudges };
         });
       }),
     ),
