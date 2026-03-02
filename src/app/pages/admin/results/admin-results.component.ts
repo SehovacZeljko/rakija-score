@@ -105,13 +105,13 @@ export class AdminResultsComponent {
 
   readonly eventJudgeStats = computed(() => {
     const results = this.categoryResults();
-    let totalLocked = 0;
-    let totalAssignments = 0;
+    let totalSubmitted = 0;
+    let totalExpected = 0;
     for (const cr of results) {
-      totalLocked += cr.lockedJudgeIds.size;
-      totalAssignments += cr.totalJudges;
+      totalExpected += cr.totalJudges * cr.samples.length;
+      totalSubmitted += cr.samples.reduce((acc, sr) => acc + sr.judgesScored, 0);
     }
-    return { totalLocked, totalAssignments };
+    return { totalSubmitted, totalExpected };
   });
 
   readonly categoryResults = toSignal(

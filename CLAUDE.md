@@ -363,6 +363,15 @@ Letter spacing for uppercase labels (captions): `0.05em`
 - Keep components **thin** — move business logic to services
 - Use `async` pipe in templates instead of manual subscription management where possible
 - **Prefer `async/await` over `.then()` chains** for all Promise-based code — more readable, easier to add `try/catch`, and consistent across the codebase
+- **No abbreviated variable names** — always use full, descriptive names. Never shorten to single letters or ambiguous abbreviations. Examples:
+  - `ids` → `categoryIds` or `sampleIds`
+  - `cr` → `categoryResult`
+  - `sr` → `sampleResult`
+  - `a` → `assignment`
+  - `s` → `score` or `sample`
+  - `p` → `producer`
+  - `n` → `scoreCount`
+  - `q` → `firestoreQuery`
 
 ---
 
