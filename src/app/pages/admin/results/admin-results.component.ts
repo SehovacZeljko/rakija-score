@@ -89,7 +89,7 @@ export class AdminResultsComponent {
   private readonly scores$ = this.samples$.pipe(
     switchMap((samples) => {
       if (!samples.length) return of([]);
-      return this.scoreService.getScoresForSampleIds(samples.map((s) => s.sampleId));
+      return this.scoreService.getScoresForSampleIds(samples.map((s) => s.sampleId)).pipe(startWith([]));
     }),
   );
 
@@ -136,10 +136,24 @@ export class AdminResultsComponent {
 
         return categories.map((cat): CategoryResult => {
           const catSamples = samples.filter((s) => s.categoryId === cat.categoryId);
-          const totalJudges = assignments.filter((a) => a.categoryId === cat.categoryId).length;
-          const allAssignedJudgeIds = assignments
-            .filter((a) => a.categoryId === cat.categoryId)
-            .map((a) => a.judgeId);
+
+          // Judges with a formal assignment record for this category
+          const assignedJudgeIds = new Set(
+            assignments.filter((a) => a.categoryId === cat.categoryId).map((a) => a.judgeId),
+          );
+
+          // Judges who submitted at least one score in this category (may lack an assignment record)
+          const scoredJudgeIdsInCategory = new Set<string>();
+          for (const sample of catSamples) {
+            for (const score of scoresBySampleId.get(sample.sampleId) ?? []) {
+              scoredJudgeIdsInCategory.add(score.judgeId);
+            }
+          }
+
+          // Union: any judge who is assigned OR who scored counts toward the total
+          const allJudgeIds = new Set([...assignedJudgeIds, ...scoredJudgeIdsInCategory]);
+          const totalJudges = allJudgeIds.size;
+          const allAssignedJudgeIds = [...allJudgeIds];
 
           const sampleResults: SampleResult[] = catSamples.map((sample): SampleResult => {
             const judgeScores = scoresBySampleId.get(sample.sampleId) ?? [];

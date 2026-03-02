@@ -14,7 +14,7 @@ import {
   updateDoc,
   where,
 } from '@angular/fire/firestore';
-import { Observable, of } from 'rxjs';
+import { Observable, combineLatest, map, of } from 'rxjs';
 
 import { Category } from '../models/category.model';
 import { JudgeAssignment } from '../models/judge-assignment.model';
@@ -86,11 +86,18 @@ export class CategoryService {
 
   getAssignmentsForCategories(categoryIds: string[]): Observable<JudgeAssignment[]> {
     if (categoryIds.length === 0) return of([]);
-    const q = query(
-      collection(this.firestore, 'judgeAssignments'),
-      where('categoryId', 'in', categoryIds.slice(0, 30)),
-    );
-    return collectionData(q) as Observable<JudgeAssignment[]>;
+    const chunks: string[][] = [];
+    for (let i = 0; i < categoryIds.length; i += 30) {
+      chunks.push(categoryIds.slice(i, i + 30));
+    }
+    const queries = chunks.map((chunk) => {
+      const q = query(
+        collection(this.firestore, 'judgeAssignments'),
+        where('categoryId', 'in', chunk),
+      );
+      return collectionData(q) as Observable<JudgeAssignment[]>;
+    });
+    return combineLatest(queries).pipe(map((results) => results.flat()));
   }
 
   async assignJudgeToCategory(judgeId: string, categoryId: string): Promise<void> {
