@@ -3,8 +3,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { of, startWith, switchMap } from 'rxjs';
 
-import { RouterLink } from '@angular/router';
-
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Sample } from '../../../models/sample.model';
@@ -15,7 +13,7 @@ import { SampleData, SampleService } from '../../../services/sample.service';
 
 @Component({
   selector: 'app-admin-samples',
-  imports: [ReactiveFormsModule, RouterLink, LoadingSpinnerComponent, ActiveFestivalBannerComponent],
+  imports: [ReactiveFormsModule, LoadingSpinnerComponent, ActiveFestivalBannerComponent],
   templateUrl: './admin-samples.component.html',
   styleUrl: './admin-samples.component.scss',
 })
