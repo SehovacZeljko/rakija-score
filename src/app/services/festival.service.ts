@@ -10,6 +10,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
   where,
   writeBatch,
 } from '@angular/fire/firestore';
@@ -42,6 +43,10 @@ export class FestivalService {
       status: 'inactive',
       createdAt: serverTimestamp(),
     });
+  }
+
+  async updateFestivalName(festivalId: string, name: string): Promise<void> {
+    await updateDoc(doc(this.firestore, `festivals/${festivalId}`), { name });
   }
 
   async setActiveFestival(festivalId: string): Promise<void> {

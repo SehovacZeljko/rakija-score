@@ -53,6 +53,10 @@ export class EventService {
     );
   }
 
+  async updateEvent(eventId: string, name: string, year: number): Promise<void> {
+    await updateDoc(doc(this.firestore, `events/${eventId}`), { name, year });
+  }
+
   async createEvent(festivalId: string, name: string, year: number): Promise<void> {
     const newDocRef = doc(this.eventsRef);
     await setDoc(newDocRef, {

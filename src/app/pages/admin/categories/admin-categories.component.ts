@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { map, of, shareReplay, switchMap, take } from 'rxjs';
@@ -53,6 +53,20 @@ export class AdminCategoriesComponent {
   readonly newEventName = signal('');
   readonly newEventYear = signal(new Date().getFullYear());
   readonly isSavingEvent = signal(false);
+  readonly showNewEventWarning = signal(false);
+
+  // Event edit state
+  readonly editingEventId = signal<string | null>(null);
+  readonly editingEventName = signal('');
+  readonly editingEventYear = signal(new Date().getFullYear());
+  readonly isSavingEventEdit = signal(false);
+  readonly editingEventNameValid = computed(() => this.editingEventName().trim().length >= 3);
+
+  constructor() {
+    effect(() => {
+      if (!this.hasNonFinishedEvent()) this.showNewEventWarning.set(false);
+    });
+  }
 
   // Event transition state
   readonly activatingEventId = signal<string | null>(null);
@@ -115,6 +129,50 @@ export class AdminCategoriesComponent {
     this.newEventName.set('');
     this.newEventYear.set(new Date().getFullYear());
     this.showEventForm.set(false);
+    this.showNewEventWarning.set(false);
+  }
+
+  onNewEventClick(): void {
+    if (this.hasNonFinishedEvent()) {
+      this.showNewEventWarning.set(true);
+    } else {
+      this.showNewEventWarning.set(false);
+      this.showEventForm.set(true);
+    }
+  }
+
+  startEventEdit(festivalEvent: FestivalEvent): void {
+    this.editingEventId.set(festivalEvent.eventId);
+    this.editingEventName.set(festivalEvent.name);
+    this.editingEventYear.set(festivalEvent.year);
+  }
+
+  cancelEventEdit(): void {
+    this.editingEventId.set(null);
+    this.editingEventName.set('');
+    this.editingEventYear.set(new Date().getFullYear());
+  }
+
+  onEditEventNameInput(event: Event): void {
+    this.editingEventName.set((event.target as HTMLInputElement).value);
+  }
+
+  onEditEventYearInput(event: Event): void {
+    const val = parseInt((event.target as HTMLInputElement).value, 10);
+    if (!isNaN(val)) this.editingEventYear.set(val);
+  }
+
+  async saveEventEdit(eventId: string): Promise<void> {
+    const name = this.editingEventName().trim();
+    if (name.length < 3) return;
+    this.isSavingEventEdit.set(true);
+    try {
+      await this.eventService.updateEvent(eventId, name, this.editingEventYear());
+      this.editingEventId.set(null);
+      this.editingEventName.set('');
+    } finally {
+      this.isSavingEventEdit.set(false);
+    }
   }
 
   async activateEvent(eventId: string): Promise<void> {

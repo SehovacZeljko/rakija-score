@@ -67,7 +67,8 @@
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
           <p class="text-sm text-status-pending">
-            Dogadjaj je aktivan. Uzorci se ne mogu dodavati niti mijenjati dok je ocjenjivanje u toku.
+            Dogadjaj je aktivan. Uzorci se ne mogu dodavati niti mijenjati dok je ocjenjivanje u
+            toku.
           </p>
         </div>
       }
@@ -98,7 +99,9 @@
               <!-- Sample code + order -->
               <div class="flex items-center gap-2">
                 <span class="font-semibold text-text-primary">{{ sample.sampleCode }}</span>
-                <span class="rounded bg-bg-surface px-1.5 py-0.5 text-[11px] font-medium text-text-muted">
+                <span
+                  class="rounded bg-bg-surface px-1.5 py-0.5 text-[11px] font-medium text-text-muted"
+                >
                   #{{ sample.order }}
                 </span>
               </div>
@@ -191,7 +194,9 @@
             formControlName="sampleCode"
             placeholder="npr. 1034"
             class="w-full rounded-lg border border-border-default bg-bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
-            [class.border-status-error]="form.controls.sampleCode.invalid && form.controls.sampleCode.touched"
+            [class.border-status-error]="
+              form.controls.sampleCode.invalid && form.controls.sampleCode.touched
+            "
           />
         </div>
         <div class="w-24">
@@ -213,9 +218,11 @@
         <select
           formControlName="producerId"
           class="w-full rounded-lg border border-border-default bg-bg-surface px-3 py-2.5 text-sm text-text-primary focus:border-border-focus focus:outline-none"
-          [class.border-status-error]="form.controls.producerId.invalid && form.controls.producerId.touched"
+          [class.border-status-error]="
+            form.controls.producerId.invalid && form.controls.producerId.touched
+          "
         >
-          <option value="" disabled>Odaberi producenta</option>
+          <option value="" disabled>Odaberi proizvodjača</option>
           @for (producer of producers(); track producer.producerId) {
             <option [value]="producer.producerId">{{ producer.name }}</option>
           }
@@ -230,7 +237,9 @@
         <select
           formControlName="categoryId"
           class="w-full rounded-lg border border-border-default bg-bg-surface px-3 py-2.5 text-sm text-text-primary focus:border-border-focus focus:outline-none"
-          [class.border-status-error]="form.controls.categoryId.invalid && form.controls.categoryId.touched"
+          [class.border-status-error]="
+            form.controls.categoryId.invalid && form.controls.categoryId.touched
+          "
         >
           <option value="" disabled>Odaberi kategoriju</option>
           @for (cat of categories(); track cat.categoryId) {
