@@ -1,4 +1,4 @@
-import { Component, WritableSignal, computed, inject, signal } from '@angular/core';
+import { Component, WritableSignal, computed, effect, inject, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
@@ -60,7 +60,21 @@ export class ScoringComponent {
     return Math.round(t * 100) / 100;
   });
 
+  // Redirect to dashboard when the event becomes inactive while on this page.
+  // Track whether an active event was ever seen so we don't redirect on initial
+  // load (before Firestore resolves the signal from its null initial value).
+  private hasSeenActiveEvent = false;
+
   constructor() {
+    effect(() => {
+      const activeEvent = this.ctx.activeEvent();
+      if (activeEvent) {
+        this.hasSeenActiveEvent = true;
+      } else if (this.hasSeenActiveEvent) {
+        void this.router.navigate(['/dashboard']);
+      }
+    });
+
     const uid = this.authService.currentUser()?.userId;
     if (!uid) {
       this.router.navigate(['/login']);

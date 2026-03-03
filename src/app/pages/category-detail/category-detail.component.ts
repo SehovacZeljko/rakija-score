@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -167,6 +167,25 @@ export class CategoryDetailComponent {
   });
 
   readonly isLocking = signal(false);
+
+  // ── Redirect when event becomes inactive ──────────────────────────────────
+  //
+  // Judges can be on this page when an admin finishes or deactivates the event.
+  // Track whether an active event was ever seen so we don't redirect on initial
+  // load (when the signal is still null before Firestore resolves).
+
+  private hasSeenActiveEvent = false;
+
+  constructor() {
+    effect(() => {
+      const activeEvent = this.ctx.activeEvent();
+      if (activeEvent) {
+        this.hasSeenActiveEvent = true;
+      } else if (this.hasSeenActiveEvent) {
+        void this.router.navigate(['/dashboard']);
+      }
+    });
+  }
 
   // ── Carousel category cards ────────────────────────────────────────────────
 
