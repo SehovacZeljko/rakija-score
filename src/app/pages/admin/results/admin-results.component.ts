@@ -13,6 +13,11 @@ import { User } from '../../../models/user.model';
 import { CategoryService } from '../../../services/category.service';
 import { EventService } from '../../../services/event.service';
 import { ProducerService } from '../../../services/producer.service';
+import {
+  PdfExportInput,
+  PdfJudgeScore,
+  ResultsPdfService,
+} from '../../../services/results-pdf.service';
 import { SampleService } from '../../../services/sample.service';
 import { ScoreService } from '../../../services/score.service';
 import { UserService } from '../../../services/user.service';
@@ -54,6 +59,7 @@ export class AdminResultsComponent {
   private readonly scoreService = inject(ScoreService);
   private readonly userService = inject(UserService);
   private readonly producerService = inject(ProducerService);
+  private readonly resultsPdfService = inject(ResultsPdfService);
 
   private readonly eventId = toSignal(
     this.route.paramMap.pipe(map((p) => p.get('eventId') ?? '')),
@@ -249,6 +255,60 @@ export class AdminResultsComponent {
       results.length > 0 &&
       results.every((cr) => this.expandedCategoryIds().has(cr.category.categoryId))
     );
+  }
+
+  downloadPdf(): void {
+    const currentEvent = this.event();
+    if (!currentEvent) return;
+
+    const judgeNameMap = this.judgeNameMap();
+
+    const input: PdfExportInput = {
+      eventName: currentEvent.name,
+      eventYear: currentEvent.year,
+      totalSubmitted: this.eventJudgeStats().totalSubmitted,
+      totalExpected: this.eventJudgeStats().totalExpected,
+      categoryResults: this.categoryResults().map((categoryResult) => ({
+        categoryName: categoryResult.category.name,
+        samples: categoryResult.samples.map((sampleResult, index) => {
+          const scoredJudges: PdfJudgeScore[] = sampleResult.scores.map((score) => ({
+            judgeName: judgeNameMap.get(score.judgeId) ?? score.judgeId,
+            scored: true,
+            color: score.color,
+            clarity: score.clarity,
+            typicality: score.typicality,
+            aroma: score.aroma,
+            taste: score.taste,
+            total: score.color + score.clarity + score.typicality + score.aroma + score.taste,
+          }));
+
+          const unscoredJudges: PdfJudgeScore[] = sampleResult.unscoredJudgeIds.map(
+            (judgeId) => ({
+              judgeName: judgeNameMap.get(judgeId) ?? judgeId,
+              scored: false,
+              color: 0,
+              clarity: 0,
+              typicality: 0,
+              aroma: 0,
+              taste: 0,
+              total: 0,
+            }),
+          );
+
+          return {
+            rank: index + 1, // samples are already sorted by avgTotal descending
+            sampleCode: sampleResult.sample.sampleCode,
+            producerName: sampleResult.producerName,
+            judgesScored: sampleResult.judgesScored,
+            totalJudges: sampleResult.totalJudges,
+            avgTotal: sampleResult.avgTotal,
+            judgeScores: [...scoredJudges, ...unscoredJudges],
+          };
+        }),
+      })),
+    };
+
+    this.resultsPdfService.generateResultsPdf(input);
   }
 
   scoreTotal(score: Score): number {
