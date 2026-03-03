@@ -11,7 +11,7 @@ import {
   signOut,
   verifyPasswordResetCode,
 } from '@angular/fire/auth';
-import { Firestore, doc, docData, setDoc, serverTimestamp } from '@angular/fire/firestore';
+import { Firestore, doc, docData, setDoc, updateDoc, serverTimestamp } from '@angular/fire/firestore';
 import { Observable, of, switchMap, map } from 'rxjs';
 
 import { User } from '../models/user.model';
@@ -69,5 +69,9 @@ export class AuthService {
   async logout(): Promise<void> {
     await signOut(this.auth);
     this.router.navigate(['/login']);
+  }
+
+  async updateUsername(uid: string, newUsername: string): Promise<void> {
+    await updateDoc(doc(this.firestore, 'users', uid), { username: newUsername });
   }
 }

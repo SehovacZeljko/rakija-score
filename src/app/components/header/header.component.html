@@ -142,28 +142,114 @@
       </nav>
     }
 
-    <!-- Logout button -->
-    <button
-      type="button"
-      (click)="logout()"
-      aria-label="Odjava"
-      class="shrink-0 flex h-9 w-9 items-center justify-center rounded-lg text-white transition-colors hover:bg-primary-light active:bg-primary-dark"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+    <!-- Burger menu -->
+    <div class="relative">
+      <button
+        type="button"
+        (click)="toggleMenu()"
+        aria-label="Meni"
+        class="shrink-0 flex h-9 w-9 items-center justify-center rounded-lg text-white transition-colors hover:bg-primary-light active:bg-primary-dark"
       >
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-        <polyline points="16 17 21 12 16 7" />
-        <line x1="21" y1="12" x2="9" y2="12" />
-      </svg>
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+
+      @if (isMenuOpen()) {
+        <div
+          class="absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-xl border border-border-default bg-bg-card shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
+        >
+          <!-- Profil -->
+          <button
+            type="button"
+            (click)="navigateTo('/profile')"
+            class="flex w-full items-center gap-3 px-4 py-3 text-sm text-text-primary transition-colors hover:bg-bg-surface"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="shrink-0 text-text-secondary"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            Profil
+          </button>
+
+          <div class="border-t border-border-default"></div>
+
+          <!-- Uputstvo -->
+          <button
+            type="button"
+            (click)="navigateTo('/instructions')"
+            class="flex w-full items-center gap-3 px-4 py-3 text-sm text-text-primary transition-colors hover:bg-bg-surface"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="shrink-0 text-text-secondary"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            Uputstvo
+          </button>
+
+          <div class="border-t border-border-default"></div>
+
+          <!-- Odjava -->
+          <button
+            type="button"
+            (click)="logout()"
+            class="flex w-full items-center gap-3 px-4 py-3 text-sm text-status-error transition-colors hover:bg-red-50"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="shrink-0"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Odjava
+          </button>
+        </div>
+      }
+    </div>
   </div>
 </header>

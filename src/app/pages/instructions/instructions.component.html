@@ -1,0 +1,133 @@
+<header class="fixed left-0 right-0 top-0 z-50 h-14 bg-primary">
+  <div class="mx-auto flex h-full max-w-5xl items-center gap-2 px-4">
+    <button
+      type="button"
+      (click)="goBack()"
+      aria-label="Nazad"
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white transition-colors hover:bg-primary-light active:bg-primary-dark"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="15 18 9 12 15 6" />
+      </svg>
+    </button>
+    <p class="truncate text-base font-semibold text-white">Uputstvo</p>
+  </div>
+</header>
+
+<main class="min-h-screen bg-bg-app pb-10 pt-14">
+  <div class="mx-auto w-full max-w-5xl p-4">
+    <!-- Admin flow (only for admins) -->
+    @if (isAdmin) {
+      <section class="mb-6">
+        <h2 class="mb-3 text-lg font-semibold text-text-primary">Upravljanje festivalom (Admin)</h2>
+
+        <div class="space-y-3">
+          <div class="rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+            <p class="mb-1 text-sm font-semibold text-text-primary">1. Festivali</p>
+            <p class="text-sm text-text-secondary">
+              Kreirajte festival i označite ga kao aktivan. Samo jedan festival može biti aktivan u
+              isto vrijeme, a jedan festival može imati više događaja.
+            </p>
+          </div>
+
+          <div class="rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+            <p class="mb-1 text-sm font-semibold text-text-primary">2. Događaji</p>
+            <p class="text-sm text-text-secondary">
+              Kreirajte događaj unutar festivala. Novi događaj se kreira u statusu
+              <span class="font-medium text-text-primary">priprema</span>. Aktivirajte ga da bi
+              sudije mogle ocjenjivati. Završite događaj kada je ocjenjivanje gotovo.
+            </p>
+          </div>
+
+          <div class="rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+            <p class="mb-1 text-sm font-semibold text-text-primary">3. Kategorije</p>
+            <p class="text-sm text-text-secondary">
+              Dodajte kategorije (npr. Šljivovica, Šljivovica iz bureta, Lozovača) u okviru
+              događaja. Kategorije se ne mogu brisati nakon što je ocjenjivanje počelo.
+            </p>
+          </div>
+
+          <div class="rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+            <p class="mb-1 text-sm font-semibold text-text-primary">4. Uzorci</p>
+            <p class="text-sm text-text-secondary">
+              Registrujte uzorke i dodijelite ih kategorijama. Svaki uzorak ima šifru, godište i
+              jačinu alkohola.
+            </p>
+          </div>
+
+          <div class="rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+            <p class="mb-1 text-sm font-semibold text-text-primary">5. Sudije</p>
+            <p class="text-sm text-text-secondary">
+              Pretražite registrovane korisnike i dodijelite ih pojedinim kategorijama. Sudija vidi
+              samo kategorije koje su joj dodijeljene.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="mb-6 border-t border-border-default"></div>
+    }
+
+    <!-- Judge flow (always shown) -->
+    <section>
+      <h2 class="mb-3 text-lg font-semibold text-text-primary">Ocjenjivanje (Sudija)</h2>
+
+      <div class="space-y-3">
+        <div class="rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+          <p class="mb-1 text-sm font-semibold text-text-primary">1. Registracija i prijava</p>
+          <p class="text-sm text-text-secondary">
+            Kreirajte nalog putem stranice za registraciju. Novi nalozi dobijaju ulogu sudije ali
+            administrator dogadjaja mora da vam dodjeli dogadjaj za ocjenjivanje. Prijavite se email
+            adresom i lozinkom.
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+          <p class="mb-1 text-sm font-semibold text-text-primary">2. Početna strana</p>
+          <p class="text-sm text-text-secondary">
+            Nakon prijave vidite sve kategorije koje su vam dodijeljene. Svaka kartica prikazuje
+            naziv kategorije i napredak ocjenjivanja (npr. 5 / 12 ocijenjeno).
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+          <p class="mb-1 text-sm font-semibold text-text-primary">3. Detalji kategorije</p>
+          <p class="text-sm text-text-secondary">
+            Otvorite kategoriju da vidite sve uzorke. Ocijenjeni uzorci prikazuju zelenu ocjenu;
+            neocijenjeni prikazuju 0.00 u crvenoj boji.
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+          <p class="mb-1 text-sm font-semibold text-text-primary">4. Ocjenjivanje uzorka</p>
+          <p class="text-sm text-text-secondary">
+            Tapnite na uzorak da otvorite formu za ocjenjivanje. Podesite svaki kriterij: Boja (max
+            1), Bistrina (max 1), Tipičnost (max 2), Miris (max 5), Ukus (max 8). Maksimalan ukupni
+            zbir je 17 poena. Dodajte opcioni komentar i tapnite
+            <span class="font-medium text-text-primary">Sačuvaj</span>.
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+          <p class="mb-1 text-sm font-semibold text-text-primary">5. Zaključavanje kategorije</p>
+          <p class="text-sm text-text-secondary">
+            Kada ocijenite sve uzorke, dugme
+            <span class="font-medium text-text-primary">Zaključaj kategoriju</span> postaje aktivno.
+            Nakon zaključavanja ocjene se ne mogu mijenjati. Zaključavanje je lično — drugi sudija
+            može još uvijek ocjenjivati istu kategoriju.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>

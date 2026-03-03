@@ -1,6 +1,6 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, inject, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
 import { NavItem } from '../bottom-nav/bottom-nav.component';
@@ -16,12 +16,33 @@ export class HeaderComponent {
   @Input() items: NavItem[] = [];
 
   protected readonly authService = inject(AuthService);
+  private readonly elementRef = inject(ElementRef);
+  private readonly router = inject(Router);
+
+  readonly isMenuOpen = signal(false);
 
   get homeRoute(): string {
     return this.authService.currentUser()?.role === 'admin' ? '/admin/festivals' : '/dashboard';
   }
 
+  toggleMenu(): void {
+    this.isMenuOpen.update((open) => !open);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.isMenuOpen.set(false);
+    }
+  }
+
+  navigateTo(path: string): void {
+    this.isMenuOpen.set(false);
+    this.router.navigate([path]);
+  }
+
   logout(): void {
+    this.isMenuOpen.set(false);
     this.authService.logout();
   }
 }

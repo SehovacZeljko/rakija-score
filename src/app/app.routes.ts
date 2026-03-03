@@ -99,5 +99,17 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('./pages/profile/profile.component').then((m) => m.ProfileComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'instructions',
+    loadComponent: () =>
+      import('./pages/instructions/instructions.component').then((m) => m.InstructionsComponent),
+    canActivate: [authGuard],
+  },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 ];
