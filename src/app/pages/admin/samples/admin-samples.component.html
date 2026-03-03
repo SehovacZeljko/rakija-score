@@ -74,16 +74,69 @@
       }
 
       <!-- Category filter -->
-      <div class="mb-4">
-        <select
-          (change)="onCategoryFilterChange($event)"
-          class="w-full rounded-xl border border-border-default bg-bg-card px-3 py-2.5 text-sm text-text-primary focus:border-border-focus focus:outline-none"
+      <div class="relative mb-4">
+        <!-- Trigger -->
+        <button
+          type="button"
+          (click)="toggleFilterDropdown($event)"
+          class="flex w-full items-center justify-between rounded-xl border border-border-default bg-bg-card px-3 py-2.5 text-sm text-text-primary"
         >
-          <option value="">Sve kategorije ({{ allSamples().length }})</option>
-          @for (cat of categories(); track cat.categoryId) {
-            <option [value]="cat.categoryId">{{ cat.name }}</option>
-          }
-        </select>
+          <span>
+            @if (selectedCategoryName()) {
+              {{ selectedCategoryName() }}
+            } @else {
+              Sve kategorije ({{ allSamples().length }})
+            }
+          </span>
+          <svg
+            class="ml-2 shrink-0 text-text-muted transition-transform duration-150"
+            [class.rotate-180]="filterDropdownOpen()"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+
+        @if (filterDropdownOpen()) {
+          <!-- Backdrop -->
+          <div class="fixed inset-0 z-10" (click)="filterDropdownOpen.set(false)"></div>
+          <!-- Panel -->
+          <div
+            class="absolute left-0 right-0 z-20 mt-1 overflow-hidden rounded-xl border border-border-default bg-bg-card shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
+          >
+            <button
+              type="button"
+              (click)="selectCategoryFilter(null, $event)"
+              class="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors hover:bg-bg-surface"
+              [class.font-semibold]="!selectedCategoryId()"
+              [class.text-text-primary]="!selectedCategoryId()"
+              [class.text-text-secondary]="!!selectedCategoryId()"
+            >
+              <span>Sve kategorije</span>
+              <span class="text-xs text-text-muted">{{ allSamples().length }}</span>
+            </button>
+            @for (cat of categories(); track cat.categoryId) {
+              <button
+                type="button"
+                (click)="selectCategoryFilter(cat.categoryId, $event)"
+                class="flex w-full items-center justify-between border-t border-border-default px-3 py-2.5 text-left text-sm transition-colors hover:bg-bg-surface"
+                [class.font-semibold]="selectedCategoryId() === cat.categoryId"
+                [class.text-text-primary]="selectedCategoryId() === cat.categoryId"
+                [class.text-text-secondary]="selectedCategoryId() !== cat.categoryId"
+              >
+                {{ cat.name }}
+              </button>
+            }
+          </div>
+        }
       </div>
 
       <!-- Sample list -->

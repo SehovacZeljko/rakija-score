@@ -59,11 +59,28 @@ export class AdminSamplesComponent {
   );
 
   readonly selectedCategoryId = signal<string | null>(null);
+  readonly selectedCategoryName = computed(() => {
+    const id = this.selectedCategoryId();
+    return id ? (this.categoryMap().get(id) ?? null) : null;
+  });
   readonly filteredSamples = computed(() => {
     const catId = this.selectedCategoryId();
     const samples = this.allSamples();
     return catId ? samples.filter((s) => s.categoryId === catId) : samples;
   });
+
+  readonly filterDropdownOpen = signal(false);
+
+  toggleFilterDropdown(event: MouseEvent): void {
+    event.stopPropagation();
+    this.filterDropdownOpen.update((open) => !open);
+  }
+
+  selectCategoryFilter(categoryId: string | null, event: MouseEvent): void {
+    event.stopPropagation();
+    this.selectedCategoryId.set(categoryId);
+    this.filterDropdownOpen.set(false);
+  }
 
   readonly mode = signal<'list' | 'create' | 'edit'>('list');
   readonly editingSample = signal<Sample | null>(null);
@@ -80,11 +97,6 @@ export class AdminSamplesComponent {
     alcoholStrength: [40, Validators.required],
     order: [1, Validators.required],
   });
-
-  onCategoryFilterChange(event: Event): void {
-    const val = (event.target as HTMLSelectElement).value;
-    this.selectedCategoryId.set(val || null);
-  }
 
   openCreate(): void {
     this.form.reset({
