@@ -1,0 +1,72 @@
+<div class="relative">
+  <!-- Trigger -->
+  <button
+    type="button"
+    (click)="toggle($event)"
+    class="flex w-full items-center justify-between border px-3 py-2.5 text-sm text-text-primary transition-colors"
+    [class]="triggerClasses()"
+    [class.border-border-default]="!invalid()"
+    [class.border-status-error]="invalid()"
+    [class.opacity-50]="isDisabled()"
+    [class.cursor-not-allowed]="isDisabled()"
+  >
+    <span [class.text-text-muted]="!internalValue() && !showAllOption()">
+      {{ displayLabel() }}
+      @if (!internalValue() && showAllOption() && allOptionCount() !== null) {
+        ({{ allOptionCount() }})
+      }
+    </span>
+    <svg
+      class="ml-2 shrink-0 text-text-muted transition-transform duration-150"
+      [class.rotate-180]="isOpen()"
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </button>
+
+  @if (isOpen()) {
+    <!-- Backdrop -->
+    <div class="fixed inset-0 z-10" (click)="close()"></div>
+    <!-- Panel -->
+    <div
+      class="absolute left-0 right-0 z-20 mt-1 overflow-hidden rounded-xl border border-border-default bg-bg-card shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
+    >
+      @if (showAllOption()) {
+        <button
+          type="button"
+          (click)="select(null, $event)"
+          class="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors hover:bg-bg-surface"
+          [class.font-semibold]="!internalValue()"
+          [class.text-text-primary]="!internalValue()"
+          [class.text-text-secondary]="!!internalValue()"
+        >
+          <span>{{ allOptionLabel() }}</span>
+          @if (allOptionCount() !== null) {
+            <span class="text-xs text-text-muted">{{ allOptionCount() }}</span>
+          }
+        </button>
+      }
+      @for (option of options(); track option.id) {
+        <button
+          type="button"
+          (click)="select(option.id, $event)"
+          class="flex w-full items-center justify-between border-t border-border-default px-3 py-2.5 text-left text-sm transition-colors hover:bg-bg-surface"
+          [class.font-semibold]="internalValue() === option.id"
+          [class.text-text-primary]="internalValue() === option.id"
+          [class.text-text-secondary]="internalValue() !== option.id"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+  }
+</div>

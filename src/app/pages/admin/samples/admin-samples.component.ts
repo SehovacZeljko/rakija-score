@@ -11,6 +11,7 @@ import {
 import { of, startWith, switchMap } from 'rxjs';
 
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
+import { SelectDropdownComponent } from '../../../components/select-dropdown/select-dropdown.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Sample } from '../../../models/sample.model';
 import { CategoryService } from '../../../services/category.service';
@@ -20,7 +21,7 @@ import { SampleData, SampleService } from '../../../services/sample.service';
 
 @Component({
   selector: 'app-admin-samples',
-  imports: [ReactiveFormsModule, LoadingSpinnerComponent, ActiveFestivalBannerComponent],
+  imports: [ReactiveFormsModule, LoadingSpinnerComponent, ActiveFestivalBannerComponent, SelectDropdownComponent],
   templateUrl: './admin-samples.component.html',
   styleUrl: './admin-samples.component.scss',
 })
@@ -58,29 +59,19 @@ export class AdminSamplesComponent {
     () => new Map(this.categories().map((c) => [c.categoryId, c.name])),
   );
 
+  readonly categoryOptions = computed(() =>
+    this.categories().map((c) => ({ id: c.categoryId, label: c.name })),
+  );
+  readonly producerOptions = computed(() =>
+    this.producers().map((p) => ({ id: p.producerId, label: p.name })),
+  );
+
   readonly selectedCategoryId = signal<string | null>(null);
-  readonly selectedCategoryName = computed(() => {
-    const id = this.selectedCategoryId();
-    return id ? (this.categoryMap().get(id) ?? null) : null;
-  });
   readonly filteredSamples = computed(() => {
     const catId = this.selectedCategoryId();
     const samples = this.allSamples();
     return catId ? samples.filter((s) => s.categoryId === catId) : samples;
   });
-
-  readonly filterDropdownOpen = signal(false);
-
-  toggleFilterDropdown(event: MouseEvent): void {
-    event.stopPropagation();
-    this.filterDropdownOpen.update((open) => !open);
-  }
-
-  selectCategoryFilter(categoryId: string | null, event: MouseEvent): void {
-    event.stopPropagation();
-    this.selectedCategoryId.set(categoryId);
-    this.filterDropdownOpen.set(false);
-  }
 
   readonly mode = signal<'list' | 'create' | 'edit'>('list');
   readonly editingSample = signal<Sample | null>(null);

@@ -134,7 +134,7 @@
         </svg>
       </button>
       <h1 class="text-xl font-semibold text-text-primary">
-        {{ mode() === 'create' ? 'Novi producent' : 'Uredi producenta' }}
+        {{ mode() === 'create' ? 'Novi proizvodjač' : 'Uredi proizvodjača' }}
       </h1>
     </div>
 
@@ -148,7 +148,7 @@
         <input
           type="text"
           formControlName="name"
-          placeholder="Naziv producenta"
+          placeholder="Naziv proizvodjača"
           class="w-full rounded-lg border border-border-default bg-bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
           [class.border-status-error]="form.controls.name.invalid && form.controls.name.touched"
         />

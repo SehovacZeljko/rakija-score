@@ -313,7 +313,7 @@ If `isLocked`: read-only banner "Kategorija je zaključana. Ocjena se ne može m
 ### [ ] 5.1 Admin Layout Shell
 **File:** `src/app/pages/admin/admin-layout.component.ts`
 
-- Tab bar (mobile): "Festivali", "Kategorije", "Producenti", "Uzorci", "Sudije"
+- Tab bar (mobile): "Festivali", "Kategorije", "Proizvodjači", "Uzorci", "Sudije"
 - `RouterLinkActive` for active tab styling
 - `<router-outlet>` for child pages
 - Logout button accessible
@@ -364,7 +364,7 @@ If `isLocked`: read-only banner "Kategorija je zaključana. Ocjena se ne može m
 
 **ProducerService:** `getAllProducers`, `createProducer`, `updateProducer`
 
-**UI:** Searchable list (client-side signal filter); "Novi producent" form with all fields; tap to edit.
+**UI:** Searchable list (client-side signal filter); "Novi Proizvodjač" form with all fields; tap to edit.
 
 **Verify:** Create, edit, search producers.
 

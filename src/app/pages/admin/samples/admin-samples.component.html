@@ -74,70 +74,15 @@
       }
 
       <!-- Category filter -->
-      <div class="relative mb-4">
-        <!-- Trigger -->
-        <button
-          type="button"
-          (click)="toggleFilterDropdown($event)"
-          class="flex w-full items-center justify-between rounded-xl border border-border-default bg-bg-card px-3 py-2.5 text-sm text-text-primary"
-        >
-          <span>
-            @if (selectedCategoryName()) {
-              {{ selectedCategoryName() }}
-            } @else {
-              Sve kategorije ({{ allSamples().length }})
-            }
-          </span>
-          <svg
-            class="ml-2 shrink-0 text-text-muted transition-transform duration-150"
-            [class.rotate-180]="filterDropdownOpen()"
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </button>
-
-        @if (filterDropdownOpen()) {
-          <!-- Backdrop -->
-          <div class="fixed inset-0 z-10" (click)="filterDropdownOpen.set(false)"></div>
-          <!-- Panel -->
-          <div
-            class="absolute left-0 right-0 z-20 mt-1 overflow-hidden rounded-xl border border-border-default bg-bg-card shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
-          >
-            <button
-              type="button"
-              (click)="selectCategoryFilter(null, $event)"
-              class="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors hover:bg-bg-surface"
-              [class.font-semibold]="!selectedCategoryId()"
-              [class.text-text-primary]="!selectedCategoryId()"
-              [class.text-text-secondary]="!!selectedCategoryId()"
-            >
-              <span>Sve kategorije</span>
-              <span class="text-xs text-text-muted">{{ allSamples().length }}</span>
-            </button>
-            @for (cat of categories(); track cat.categoryId) {
-              <button
-                type="button"
-                (click)="selectCategoryFilter(cat.categoryId, $event)"
-                class="flex w-full items-center justify-between border-t border-border-default px-3 py-2.5 text-left text-sm transition-colors hover:bg-bg-surface"
-                [class.font-semibold]="selectedCategoryId() === cat.categoryId"
-                [class.text-text-primary]="selectedCategoryId() === cat.categoryId"
-                [class.text-text-secondary]="selectedCategoryId() !== cat.categoryId"
-              >
-                {{ cat.name }}
-              </button>
-            }
-          </div>
-        }
-      </div>
+      <app-select-dropdown
+        class="mb-4 block"
+        [options]="categoryOptions()"
+        [currentValue]="selectedCategoryId()"
+        (selectionChange)="selectedCategoryId.set($event)"
+        [showAllOption]="true"
+        allOptionLabel="Sve kategorije"
+        [allOptionCount]="allSamples().length"
+      />
 
       <!-- Sample list -->
       @for (sample of filteredSamples(); track sample.sampleId) {
@@ -257,9 +202,7 @@
             } @else if (form.controls.sampleCode.hasError('minlength')) {
               <p class="mt-1 text-xs text-status-error">Šifra mora imati najmanje 4 karaktera.</p>
             } @else if (form.controls.sampleCode.hasError('duplicateCode')) {
-              <p class="mt-1 text-xs text-status-error">
-                Ova šifra već postoji u ovom dogadjaju.
-              </p>
+              <p class="mt-1 text-xs text-status-error">Ova šifra već postoji u ovom dogadjaju.</p>
             }
           }
         </div>
@@ -277,20 +220,15 @@
       <!-- Producer -->
       <div class="mb-4">
         <label class="mb-1.5 block text-sm font-medium text-text-secondary">
-          Producent <span class="text-status-error">*</span>
+          Proizvodjač <span class="text-status-error">*</span>
         </label>
-        <select
+        <app-select-dropdown
           formControlName="producerId"
-          class="w-full rounded-lg border border-border-default bg-bg-surface px-3 py-2.5 text-sm text-text-primary focus:border-border-focus focus:outline-none"
-          [class.border-status-error]="
-            form.controls.producerId.invalid && form.controls.producerId.touched
-          "
-        >
-          <option value="" disabled>Odaberi proizvodjača</option>
-          @for (producer of producers(); track producer.producerId) {
-            <option [value]="producer.producerId">{{ producer.name }}</option>
-          }
-        </select>
+          [options]="producerOptions()"
+          variant="form"
+          placeholder="Odaberi proizvodjača"
+          [invalid]="form.controls.producerId.invalid && form.controls.producerId.touched"
+        />
       </div>
 
       <!-- Category -->
@@ -298,18 +236,13 @@
         <label class="mb-1.5 block text-sm font-medium text-text-secondary">
           Kategorija <span class="text-status-error">*</span>
         </label>
-        <select
+        <app-select-dropdown
           formControlName="categoryId"
-          class="w-full rounded-lg border border-border-default bg-bg-surface px-3 py-2.5 text-sm text-text-primary focus:border-border-focus focus:outline-none"
-          [class.border-status-error]="
-            form.controls.categoryId.invalid && form.controls.categoryId.touched
-          "
-        >
-          <option value="" disabled>Odaberi kategoriju</option>
-          @for (cat of categories(); track cat.categoryId) {
-            <option [value]="cat.categoryId">{{ cat.name }}</option>
-          }
-        </select>
+          [options]="categoryOptions()"
+          variant="form"
+          placeholder="Odaberi kategoriju"
+          [invalid]="form.controls.categoryId.invalid && form.controls.categoryId.touched"
+        />
       </div>
 
       <!-- Year + Alcohol row -->
