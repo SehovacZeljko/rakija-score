@@ -109,7 +109,7 @@
     }
 
     <!-- Lock button -->
-    @if (!isLocked()) {
+    @if (!isLocked() && isEventActive()) {
       <div class="mt-6">
         <button
           type="button"

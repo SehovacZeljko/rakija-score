@@ -8,8 +8,23 @@
         Aktivan
       </span>
     </div>
-    @if (ctx.activeEvent(); as event) {
-      <p class="mt-1 text-xs text-text-secondary">{{ event.name }} · {{ event.year }}</p>
+    @if (ctx.adminCurrentEvent(); as event) {
+      <div class="mt-1 flex items-center gap-2">
+        <p class="text-xs text-text-secondary">{{ event.name }} · {{ event.year }}</p>
+        @if (event.status === 'active') {
+          <span
+            class="shrink-0 rounded-[6px] bg-accent px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.05em] text-text-on-accent"
+          >
+            Aktivno
+          </span>
+        } @else if (event.status === 'staging') {
+          <span
+            class="shrink-0 rounded-[6px] bg-status-pending/20 px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.05em] text-status-pending"
+          >
+            Priprema
+          </span>
+        }
+      </div>
     } @else {
       <p class="mt-1 text-xs text-status-error">
         Nema aktivnog dogadjaja. Aktivirajte dogadjaj u sekciji Kategorije.

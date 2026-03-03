@@ -125,6 +125,7 @@ export class CategoryDetailComponent {
   readonly assignment = toSignal(this.assignment$, { initialValue: null });
 
   readonly isLocked = computed(() => this.assignment()?.status === 'finished');
+  readonly isEventActive = computed(() => !!this.ctx.activeEvent());
 
   private readonly samples$ = combineLatest([this.allSamples$, this.categoryId$]).pipe(
     map(([samples, id]) => samples.filter((s) => s.categoryId === id)),

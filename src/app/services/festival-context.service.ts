@@ -35,8 +35,18 @@ export class FestivalContextService {
     shareReplay(1),
   );
 
+  readonly adminCurrentEvent$: Observable<FestivalEvent | null> = this.activeFestival$.pipe(
+    switchMap((f) =>
+      f
+        ? this.eventService.getCurrentAdminEvent(f.festivalId).pipe(catchError(() => of(null)))
+        : of(null),
+    ),
+    shareReplay(1),
+  );
+
   readonly activeFestival = toSignal(this.activeFestival$, { initialValue: null });
   readonly activeEvent = toSignal(this.activeEvent$, { initialValue: null });
+  readonly adminCurrentEvent = toSignal(this.adminCurrentEvent$, { initialValue: null });
 
   readonly dataReady = toSignal(
     this.activeFestival$.pipe(

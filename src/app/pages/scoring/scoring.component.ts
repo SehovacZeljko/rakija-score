@@ -1,11 +1,11 @@
-import { Component, WritableSignal, computed, signal } from '@angular/core';
-import { inject } from '@angular/core';
+import { Component, WritableSignal, computed, inject, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../services/auth.service';
 import { CategoryService } from '../../services/category.service';
+import { FestivalContextService } from '../../services/festival-context.service';
 import { SampleService } from '../../services/sample.service';
 import { ScoreService } from '../../services/score.service';
 import { ToastService } from '../../services/toast.service';
@@ -23,6 +23,7 @@ export class ScoringComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly categoryService = inject(CategoryService);
+  private readonly ctx = inject(FestivalContextService);
   private readonly sampleService = inject(SampleService);
   private readonly scoreService = inject(ScoreService);
   private readonly toastService = inject(ToastService);
@@ -87,7 +88,8 @@ export class ScoringComponent {
       }
 
       const assignment = assignments.find((a) => a.categoryId === this.categoryId);
-      if (assignment?.status === 'finished') this.isLocked.set(true);
+      const isEventActive = !!this.ctx.activeEvent();
+      if (assignment?.status === 'finished' || !isEventActive) this.isLocked.set(true);
     } finally {
       this.isLoading.set(false);
     }

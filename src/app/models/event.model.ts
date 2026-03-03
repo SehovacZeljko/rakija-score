@@ -5,7 +5,7 @@ export interface FestivalEvent {
   festivalId: string;
   name: string;
   year: number;
-  status: 'active' | 'inactive';
+  status: 'staging' | 'active' | 'finished';
   closedAt: Timestamp | null;
   createdAt: Timestamp;
 }

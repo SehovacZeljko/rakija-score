@@ -1,4 +1,6 @@
 import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
+
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Component, computed, inject, signal } from '@angular/core';
@@ -16,7 +18,7 @@ type JudgeFilter = 'unassigned' | 'assigned';
 
 @Component({
   selector: 'app-admin-judges',
-  imports: [NgClass, LoadingSpinnerComponent, ActiveFestivalBannerComponent],
+  imports: [NgClass, RouterLink, LoadingSpinnerComponent, ActiveFestivalBannerComponent],
   templateUrl: './admin-judges.component.html',
   styleUrl: './admin-judges.component.scss',
 })
@@ -28,10 +30,11 @@ export class AdminJudgesComponent {
   readonly PAGE_SIZE = PAGE_SIZE;
 
   readonly activeFestival = this.ctx.activeFestival;
-  readonly activeEvent = this.ctx.activeEvent;
+  readonly adminCurrentEvent = this.ctx.adminCurrentEvent;
   readonly dataReady = this.ctx.dataReady;
+  readonly isEventActive = computed(() => this.adminCurrentEvent()?.status === 'active');
 
-  private readonly categories$ = this.ctx.activeEvent$.pipe(
+  private readonly categories$ = this.ctx.adminCurrentEvent$.pipe(
     switchMap((event) => {
       if (!event) return of([]);
       return this.categoryService.getCategoriesForEvents([event.eventId]).pipe(startWith([]));

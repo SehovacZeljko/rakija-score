@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { map, of, shareReplay, switchMap, take } from 'rxjs';
 
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Category } from '../../../models/category.model';
+import { FestivalEvent } from '../../../models/event.model';
 import { CategoryService } from '../../../services/category.service';
 import { EventService } from '../../../services/event.service';
 import { FestivalService } from '../../../services/festival.service';
@@ -42,14 +43,23 @@ export class AdminCategoriesComponent {
 
   readonly categories = toSignal(this.categories$, { initialValue: [] });
 
+  readonly hasActiveEvent = computed(() => this.events().some((e) => e.status === 'active'));
+  readonly hasNonFinishedEvent = computed(() =>
+    this.events().some((e) => e.status === 'active' || e.status === 'staging'),
+  );
+
   // Event form state
   readonly showEventForm = signal(false);
   readonly newEventName = signal('');
   readonly newEventYear = signal(new Date().getFullYear());
   readonly isSavingEvent = signal(false);
 
-  // Event activate state
+  // Event transition state
   readonly activatingEventId = signal<string | null>(null);
+  readonly finishingEventId = signal<string | null>(null);
+  readonly revertingEventId = signal<string | null>(null);
+  readonly revertErrorEventId = signal<string | null>(null);
+  readonly reopeningEventId = signal<string | null>(null);
 
   // Category form state — stores eventId of the event whose form is open
   readonly activeCategoryFormEventId = signal<string | null>(null);
@@ -63,6 +73,14 @@ export class AdminCategoriesComponent {
   categoriesForEvent(eventId: string): Category[] {
     return this.categories().filter((c) => c.eventId === eventId);
   }
+
+  readonly sortedEvents = computed(() => {
+    // Sort by creation time only — stable positions prevent confusing card jumps
+    // when an event changes status. Status is visible via badges.
+    return [...this.events()].sort(
+      (a, b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0),
+    );
+  });
 
   onEventNameInput(event: Event): void {
     this.newEventName.set((event.target as HTMLInputElement).value);
@@ -99,14 +117,49 @@ export class AdminCategoriesComponent {
     this.showEventForm.set(false);
   }
 
-  async setActiveEvent(eventId: string): Promise<void> {
+  async activateEvent(eventId: string): Promise<void> {
     const festivalId = this.activeFestival()?.festivalId;
     if (!festivalId) return;
     this.activatingEventId.set(eventId);
     try {
-      await this.eventService.setActiveEvent(festivalId, eventId);
+      await this.eventService.activateEvent(festivalId, eventId);
     } finally {
       this.activatingEventId.set(null);
+    }
+  }
+
+  async finishEvent(eventId: string): Promise<void> {
+    this.finishingEventId.set(eventId);
+    try {
+      await this.eventService.finishEvent(eventId);
+    } finally {
+      this.finishingEventId.set(null);
+    }
+  }
+
+  async reopenEvent(eventId: string): Promise<void> {
+    const festivalId = this.activeFestival()?.festivalId;
+    if (!festivalId) return;
+    this.reopeningEventId.set(eventId);
+    try {
+      await this.eventService.reopenEvent(festivalId, eventId);
+    } finally {
+      this.reopeningEventId.set(null);
+    }
+  }
+
+  async revertToStaging(eventId: string): Promise<void> {
+    this.revertingEventId.set(eventId);
+    this.revertErrorEventId.set(null);
+    try {
+      await this.eventService.revertToStaging(eventId);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'SCORES_EXIST') {
+        this.revertErrorEventId.set(eventId);
+        setTimeout(() => this.revertErrorEventId.set(null), 4000);
+      }
+    } finally {
+      this.revertingEventId.set(null);
     }
   }
 
