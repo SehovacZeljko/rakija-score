@@ -2,6 +2,7 @@ import { Component, WritableSignal, computed, inject, signal } from '@angular/co
 import { Router, ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { HeaderComponent } from '../../components/header/header.component';
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../services/auth.service';
 import { CategoryService } from '../../services/category.service';
@@ -14,7 +15,7 @@ import { SCORE_STEP, SCORING_CRITERIA, ScoringCriterion } from '../../shared/sco
 
 @Component({
   selector: 'app-scoring',
-  imports: [LoadingSpinnerComponent],
+  imports: [HeaderComponent, LoadingSpinnerComponent],
   templateUrl: './scoring.component.html',
   styleUrl: './scoring.component.scss',
 })
@@ -31,7 +32,7 @@ export class ScoringComponent {
   readonly SCORING_CRITERIA = SCORING_CRITERIA;
   readonly SCORE_STEP = SCORE_STEP;
 
-  private readonly categoryId = this.route.snapshot.paramMap.get('categoryId')!;
+  protected readonly categoryId = this.route.snapshot.paramMap.get('categoryId')!;
   private readonly sampleId = this.route.snapshot.paramMap.get('sampleId')!;
 
   readonly sample = signal<Sample | null>(null);
@@ -145,7 +146,4 @@ export class ScoringComponent {
     }
   }
 
-  goBack(): void {
-    this.router.navigate(['/category', this.categoryId]);
-  }
 }

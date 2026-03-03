@@ -1,16 +1,15 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
 
+import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-instructions',
-  imports: [],
+  imports: [HeaderComponent],
   templateUrl: './instructions.component.html',
   styleUrl: './instructions.component.scss',
 })
 export class InstructionsComponent {
-  private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
   get isAdmin(): boolean {
@@ -19,9 +18,5 @@ export class InstructionsComponent {
 
   get homeRoute(): string {
     return this.isAdmin ? '/admin/festivals' : '/dashboard';
-  }
-
-  goBack(): void {
-    this.router.navigate([this.homeRoute]);
   }
 }

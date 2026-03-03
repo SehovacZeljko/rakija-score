@@ -14,6 +14,8 @@ import { NavItem } from '../bottom-nav/bottom-nav.component';
 export class HeaderComponent {
   @Input({ required: true }) title!: string;
   @Input() items: NavItem[] = [];
+  @Input() backRoute: string | null = null;
+  @Input() subtitle: string = '';
 
   protected readonly authService = inject(AuthService);
   private readonly elementRef = inject(ElementRef);
@@ -39,6 +41,10 @@ export class HeaderComponent {
   navigateTo(path: string): void {
     this.isMenuOpen.set(false);
     this.router.navigate([path]);
+  }
+
+  goBack(): void {
+    this.router.navigate([this.backRoute]);
   }
 
   logout(): void {

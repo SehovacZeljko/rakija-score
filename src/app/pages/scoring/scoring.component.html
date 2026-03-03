@@ -1,22 +1,8 @@
-<!-- Custom header with back button -->
-<header class="fixed left-0 right-0 top-0 z-50 flex h-14 items-center gap-2 bg-primary px-4">
-  <button
-    type="button"
-    (click)="goBack()"
-    aria-label="Nazad"
-    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white transition-colors hover:bg-primary-light active:bg-primary-dark"
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  </button>
-  <div class="min-w-0 flex-1">
-    <p class="truncate text-base font-semibold text-white">
-      {{ isLoading() ? '...' : (sample()?.sampleCode ?? '') }}
-    </p>
-    <p class="text-xs text-white/60">Ocjenjivanje</p>
-  </div>
-</header>
+<app-header
+  [title]="isLoading() ? '...' : (sample()?.sampleCode ?? '')"
+  subtitle="Ocjenjivanje"
+  [backRoute]="'/category/' + categoryId"
+/>
 
 <main class="min-h-screen bg-bg-app pb-24 pt-14">
 

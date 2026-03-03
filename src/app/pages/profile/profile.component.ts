@@ -1,13 +1,13 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 
+import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule],
+  imports: [HeaderComponent, ReactiveFormsModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -15,7 +15,6 @@ export class ProfileComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
-  private readonly router = inject(Router);
 
   readonly currentUser = this.authService.currentUser;
   readonly isSaving = signal(false);
@@ -51,7 +50,4 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  goBack(): void {
-    this.router.navigate([this.homeRoute]);
-  }
 }
