@@ -198,6 +198,17 @@
               form.controls.sampleCode.invalid && form.controls.sampleCode.touched
             "
           />
+          @if (form.controls.sampleCode.touched) {
+            @if (form.controls.sampleCode.hasError('required')) {
+              <p class="mt-1 text-xs text-status-error">Šifra uzorka je obavezna.</p>
+            } @else if (form.controls.sampleCode.hasError('minlength')) {
+              <p class="mt-1 text-xs text-status-error">Šifra mora imati najmanje 4 karaktera.</p>
+            } @else if (form.controls.sampleCode.hasError('duplicateCode')) {
+              <p class="mt-1 text-xs text-status-error">
+                Ova šifra već postoji u ovom dogadjaju.
+              </p>
+            }
+          }
         </div>
         <div class="w-24">
           <label class="mb-1.5 block text-sm font-medium text-text-secondary">Redoslijed</label>

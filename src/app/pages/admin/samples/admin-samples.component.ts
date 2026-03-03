@@ -1,6 +1,13 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { of, startWith, switchMap } from 'rxjs';
 
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
@@ -63,7 +70,10 @@ export class AdminSamplesComponent {
   readonly isSaving = signal(false);
 
   readonly form = this.fb.nonNullable.group({
-    sampleCode: ['', Validators.required],
+    sampleCode: [
+      '',
+      [Validators.required, Validators.minLength(4), this.uniqueSampleCodeValidator()],
+    ],
     producerId: ['', Validators.required],
     categoryId: ['', Validators.required],
     year: [new Date().getFullYear(), Validators.required],
@@ -90,6 +100,7 @@ export class AdminSamplesComponent {
   }
 
   openEdit(sample: Sample): void {
+    this.editingSample.set(sample);
     this.form.patchValue({
       sampleCode: sample.sampleCode,
       producerId: sample.producerId,
@@ -98,8 +109,19 @@ export class AdminSamplesComponent {
       alcoholStrength: sample.alcoholStrength,
       order: sample.order,
     });
-    this.editingSample.set(sample);
     this.mode.set('edit');
+  }
+
+  private uniqueSampleCodeValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const code = (control.value as string)?.trim();
+      if (!code) return null;
+      const currentSampleId = this.editingSample()?.sampleId;
+      const isDuplicate = this.allSamples().some(
+        (s) => s.sampleCode === code && s.sampleId !== currentSampleId,
+      );
+      return isDuplicate ? { duplicateCode: true } : null;
+    };
   }
 
   cancel(): void {
