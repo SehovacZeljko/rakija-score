@@ -21,6 +21,7 @@ import {
 import { SampleService } from '../../../services/sample.service';
 import { ScoreService } from '../../../services/score.service';
 import { UserService } from '../../../services/user.service';
+import { LucideAngularModule } from 'lucide-angular';
 
 interface SampleResult {
   sample: Sample;
@@ -46,7 +47,7 @@ interface CategoryResult {
 
 @Component({
   selector: 'app-admin-results',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, LucideAngularModule],
   templateUrl: './admin-results.component.html',
   styleUrl: './admin-results.component.scss',
 })

@@ -13,6 +13,7 @@ import { CategoryService } from '../../../services/category.service';
 import { FestivalContextService } from '../../../services/festival-context.service';
 import { UserService } from '../../../services/user.service';
 import { PAGE_SIZE } from '../../../shared/pagination.constants';
+import { LucideAngularModule } from 'lucide-angular';
 
 type JudgeFilter = 'unassigned' | 'assigned';
 
@@ -24,6 +25,7 @@ type JudgeFilter = 'unassigned' | 'assigned';
     LoadingSpinnerComponent,
     InlineSpinnerComponent,
     ActiveFestivalBannerComponent,
+    LucideAngularModule,
   ],
   templateUrl: './admin-judges.component.html',
   styleUrl: './admin-judges.component.scss',

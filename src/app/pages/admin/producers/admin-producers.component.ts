@@ -7,10 +7,11 @@ import { InlineSpinnerComponent } from '../../../components/inline-spinner/inlin
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Producer } from '../../../models/producer.model';
 import { ProducerService } from '../../../services/producer.service';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-admin-producers',
-  imports: [ReactiveFormsModule, LoadingSpinnerComponent, InlineSpinnerComponent],
+  imports: [ReactiveFormsModule, LoadingSpinnerComponent, InlineSpinnerComponent, LucideAngularModule],
   templateUrl: './admin-producers.component.html',
   styleUrl: './admin-producers.component.scss',
 })

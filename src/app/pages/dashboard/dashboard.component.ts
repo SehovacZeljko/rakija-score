@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged, filter, map, of, shareReplay, switchMap } from 'rxjs';
 
+import { LucideAngularModule } from 'lucide-angular';
+
 import { ActiveFestivalBannerComponent } from '../../components/active-festival-banner/active-festival-banner.component';
 import { BottomNavComponent, NavItem } from '../../components/bottom-nav/bottom-nav.component';
 import { HeaderComponent } from '../../components/header/header.component';
@@ -16,7 +18,7 @@ import { ScoreService } from '../../services/score.service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [HeaderComponent, BottomNavComponent, LoadingSpinnerComponent, ActiveFestivalBannerComponent],
+  imports: [HeaderComponent, BottomNavComponent, LoadingSpinnerComponent, ActiveFestivalBannerComponent, LucideAngularModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })

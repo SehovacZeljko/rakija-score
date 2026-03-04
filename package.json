@@ -22,6 +22,7 @@
     "firebase": "^11.10.0",
     "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
+    "lucide-angular": "^0.577.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

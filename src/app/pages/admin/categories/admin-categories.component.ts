@@ -9,10 +9,11 @@ import { FestivalEvent } from '../../../models/event.model';
 import { CategoryService } from '../../../services/category.service';
 import { EventService } from '../../../services/event.service';
 import { FestivalContextService } from '../../../services/festival-context.service';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-admin-categories',
-  imports: [LoadingSpinnerComponent, InlineSpinnerComponent, RouterLink],
+  imports: [LoadingSpinnerComponent, InlineSpinnerComponent, RouterLink, LucideAngularModule],
   templateUrl: './admin-categories.component.html',
   styleUrl: './admin-categories.component.scss',
 })

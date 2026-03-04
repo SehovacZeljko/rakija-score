@@ -2,6 +2,8 @@ import { Component, WritableSignal, computed, effect, inject, signal } from '@an
 import { Router, ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { LucideAngularModule } from 'lucide-angular';
+
 import { HeaderComponent } from '../../components/header/header.component';
 import { InlineSpinnerComponent } from '../../components/inline-spinner/inline-spinner.component';
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component';
@@ -16,7 +18,7 @@ import { SCORE_STEP, SCORING_CRITERIA, ScoringCriterion } from '../../shared/sco
 
 @Component({
   selector: 'app-scoring',
-  imports: [HeaderComponent, InlineSpinnerComponent, LoadingSpinnerComponent],
+  imports: [HeaderComponent, InlineSpinnerComponent, LoadingSpinnerComponent, LucideAngularModule],
   templateUrl: './scoring.component.html',
   styleUrl: './scoring.component.scss',
 })

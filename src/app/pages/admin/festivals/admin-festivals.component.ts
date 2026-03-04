@@ -6,10 +6,11 @@ import { InlineSpinnerComponent } from '../../../components/inline-spinner/inlin
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Festival } from '../../../models/festival.model';
 import { FestivalService } from '../../../services/festival.service';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-admin-festivals',
-  imports: [LoadingSpinnerComponent, InlineSpinnerComponent],
+  imports: [LoadingSpinnerComponent, InlineSpinnerComponent, LucideAngularModule],
   templateUrl: './admin-festivals.component.html',
   styleUrl: './admin-festivals.component.scss',
 })

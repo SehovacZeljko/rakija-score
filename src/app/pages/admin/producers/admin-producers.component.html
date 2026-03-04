@@ -13,41 +13,14 @@
         (click)="openCreate()"
         class="flex items-center gap-1.5 rounded-[10px] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark active:bg-primary-dark"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
+        <lucide-icon name="plus" [size]="16" [strokeWidth]="2.5" />
         Dodaj Proizvođača
       </button>
     </div>
 
     <!-- Search -->
     <div class="relative mb-4">
-      <svg
-        class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
+      <lucide-icon name="search" [size]="16" class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
       <input
         type="search"
         [value]="searchQuery()"
@@ -80,20 +53,7 @@
             }
           </div>
           <!-- Edit chevron -->
-          <svg
-            class="mt-0.5 shrink-0 text-text-muted"
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
+          <lucide-icon name="chevron-right" [size]="16" class="mt-0.5 shrink-0 text-text-muted" />
         </div>
       </button>
     } @empty {
@@ -119,19 +79,7 @@
         class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-bg-surface"
         aria-label="Nazad"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
+        <lucide-icon name="chevron-left" [size]="20" />
       </button>
       <h1 class="text-xl font-semibold text-text-primary">
         {{ mode() === 'create' ? 'Novi proizvodjač' : 'Uredi proizvodjača' }}

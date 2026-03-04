@@ -1,13 +1,14 @@
 import { Component, ElementRef, HostListener, Input, inject, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
 
 import { AuthService } from '../../services/auth.service';
 import { NavItem } from '../bottom-nav/bottom-nav.component';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, RouterLinkActive, NgClass],
+  imports: [RouterLink, RouterLinkActive, NgClass, LucideAngularModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })

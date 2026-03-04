@@ -10,6 +10,7 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { LucideAngularModule } from 'lucide-angular';
 
 export interface CategoryCarouselCard {
   categoryId: string;
@@ -25,6 +26,7 @@ const SWIPE_THRESHOLD = 50; // min px delta to register a swipe
 
 @Component({
   selector: 'app-category-carousel',
+  imports: [LucideAngularModule],
   templateUrl: './category-carousel.component.html',
   styleUrl: './category-carousel.component.scss',
 })

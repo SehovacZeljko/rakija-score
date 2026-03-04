@@ -5,20 +5,7 @@
     (click)="goBack()"
     class="mb-4 flex items-center gap-1.5 text-sm text-text-secondary transition-colors hover:text-text-primary"
   >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <line x1="19" y1="12" x2="5" y2="12" />
-      <polyline points="12 19 5 12 12 5" />
-    </svg>
+    <lucide-icon name="arrow-left" [size]="16" />
     Nazad
   </button>
 
@@ -31,24 +18,7 @@
       }
       @if (eventJudgeStats().totalExpected > 0) {
         <div class="flex items-center gap-1.5">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="shrink-0 text-text-muted"
-          >
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-            <line x1="10" y1="9" x2="8" y2="9" />
-          </svg>
+          <lucide-icon name="file-text" [size]="13" class="shrink-0 text-text-muted" />
           <span class="text-xs text-text-muted">
             {{ eventJudgeStats().totalSubmitted }}/{{ eventJudgeStats().totalExpected }} ocijenjeno
           </span>
@@ -78,21 +48,7 @@
           (click)="downloadPdf()"
           class="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-text-on-primary transition-colors hover:bg-primary-dark"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
+          <lucide-icon name="download" [size]="14" />
           Izvezi PDF
         </button>
       }
@@ -111,21 +67,12 @@
         <p class="font-semibold text-text-primary">{{ cr.category.name }}</p>
         <div class="flex items-center gap-2">
           <span class="text-xs text-text-muted">{{ cr.samples.length }} uzoraka</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+          <lucide-icon
+            name="chevron-down"
+            [size]="14"
             class="shrink-0 text-text-muted transition-transform"
             [class.rotate-180]="expandedCategoryIds().has(cr.category.categoryId)"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
+          />
         </div>
       </button>
 
@@ -177,21 +124,12 @@
                 {{ sr.avgTotal | number: '1.2-2' }}
               </span>
               <!-- Chevron -->
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+              <lucide-icon
+                name="chevron-down"
+                [size]="14"
                 class="w-4 shrink-0 text-text-muted transition-transform"
                 [class.rotate-180]="expandedSampleIds().has(sr.sample.sampleId)"
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
+              />
             </div>
           </button>
 
@@ -202,60 +140,19 @@
                 <div class="py-1.5">
                   <!-- Line 1: icon + name + total -->
                   <div class="flex items-center gap-1.5">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="shrink-0 text-text-muted"
-                    >
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                      <circle cx="12" cy="7" r="4" />
-                    </svg>
+                    <lucide-icon name="user" [size]="13" class="shrink-0 text-text-muted" />
                     <span class="flex-1 truncate text-xs font-medium text-text-secondary">
                       {{ judgeNameMap().get(score.judgeId) ?? score.judgeId }}
                     </span>
                     @if (cr.lockedJudgeIds.has(score.judgeId)) {
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="shrink-0 text-status-success"
-                      >
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                      </svg>
+                      <lucide-icon name="lock" [size]="12" [strokeWidth]="2.5" class="shrink-0 text-status-success" />
                     }
                   </div>
                   <!-- Line 2: criteria with icons -->
                   <div class="mt-2 flex items-start gap-4 pl-[21px] text-text-muted">
                     <div class="flex flex-col items-center gap-0.5">
                       <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="10"
-                          height="10"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="flex-none"
-                        >
-                          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-                        </svg>
+                        <lucide-icon name="droplet" [size]="10" [strokeWidth]="2.5" class="flex-none" />
                         <span>Bo</span>
                       </div>
                       <span class="text-[10px] font-medium text-text-primary">{{
@@ -265,21 +162,7 @@
 
                     <div class="flex flex-col items-center gap-0.5">
                       <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="10"
-                          height="10"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="flex-none"
-                        >
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </svg>
+                        <lucide-icon name="eye" [size]="10" [strokeWidth]="2.5" class="flex-none" />
                         <span>Bi</span>
                       </div>
                       <span class="text-[10px] font-medium text-text-primary">{{
@@ -289,22 +172,7 @@
 
                     <div class="flex flex-col items-center gap-0.5">
                       <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="10"
-                          height="10"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="flex-none"
-                        >
-                          <polygon
-                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                          />
-                        </svg>
+                        <lucide-icon name="star" [size]="10" [strokeWidth]="2.5" class="flex-none" />
                         <span>Ti</span>
                       </div>
                       <span class="text-[10px] font-medium text-text-primary">{{
@@ -314,22 +182,7 @@
 
                     <div class="flex flex-col items-center gap-0.5">
                       <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="10"
-                          height="10"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="flex-none"
-                        >
-                          <path d="M9.59 4.59A2 2 0 1 1 11 8H2" />
-                          <path d="M10.59 19.41A2 2 0 1 0 14 16H2" />
-                          <path d="M15.73 3.73A2.5 2.5 0 1 1 19.5 7H2" />
-                        </svg>
+                        <lucide-icon name="wind" [size]="10" [strokeWidth]="2.5" class="flex-none" />
                         <span>Mi</span>
                       </div>
                       <span class="text-[10px] font-medium text-text-primary">{{
@@ -339,24 +192,7 @@
 
                     <div class="flex flex-col items-center gap-0.5">
                       <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="10"
-                          height="10"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="flex-none"
-                        >
-                          <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
-                          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
-                          <line x1="6" y1="1" x2="6" y2="4" />
-                          <line x1="10" y1="1" x2="10" y2="4" />
-                          <line x1="14" y1="1" x2="14" y2="4" />
-                        </svg>
+                        <lucide-icon name="coffee" [size]="10" [strokeWidth]="2.5" class="flex-none" />
                         <span>Uk</span>
                       </div>
                       <span class="text-[10px] font-medium text-text-primary">{{
@@ -375,21 +211,7 @@
               @for (judgeId of sr.unscoredJudgeIds; track judgeId) {
                 <div class="py-1.5">
                   <div class="flex items-center gap-1.5">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="shrink-0 text-text-muted"
-                    >
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                      <circle cx="12" cy="7" r="4" />
-                    </svg>
+                    <lucide-icon name="user" [size]="13" class="shrink-0 text-text-muted" />
                     <span class="flex-1 truncate text-xs font-medium text-text-secondary">
                       {{ judgeNameMap().get(judgeId) ?? judgeId }}
                     </span>

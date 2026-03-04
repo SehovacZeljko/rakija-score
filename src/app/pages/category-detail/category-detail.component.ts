@@ -12,6 +12,8 @@ import {
   take,
 } from 'rxjs';
 
+import { LucideAngularModule } from 'lucide-angular';
+
 import { ActiveFestivalBannerComponent } from '../../components/active-festival-banner/active-festival-banner.component';
 import { BottomNavComponent, NavItem } from '../../components/bottom-nav/bottom-nav.component';
 import { CategoryCarouselComponent } from '../../components/category-carousel/category-carousel.component';
@@ -34,6 +36,7 @@ import { User } from '../../models/user.model';
     InlineSpinnerComponent,
     ActiveFestivalBannerComponent,
     CategoryCarouselComponent,
+    LucideAngularModule,
   ],
   templateUrl: './category-detail.component.html',
   styleUrl: './category-detail.component.scss',

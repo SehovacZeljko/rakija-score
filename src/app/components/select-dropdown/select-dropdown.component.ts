@@ -9,6 +9,7 @@ import {
   untracked,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
 
 export interface SelectOption {
   id: string;
@@ -17,6 +18,7 @@ export interface SelectOption {
 
 @Component({
   selector: 'app-select-dropdown',
+  imports: [LucideAngularModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

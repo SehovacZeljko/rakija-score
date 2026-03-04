@@ -19,10 +19,11 @@ import { CategoryService } from '../../../services/category.service';
 import { FestivalContextService } from '../../../services/festival-context.service';
 import { ProducerService } from '../../../services/producer.service';
 import { SampleData, SampleService } from '../../../services/sample.service';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-admin-samples',
-  imports: [ReactiveFormsModule, LoadingSpinnerComponent, InlineSpinnerComponent, ActiveFestivalBannerComponent, SelectDropdownComponent],
+  imports: [ReactiveFormsModule, LoadingSpinnerComponent, InlineSpinnerComponent, ActiveFestivalBannerComponent, SelectDropdownComponent, LucideAngularModule],
   templateUrl: './admin-samples.component.html',
   styleUrl: './admin-samples.component.scss',
 })
