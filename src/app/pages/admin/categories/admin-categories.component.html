@@ -92,7 +92,12 @@
 
     <!-- Events list — active first, then staging, then finished -->
     @for (event of sortedEvents(); track event.eventId) {
-      <div class="mb-4 rounded-xl bg-bg-card shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+      <div
+        class="mb-4 rounded-xl border bg-bg-card shadow-[0_1px_4px_rgba(0,0,0,0.08)]"
+        [class.border-accent]="event.status === 'active'"
+        [class.border-status-pending]="event.status === 'staging'"
+        [class.border-border-default]="event.status === 'finished'"
+      >
         <!-- Event header -->
         <div class="border-b border-border-default px-4 py-3">
           @if (editingEventId() === event.eventId) {
