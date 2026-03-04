@@ -397,7 +397,11 @@
 
         <!-- Add category row -->
         <div class="px-4 py-3">
-          @if (activeCategoryFormEventId() === event.eventId) {
+          @if (event.status === 'active') {
+            <p class="text-xs text-text-muted">
+              Kategorije se mogu dodavati samo dok je dogadjaj u pripremi.
+            </p>
+          } @else if (activeCategoryFormEventId() === event.eventId) {
             <div class="flex items-center gap-2">
               <input
                 type="text"
