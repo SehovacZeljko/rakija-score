@@ -1,34 +1,30 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { map, of, shareReplay, switchMap, take } from 'rxjs';
+import { of, switchMap } from 'rxjs';
 
+import { InlineSpinnerComponent } from '../../../components/inline-spinner/inline-spinner.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
-import { Category } from '../../../models/category.model';
 import { FestivalEvent } from '../../../models/event.model';
 import { CategoryService } from '../../../services/category.service';
 import { EventService } from '../../../services/event.service';
-import { FestivalService } from '../../../services/festival.service';
+import { FestivalContextService } from '../../../services/festival-context.service';
 
 @Component({
   selector: 'app-admin-categories',
-  imports: [LoadingSpinnerComponent, RouterLink],
+  imports: [LoadingSpinnerComponent, InlineSpinnerComponent, RouterLink],
   templateUrl: './admin-categories.component.html',
   styleUrl: './admin-categories.component.scss',
 })
 export class AdminCategoriesComponent {
-  private readonly festivalService = inject(FestivalService);
+  private readonly ctx = inject(FestivalContextService);
   private readonly eventService = inject(EventService);
   private readonly categoryService = inject(CategoryService);
 
-  private readonly activeFestival$ = this.festivalService.getActiveFestival().pipe(shareReplay(1));
+  readonly activeFestival = this.ctx.activeFestival;
+  readonly dataReady = this.ctx.dataReady;
 
-  readonly activeFestival = toSignal(this.activeFestival$, { initialValue: null });
-  readonly dataReady = toSignal(this.activeFestival$.pipe(take(1), map(() => true)), {
-    initialValue: false,
-  });
-
-  private readonly events$ = this.activeFestival$.pipe(
+  private readonly events$ = this.ctx.activeFestival$.pipe(
     switchMap((f) => (f ? this.eventService.getEventsForFestival(f.festivalId) : of([]))),
   );
 
@@ -36,12 +32,22 @@ export class AdminCategoriesComponent {
 
   private readonly categories$ = this.events$.pipe(
     switchMap((events) => {
-      const ids = events.map((e) => e.eventId);
-      return this.categoryService.getCategoriesForEvents(ids);
+      const eventIds = events.map((e) => e.eventId);
+      return this.categoryService.getCategoriesForEvents(eventIds);
     }),
   );
 
   readonly categories = toSignal(this.categories$, { initialValue: [] });
+
+  readonly categoriesByEventId = computed(() => {
+    const categoryMap = new Map<string, ReturnType<typeof this.categories>[number][]>();
+    for (const category of this.categories()) {
+      const list = categoryMap.get(category.eventId) ?? [];
+      list.push(category);
+      categoryMap.set(category.eventId, list);
+    }
+    return categoryMap;
+  });
 
   readonly hasActiveEvent = computed(() => this.events().some((e) => e.status === 'active'));
   readonly hasNonFinishedEvent = computed(() =>
@@ -84,8 +90,8 @@ export class AdminCategoriesComponent {
   readonly deletingCategoryId = signal<string | null>(null);
   readonly deleteErrorCategoryId = signal<string | null>(null);
 
-  categoriesForEvent(eventId: string): Category[] {
-    return this.categories().filter((c) => c.eventId === eventId);
+  categoriesForEvent(eventId: string) {
+    return this.categoriesByEventId().get(eventId) ?? [];
   }
 
   readonly sortedEvents = computed(() => {
