@@ -26,7 +26,7 @@ export class DashboardComponent {
   private readonly ctx = inject(FestivalContextService);
   private readonly sampleService = inject(SampleService);
   private readonly scoreService = inject(ScoreService);
-  readonly router = inject(Router);
+  private readonly router = inject(Router);
 
   readonly navItems: NavItem[] = [{ route: '/dashboard', label: 'Početna', icon: 'home' }];
 
@@ -36,8 +36,8 @@ export class DashboardComponent {
   readonly dataReady = this.ctx.dataReady;
 
   private readonly uid$ = this.authService.currentUser$.pipe(
-    filter((u): u is User => u !== null),
-    map((u) => u.userId),
+    filter((user): user is User => user !== null),
+    map((user) => user.userId),
     distinctUntilChanged(),
     shareReplay(1),
   );
@@ -50,8 +50,11 @@ export class DashboardComponent {
   readonly assignments = toSignal(this.assignments$, { initialValue: [] });
 
   private readonly categoryIds$ = this.assignments$.pipe(
-    map((a) => a.map((x) => x.categoryId)),
-    distinctUntilChanged((a, b) => JSON.stringify([...a].sort()) === JSON.stringify([...b].sort())),
+    map((assignments) => assignments.map((assignment) => assignment.categoryId)),
+    distinctUntilChanged(
+      (prevIds, nextIds) =>
+        JSON.stringify([...prevIds].sort()) === JSON.stringify([...nextIds].sort()),
+    ),
   );
 
   private readonly categories$ = this.categoryIds$.pipe(
@@ -76,38 +79,38 @@ export class DashboardComponent {
   readonly scores = toSignal(this.scores$, { initialValue: [] });
 
   private readonly sampleCountMap = computed(() => {
-    const map = new Map<string, number>();
-    for (const s of this.samples()) {
-      map.set(s.categoryId, (map.get(s.categoryId) ?? 0) + 1);
+    const countMap = new Map<string, number>();
+    for (const sample of this.samples()) {
+      countMap.set(sample.categoryId, (countMap.get(sample.categoryId) ?? 0) + 1);
     }
-    return map;
+    return countMap;
   });
 
   private readonly scoreCountMap = computed(() => {
-    const scoredSampleIds = new Set(this.scores().map((s) => s.sampleId));
-    const map = new Map<string, number>();
-    for (const s of this.samples()) {
-      if (scoredSampleIds.has(s.sampleId)) {
-        map.set(s.categoryId, (map.get(s.categoryId) ?? 0) + 1);
+    const scoredSampleIds = new Set(this.scores().map((score) => score.sampleId));
+    const countMap = new Map<string, number>();
+    for (const sample of this.samples()) {
+      if (scoredSampleIds.has(sample.sampleId)) {
+        countMap.set(sample.categoryId, (countMap.get(sample.categoryId) ?? 0) + 1);
       }
     }
-    return map;
+    return countMap;
   });
 
   private readonly assignmentStatusMap = computed(
-    () => new Map(this.assignments().map((a) => [a.categoryId, a.status])),
+    () => new Map(this.assignments().map((assignment) => [assignment.categoryId, assignment.status])),
   );
 
   readonly categoryCards = computed(() => {
     const eventId = this.ctx.activeEvent()?.eventId;
     if (!eventId) return [];
     return this.categories()
-      .filter((cat) => cat.eventId === eventId)
-      .map((cat) => ({
-        ...cat,
-        sampleCount: this.sampleCountMap().get(cat.categoryId) ?? 0,
-        scoredCount: this.scoreCountMap().get(cat.categoryId) ?? 0,
-        isLocked: this.assignmentStatusMap().get(cat.categoryId) === 'finished',
+      .filter((category) => category.eventId === eventId)
+      .map((category) => ({
+        ...category,
+        sampleCount: this.sampleCountMap().get(category.categoryId) ?? 0,
+        scoredCount: this.scoreCountMap().get(category.categoryId) ?? 0,
+        isLocked: this.assignmentStatusMap().get(category.categoryId) === 'finished',
       }));
   });
 
