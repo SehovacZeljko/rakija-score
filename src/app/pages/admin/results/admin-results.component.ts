@@ -219,8 +219,10 @@ export class AdminResultsComponent {
   }
 
   expandAllSamples(): void {
-    const ids = this.categoryResults().flatMap((cr) => cr.samples.map((sr) => sr.sample.sampleId));
-    this.expandedSampleIds.set(new Set(ids));
+    const categoryIds = this.categoryResults().map((cr) => cr.category.categoryId);
+    this.expandedCategoryIds.set(new Set(categoryIds));
+    const sampleIds = this.categoryResults().flatMap((cr) => cr.samples.map((sr) => sr.sample.sampleId));
+    this.expandedSampleIds.set(new Set(sampleIds));
   }
 
   collapseAllSamples(): void {
