@@ -11,8 +11,9 @@ import {
 import { of, startWith, switchMap } from 'rxjs';
 
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
-import { SelectDropdownComponent } from '../../../components/select-dropdown/select-dropdown.component';
+import { InlineSpinnerComponent } from '../../../components/inline-spinner/inline-spinner.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
+import { SelectDropdownComponent } from '../../../components/select-dropdown/select-dropdown.component';
 import { Sample } from '../../../models/sample.model';
 import { CategoryService } from '../../../services/category.service';
 import { FestivalContextService } from '../../../services/festival-context.service';
@@ -21,7 +22,7 @@ import { SampleData, SampleService } from '../../../services/sample.service';
 
 @Component({
   selector: 'app-admin-samples',
-  imports: [ReactiveFormsModule, LoadingSpinnerComponent, ActiveFestivalBannerComponent, SelectDropdownComponent],
+  imports: [ReactiveFormsModule, LoadingSpinnerComponent, InlineSpinnerComponent, ActiveFestivalBannerComponent, SelectDropdownComponent],
   templateUrl: './admin-samples.component.html',
   styleUrl: './admin-samples.component.scss',
 })
@@ -47,30 +48,32 @@ export class AdminSamplesComponent {
   readonly categories = toSignal(this.categories$, { initialValue: [] });
   readonly producers = toSignal(this.producerService.getAllProducers(), { initialValue: [] });
   private readonly eventSamples$ = this.categories$.pipe(
-    switchMap((cats) => this.sampleService.getSamplesForCategories(cats.map((c) => c.categoryId))),
+    switchMap((categories) =>
+      this.sampleService.getSamplesForCategories(categories.map((category) => category.categoryId)),
+    ),
     startWith([]),
   );
   readonly allSamples = toSignal(this.eventSamples$, { initialValue: [] });
 
   readonly producerMap = computed(
-    () => new Map(this.producers().map((p) => [p.producerId, p.name])),
+    () => new Map(this.producers().map((producer) => [producer.producerId, producer.name])),
   );
   readonly categoryMap = computed(
-    () => new Map(this.categories().map((c) => [c.categoryId, c.name])),
+    () => new Map(this.categories().map((category) => [category.categoryId, category.name])),
   );
 
   readonly categoryOptions = computed(() =>
-    this.categories().map((c) => ({ id: c.categoryId, label: c.name })),
+    this.categories().map((category) => ({ id: category.categoryId, label: category.name })),
   );
   readonly producerOptions = computed(() =>
-    this.producers().map((p) => ({ id: p.producerId, label: p.name })),
+    this.producers().map((producer) => ({ id: producer.producerId, label: producer.name })),
   );
 
   readonly selectedCategoryId = signal<string | null>(null);
   readonly filteredSamples = computed(() => {
-    const catId = this.selectedCategoryId();
+    const categoryId = this.selectedCategoryId();
     const samples = this.allSamples();
-    return catId ? samples.filter((s) => s.categoryId === catId) : samples;
+    return categoryId ? samples.filter((sample) => sample.categoryId === categoryId) : samples;
   });
 
   readonly mode = signal<'list' | 'create' | 'edit'>('list');
@@ -121,7 +124,7 @@ export class AdminSamplesComponent {
       if (!code) return null;
       const currentSampleId = this.editingSample()?.sampleId;
       const isDuplicate = this.allSamples().some(
-        (s) => s.sampleCode === code && s.sampleId !== currentSampleId,
+        (sample) => sample.sampleCode === code && sample.sampleId !== currentSampleId,
       );
       return isDuplicate ? { duplicateCode: true } : null;
     };
