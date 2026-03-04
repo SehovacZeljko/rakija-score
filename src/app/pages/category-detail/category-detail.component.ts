@@ -16,6 +16,7 @@ import { ActiveFestivalBannerComponent } from '../../components/active-festival-
 import { BottomNavComponent, NavItem } from '../../components/bottom-nav/bottom-nav.component';
 import { CategoryCarouselComponent } from '../../components/category-carousel/category-carousel.component';
 import { HeaderComponent } from '../../components/header/header.component';
+import { InlineSpinnerComponent } from '../../components/inline-spinner/inline-spinner.component';
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../services/auth.service';
 import { CategoryService } from '../../services/category.service';
@@ -30,6 +31,7 @@ import { User } from '../../models/user.model';
     HeaderComponent,
     BottomNavComponent,
     LoadingSpinnerComponent,
+    InlineSpinnerComponent,
     ActiveFestivalBannerComponent,
     CategoryCarouselComponent,
   ],
@@ -48,8 +50,8 @@ export class CategoryDetailComponent {
   readonly navItems: NavItem[] = [{ route: '/dashboard', label: 'Početna', icon: 'home' }];
 
   private readonly uid$ = this.authService.currentUser$.pipe(
-    filter((u): u is User => u !== null),
-    map((u) => u.userId),
+    filter((user): user is User => user !== null),
+    map((user) => user.userId),
     distinctUntilChanged(),
     shareReplay(1),
   );
@@ -82,7 +84,7 @@ export class CategoryDetailComponent {
   readonly allAssignments = toSignal(this.allAssignments$, { initialValue: [] });
 
   private readonly allCategoryIds$ = this.allAssignments$.pipe(
-    map((assignments) => assignments.map((a) => a.categoryId)),
+    map((assignments) => assignments.map((assignment) => assignment.categoryId)),
     distinctUntilChanged(
       (prev, curr) =>
         JSON.stringify([...prev].sort()) === JSON.stringify([...curr].sort()),
@@ -113,13 +115,13 @@ export class CategoryDetailComponent {
   // ── Per-category data (filtered from all-data using reactive categoryId) ──
 
   private readonly category$ = combineLatest([this.allCategories$, this.categoryId$]).pipe(
-    map(([cats, id]) => cats.find((c) => c.categoryId === id) ?? null),
+    map(([categories, id]) => categories.find((category) => category.categoryId === id) ?? null),
   );
 
   readonly category = toSignal(this.category$, { initialValue: null });
 
   private readonly assignment$ = combineLatest([this.allAssignments$, this.categoryId$]).pipe(
-    map(([assignments, id]) => assignments.find((a) => a.categoryId === id) ?? null),
+    map(([assignments, id]) => assignments.find((assignment) => assignment.categoryId === id) ?? null),
   );
 
   readonly assignment = toSignal(this.assignment$, { initialValue: null });
@@ -128,7 +130,7 @@ export class CategoryDetailComponent {
   readonly isEventActive = computed(() => !!this.ctx.activeEvent());
 
   private readonly samples$ = combineLatest([this.allSamples$, this.categoryId$]).pipe(
-    map(([samples, id]) => samples.filter((s) => s.categoryId === id)),
+    map(([samples, id]) => samples.filter((sample) => sample.categoryId === id)),
     shareReplay(1),
   );
 
@@ -141,7 +143,7 @@ export class CategoryDetailComponent {
 
   private readonly scores$ = combineLatest([this.allScores$, this.samples$]).pipe(
     map(([scores, samples]) => {
-      const sampleIds = new Set(samples.map((s) => s.sampleId));
+      const sampleIds = new Set(samples.map((sample) => sample.sampleId));
       return scores.filter((score) => sampleIds.has(score.sampleId));
     }),
     shareReplay(1),
@@ -149,21 +151,21 @@ export class CategoryDetailComponent {
 
   readonly scores = toSignal(this.scores$, { initialValue: [] });
 
-  private readonly scoredSampleIds = computed(() => new Set(this.scores().map((s) => s.sampleId)));
+  private readonly scoredSampleIds = computed(() => new Set(this.scores().map((score) => score.sampleId)));
 
   readonly scoreMap = computed(() => {
-    const map = new Map<string, number>();
+    const scoreById = new Map<string, number>();
     for (const score of this.scores()) {
       const total = score.color + score.clarity + score.typicality + score.aroma + score.taste;
-      map.set(score.sampleId, Math.round(total * 100) / 100);
+      scoreById.set(score.sampleId, Math.round(total * 100) / 100);
     }
-    return map;
+    return scoreById;
   });
 
   readonly isAllScored = computed(() => {
     const samples = this.samples();
     if (samples.length === 0) return false;
-    return samples.every((s) => this.scoredSampleIds().has(s.sampleId));
+    return samples.every((sample) => this.scoredSampleIds().has(sample.sampleId));
   });
 
   readonly isLocking = signal(false);
@@ -190,39 +192,39 @@ export class CategoryDetailComponent {
   // ── Carousel category cards ────────────────────────────────────────────────
 
   private readonly sampleCountMap = computed(() => {
-    const map = new Map<string, number>();
+    const countMap = new Map<string, number>();
     for (const sample of this.allSamples()) {
-      map.set(sample.categoryId, (map.get(sample.categoryId) ?? 0) + 1);
+      countMap.set(sample.categoryId, (countMap.get(sample.categoryId) ?? 0) + 1);
     }
-    return map;
+    return countMap;
   });
 
   private readonly scoreCountMap = computed(() => {
     const scoredSampleIds = new Set(this.allScores().map((score) => score.sampleId));
-    const map = new Map<string, number>();
+    const countMap = new Map<string, number>();
     for (const sample of this.allSamples()) {
       if (scoredSampleIds.has(sample.sampleId)) {
-        map.set(sample.categoryId, (map.get(sample.categoryId) ?? 0) + 1);
+        countMap.set(sample.categoryId, (countMap.get(sample.categoryId) ?? 0) + 1);
       }
     }
-    return map;
+    return countMap;
   });
 
   private readonly assignmentStatusMap = computed(
-    () => new Map(this.allAssignments().map((a) => [a.categoryId, a.status])),
+    () => new Map(this.allAssignments().map((assignment) => [assignment.categoryId, assignment.status])),
   );
 
   readonly categoryCards = computed(() => {
     const eventId = this.ctx.activeEvent()?.eventId;
     if (!eventId) return [];
     return this.allCategories()
-      .filter((cat) => cat.eventId === eventId)
-      .map((cat) => ({
-        categoryId: cat.categoryId,
-        name: cat.name,
-        sampleCount: this.sampleCountMap().get(cat.categoryId) ?? 0,
-        scoredCount: this.scoreCountMap().get(cat.categoryId) ?? 0,
-        isLocked: this.assignmentStatusMap().get(cat.categoryId) === 'finished',
+      .filter((category) => category.eventId === eventId)
+      .map((category) => ({
+        categoryId: category.categoryId,
+        name: category.name,
+        sampleCount: this.sampleCountMap().get(category.categoryId) ?? 0,
+        scoredCount: this.scoreCountMap().get(category.categoryId) ?? 0,
+        isLocked: this.assignmentStatusMap().get(category.categoryId) === 'finished',
       }));
   });
 
