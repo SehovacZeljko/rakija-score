@@ -227,9 +227,13 @@
         type="button"
         (click)="save()"
         [disabled]="form.invalid || isSaving()"
-        class="flex-1 rounded-[10px] bg-primary py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+        class="flex flex-1 items-center justify-center gap-2 rounded-[10px] bg-primary py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {{ isSaving() ? 'Čuvanje...' : 'Sačuvaj' }}
+        @if (isSaving()) {
+          <app-inline-spinner />
+        } @else {
+          Sačuvaj
+        }
       </button>
       <button
         type="button"
