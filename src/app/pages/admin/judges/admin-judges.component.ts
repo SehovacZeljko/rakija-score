@@ -1,12 +1,12 @@
-import { NgClass } from '@angular/common';
-import { RouterLink } from '@angular/router';
-
-import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
-import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { of, startWith, switchMap } from 'rxjs';
 
+import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
+import { InlineSpinnerComponent } from '../../../components/inline-spinner/inline-spinner.component';
+import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Category } from '../../../models/category.model';
 import { JudgeAssignment } from '../../../models/judge-assignment.model';
 import { CategoryService } from '../../../services/category.service';
@@ -18,7 +18,13 @@ type JudgeFilter = 'unassigned' | 'assigned';
 
 @Component({
   selector: 'app-admin-judges',
-  imports: [NgClass, RouterLink, LoadingSpinnerComponent, ActiveFestivalBannerComponent],
+  imports: [
+    NgClass,
+    RouterLink,
+    LoadingSpinnerComponent,
+    InlineSpinnerComponent,
+    ActiveFestivalBannerComponent,
+  ],
   templateUrl: './admin-judges.component.html',
   styleUrl: './admin-judges.component.scss',
 })
@@ -42,9 +48,9 @@ export class AdminJudgesComponent {
   );
 
   private readonly assignments$ = this.categories$.pipe(
-    switchMap((cats) => {
-      const ids = cats.map((c) => c.categoryId);
-      return this.categoryService.getAssignmentsForCategories(ids).pipe(startWith([]));
+    switchMap((categories) => {
+      const categoryIds = categories.map((category) => category.categoryId);
+      return this.categoryService.getAssignmentsForCategories(categoryIds).pipe(startWith([]));
     }),
   );
 
@@ -53,24 +59,27 @@ export class AdminJudgesComponent {
   readonly users = toSignal(this.userService.getAllUsers(), { initialValue: [] });
 
   readonly categoryMap = computed(
-    () => new Map(this.categories().map((c) => [c.categoryId, c.name])),
+    () => new Map(this.categories().map((category) => [category.categoryId, category.name])),
   );
 
   private readonly assignedJudgeIds = computed(
-    () => new Set(this.assignments().map((a) => a.judgeId)),
+    () => new Set(this.assignments().map((assignment) => assignment.judgeId)),
   );
 
-  private readonly nonAdminUsers = computed(() => this.users().filter((u) => u.role !== 'admin'));
+  private readonly nonAdminUsers = computed(() =>
+    this.users().filter((user) => user.role !== 'admin'),
+  );
 
   readonly searchQuery = signal('');
   readonly activeFilter = signal<JudgeFilter>('unassigned');
   readonly currentPage = signal(1);
 
   private readonly searchFiltered = computed(() => {
-    const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.nonAdminUsers();
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return this.nonAdminUsers();
     return this.nonAdminUsers().filter(
-      (u) => u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
+      (user) =>
+        user.username.toLowerCase().includes(query) || user.email.toLowerCase().includes(query),
     );
   });
 
@@ -78,9 +87,9 @@ export class AdminJudgesComponent {
     const assignedIds = this.assignedJudgeIds();
     const users = this.searchFiltered();
     if (this.activeFilter() === 'assigned') {
-      return users.filter((u) => assignedIds.has(u.userId));
+      return users.filter((user) => assignedIds.has(user.userId));
     }
-    return users.filter((u) => !assignedIds.has(u.userId));
+    return users.filter((user) => !assignedIds.has(user.userId));
   });
 
   readonly totalPages = computed(() => Math.ceil(this.filteredUsers().length / PAGE_SIZE));
@@ -96,10 +105,10 @@ export class AdminJudgesComponent {
 
   readonly countAll = computed(() => this.nonAdminUsers().length);
   readonly countAssigned = computed(
-    () => this.nonAdminUsers().filter((u) => this.assignedJudgeIds().has(u.userId)).length,
+    () => this.nonAdminUsers().filter((user) => this.assignedJudgeIds().has(user.userId)).length,
   );
   readonly countUnassigned = computed(
-    () => this.nonAdminUsers().filter((u) => !this.assignedJudgeIds().has(u.userId)).length,
+    () => this.nonAdminUsers().filter((user) => !this.assignedJudgeIds().has(user.userId)).length,
   );
 
   readonly selectedUserId = signal<string | null>(null);
@@ -109,6 +118,25 @@ export class AdminJudgesComponent {
   readonly removingKey = signal<string | null>(null);
   readonly removeErrorKey = signal<string | null>(null);
 
+  readonly assignmentsByUserId = computed(() => {
+    const assignmentMap = new Map<string, JudgeAssignment[]>();
+    for (const assignment of this.assignments()) {
+      const list = assignmentMap.get(assignment.judgeId) ?? [];
+      list.push(assignment);
+      assignmentMap.set(assignment.judgeId, list);
+    }
+    return assignmentMap;
+  });
+
+  readonly availableCategoriesForSelectedUser = computed(() => {
+    const userId = this.selectedUserId();
+    if (!userId) return [];
+    const assignedCategoryIds = new Set(
+      this.assignmentsForUser(userId).map((assignment) => assignment.categoryId),
+    );
+    return this.categories().filter((category) => !assignedCategoryIds.has(category.categoryId));
+  });
+
   setFilter(filter: JudgeFilter): void {
     this.activeFilter.set(filter);
     this.currentPage.set(1);
@@ -117,11 +145,11 @@ export class AdminJudgesComponent {
   }
 
   prevPage(): void {
-    if (this.currentPage() > 1) this.currentPage.update((p) => p - 1);
+    if (this.currentPage() > 1) this.currentPage.update((page) => page - 1);
   }
 
   nextPage(): void {
-    if (this.currentPage() < this.totalPages()) this.currentPage.update((p) => p + 1);
+    if (this.currentPage() < this.totalPages()) this.currentPage.update((page) => page + 1);
   }
 
   onSearchInput(event: Event): void {
@@ -146,12 +174,14 @@ export class AdminJudgesComponent {
   }
 
   assignmentsForUser(userId: string): JudgeAssignment[] {
-    return this.assignments().filter((a) => a.judgeId === userId);
+    return this.assignmentsByUserId().get(userId) ?? [];
   }
 
   availableCategoriesForUser(userId: string): Category[] {
-    const assigned = new Set(this.assignmentsForUser(userId).map((a) => a.categoryId));
-    return this.categories().filter((c) => !assigned.has(c.categoryId));
+    const assignedCategoryIds = new Set(
+      this.assignmentsForUser(userId).map((assignment) => assignment.categoryId),
+    );
+    return this.categories().filter((category) => !assignedCategoryIds.has(category.categoryId));
   }
 
   toggleAssignForm(userId: string): void {
@@ -171,7 +201,9 @@ export class AdminJudgesComponent {
     this.isAssigning.set(true);
     try {
       await Promise.all(
-        categoryIds.map((catId) => this.categoryService.assignJudgeToCategory(judgeId, catId)),
+        categoryIds.map((categoryId) =>
+          this.categoryService.assignJudgeToCategory(judgeId, categoryId),
+        ),
       );
       this.selectedCategoryIds.set(new Set());
       this.selectedUserId.set(null);

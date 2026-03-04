@@ -165,7 +165,7 @@
                   }
                 </div>
 
-                @if (assignment.status !== 'finished') {
+                @if (assignment.status !== 'finished' && !isEventActive()) {
                   <button
                     type="button"
                     (click)="removeAssignment(user.userId, assignment.categoryId)"
@@ -174,20 +174,7 @@
                     aria-label="Ukloni dodjelu"
                   >
                     @if (removingKey() === assignmentKey(user.userId, assignment.categoryId)) {
-                      <svg
-                        class="animate-spin"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                      </svg>
+                      <app-inline-spinner [size]="14" />
                     } @else {
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -214,23 +201,23 @@
         <!-- Assign form -->
         @if (selectedUserId() === user.userId && !isEventActive()) {
           <div class="border-t border-border-default px-4 py-3">
-            @if (availableCategoriesForUser(user.userId).length === 0) {
+            @if (availableCategoriesForSelectedUser().length === 0) {
               <p class="text-sm text-text-muted">Sve kategorije su već dodijeljene ovoj sudiji.</p>
             } @else {
               <div
                 class="max-h-48 overflow-y-auto rounded-lg border border-border-default bg-bg-surface"
               >
-                @for (cat of availableCategoriesForUser(user.userId); track cat.categoryId) {
+                @for (category of availableCategoriesForSelectedUser(); track category.categoryId) {
                   <label
                     class="flex cursor-pointer items-center gap-3 border-b border-border-default px-3 py-2.5 last:border-0 hover:bg-bg-card"
                   >
                     <input
                       type="checkbox"
-                      [checked]="isCategorySelected(cat.categoryId)"
-                      (change)="toggleCategorySelection(cat.categoryId)"
+                      [checked]="isCategorySelected(category.categoryId)"
+                      (change)="toggleCategorySelection(category.categoryId)"
                       class="h-4 w-4 rounded accent-primary"
                     />
-                    <span class="text-sm text-text-primary">{{ cat.name }}</span>
+                    <span class="text-sm text-text-primary">{{ category.name }}</span>
                   </label>
                 }
               </div>
@@ -239,9 +226,13 @@
                   type="button"
                   (click)="assignCategory()"
                   [disabled]="selectedCategoryIds().size === 0 || isAssigning()"
-                  class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+                  class="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {{ isAssigning() ? '...' : 'Dodijeli (' + selectedCategoryIds().size + ')' }}
+                  @if (isAssigning()) {
+                    <app-inline-spinner />
+                  } @else {
+                    Dodijeli ({{ selectedCategoryIds().size }})
+                  }
                 </button>
               </div>
             }
