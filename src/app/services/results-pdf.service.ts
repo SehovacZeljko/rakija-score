@@ -287,6 +287,9 @@ export class ResultsPdfService {
     }
 
     doc.putTotalPages(totalPagesPlaceholder);
-    doc.save(`rezultati-${input.eventYear}.pdf`);
+    const sanitizedEventName = this.sanitizeText(input.eventName)
+      .toLowerCase()
+      .replace(/\s+/g, '-');
+    doc.save(`rezultati-${sanitizedEventName}-${input.eventYear}.pdf`);
   }
 }
