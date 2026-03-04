@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { HeaderComponent } from '../../components/header/header.component';
+import { InlineSpinnerComponent } from '../../components/inline-spinner/inline-spinner.component';
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../services/auth.service';
 import { CategoryService } from '../../services/category.service';
@@ -15,7 +16,7 @@ import { SCORE_STEP, SCORING_CRITERIA, ScoringCriterion } from '../../shared/sco
 
 @Component({
   selector: 'app-scoring',
-  imports: [HeaderComponent, LoadingSpinnerComponent],
+  imports: [HeaderComponent, InlineSpinnerComponent, LoadingSpinnerComponent],
   templateUrl: './scoring.component.html',
   styleUrl: './scoring.component.scss',
 })
@@ -56,8 +57,8 @@ export class ScoringComponent {
   };
 
   readonly total = computed(() => {
-    const t = this.color() + this.clarity() + this.typicality() + this.aroma() + this.taste();
-    return Math.round(t * 100) / 100;
+    const rawTotal = this.color() + this.clarity() + this.typicality() + this.aroma() + this.taste();
+    return Math.round(rawTotal * 100) / 100;
   });
 
   // Redirect to dashboard when the event becomes inactive while on this page.
@@ -102,7 +103,7 @@ export class ScoringComponent {
         this.comment.set(score.comment);
       }
 
-      const assignment = assignments.find((a) => a.categoryId === this.categoryId);
+      const assignment = assignments.find((assignment) => assignment.categoryId === this.categoryId);
       const isEventActive = !!this.ctx.activeEvent();
       if (assignment?.status === 'finished' || !isEventActive) this.isLocked.set(true);
     } finally {
@@ -115,7 +116,7 @@ export class ScoringComponent {
   }
 
   adjust(key: string, delta: number): void {
-    const criterion = SCORING_CRITERIA.find((c) => c.key === key)!;
+    const criterion = SCORING_CRITERIA.find((criterion) => criterion.key === key)!;
     const sig = this.writableSignals[key];
     if (!sig) return;
     const current = sig();
@@ -124,7 +125,7 @@ export class ScoringComponent {
   }
 
   setPreset(key: string, value: number): void {
-    const criterion = SCORING_CRITERIA.find((c) => c.key === key)!;
+    const criterion = SCORING_CRITERIA.find((criterion) => criterion.key === key)!;
     const sig = this.writableSignals[key];
     if (!sig) return;
     sig.set(Math.min(criterion.max, Math.max(criterion.min, value)));
