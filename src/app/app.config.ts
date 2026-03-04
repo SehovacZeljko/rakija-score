@@ -6,7 +6,9 @@ import { provideAuth, getAuth } from '@angular/fire/auth';
 import {
   LUCIDE_ICONS,
   LucideIconProvider,
+  ArrowDownWideNarrow,
   ArrowLeft,
+  ArrowUpNarrowWide,
   Briefcase,
   Calendar,
   Check,
@@ -50,7 +52,9 @@ export const appConfig: ApplicationConfig = {
       provide: LUCIDE_ICONS,
       multi: true,
       useValue: new LucideIconProvider({
+        ArrowDownWideNarrow,
         ArrowLeft,
+        ArrowUpNarrowWide,
         Briefcase,
         Calendar,
         Check,
