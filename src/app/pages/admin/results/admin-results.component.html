@@ -210,6 +210,12 @@
                       </span>
                     </div>
                   </div>
+                  <!-- Line 3: comment (only if present) -->
+                  @if (score.comment.trim()) {
+                    <p class="mt-1.5 pl-[21px] text-[11px] italic text-text-secondary">
+                      "{{ score.comment.trim() }}"
+                    </p>
+                  }
                 </div>
               }
               @for (judgeId of sr.unscoredJudgeIds; track judgeId) {
