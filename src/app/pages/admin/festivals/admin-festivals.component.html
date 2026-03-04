@@ -47,9 +47,8 @@
         [value]="newFestivalName()"
         (input)="onNameInput($event)"
         placeholder="npr. Rakijada 2026"
-        class="w-full rounded-lg border bg-bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
+        class="w-full rounded-lg border bg-bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
         [class.border-border-default]="newFestivalNameValid() || !newFestivalName().trim()"
-        [class.focus:border-border-focus]="newFestivalNameValid() || !newFestivalName().trim()"
         [class.border-status-error]="!newFestivalNameValid() && newFestivalName().trim().length > 0"
       />
       @if (!newFestivalNameValid() && newFestivalName().trim().length > 0) {
@@ -60,9 +59,13 @@
           type="button"
           (click)="createFestival()"
           [disabled]="isSaving() || !newFestivalNameValid()"
-          class="rounded-[10px] bg-primary px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+          class="flex items-center justify-center gap-2 rounded-[10px] bg-primary px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {{ isSaving() ? 'Čuvanje...' : 'Sačuvaj' }}
+          @if (isSaving()) {
+            <app-inline-spinner />
+          } @else {
+            Sačuvaj
+          }
         </button>
         <button
           type="button"
@@ -85,9 +88,8 @@
           type="text"
           [value]="editingName()"
           (input)="onEditNameInput($event)"
-          class="w-full rounded-lg border bg-bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
+          class="w-full rounded-lg border bg-bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
           [class.border-border-default]="editingNameValid()"
-          [class.focus:border-border-focus]="editingNameValid()"
           [class.border-status-error]="!editingNameValid()"
         />
         @if (!editingNameValid()) {
@@ -98,9 +100,13 @@
             type="button"
             (click)="saveEdit(festival.festivalId)"
             [disabled]="isSavingEdit() || !editingNameValid()"
-            class="rounded-[10px] bg-primary px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex items-center justify-center gap-2 rounded-[10px] bg-primary px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {{ isSavingEdit() ? 'Čuvanje...' : 'Sačuvaj' }}
+            @if (isSavingEdit()) {
+              <app-inline-spinner />
+            } @else {
+              Sačuvaj
+            }
           </button>
           <button
             type="button"
@@ -154,9 +160,13 @@
               type="button"
               (click)="setActive(festival.festivalId)"
               [disabled]="activatingId() !== null"
-              class="shrink-0 rounded-[10px] border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+              class="flex shrink-0 items-center justify-center gap-2 rounded-[10px] border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {{ activatingId() === festival.festivalId ? '...' : 'Postavi aktivnim' }}
+              @if (activatingId() === festival.festivalId) {
+                <app-inline-spinner />
+              } @else {
+                Postavi aktivnim
+              }
             </button>
           }
         </div>

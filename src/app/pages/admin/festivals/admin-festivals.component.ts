@@ -2,13 +2,14 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map, shareReplay, take } from 'rxjs';
 
+import { InlineSpinnerComponent } from '../../../components/inline-spinner/inline-spinner.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Festival } from '../../../models/festival.model';
 import { FestivalService } from '../../../services/festival.service';
 
 @Component({
   selector: 'app-admin-festivals',
-  imports: [LoadingSpinnerComponent],
+  imports: [LoadingSpinnerComponent, InlineSpinnerComponent],
   templateUrl: './admin-festivals.component.html',
   styleUrl: './admin-festivals.component.scss',
 })
