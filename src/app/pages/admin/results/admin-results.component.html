@@ -2,7 +2,7 @@
   <!-- Back button -->
   <button
     type="button"
-    (click)="router.navigate(['/admin/categories'])"
+    (click)="goBack()"
     class="mb-4 flex items-center gap-1.5 text-sm text-text-secondary transition-colors hover:text-text-primary"
   >
     <svg
@@ -59,17 +59,17 @@
       @if (categoryResults().length > 0) {
         <button
           type="button"
-          (click)="allCategoriesExpanded ? collapseAllCategories() : expandAllCategories()"
+          (click)="allCategoriesExpanded() ? collapseAllCategories() : expandAllCategories()"
           class="rounded-lg bg-bg-surface px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-border-default"
         >
-          {{ allCategoriesExpanded ? 'Skupi kategorije' : 'Proširi kategorije' }}
+          {{ allCategoriesExpanded() ? 'Skupi kategorije' : 'Proširi kategorije' }}
         </button>
         <button
           type="button"
-          (click)="allSamplesExpanded ? collapseAllSamples() : expandAllSamples()"
+          (click)="allSamplesExpanded() ? collapseAllSamples() : expandAllSamples()"
           class="rounded-lg bg-bg-surface px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-border-default"
         >
-          {{ allSamplesExpanded ? 'Skupi uzorke' : 'Proširi uzorke' }}
+          {{ allSamplesExpanded() ? 'Skupi uzorke' : 'Proširi uzorke' }}
         </button>
       }
       @if (event()) {

@@ -52,7 +52,7 @@ interface CategoryResult {
 })
 export class AdminResultsComponent {
   private readonly route = inject(ActivatedRoute);
-  readonly router = inject(Router);
+  private readonly router = inject(Router);
   private readonly eventService = inject(EventService);
   private readonly categoryService = inject(CategoryService);
   private readonly sampleService = inject(SampleService);
@@ -62,7 +62,7 @@ export class AdminResultsComponent {
   private readonly resultsPdfService = inject(ResultsPdfService);
 
   private readonly eventId = toSignal(
-    this.route.paramMap.pipe(map((p) => p.get('eventId') ?? '')),
+    this.route.paramMap.pipe(map((params) => params.get('eventId') ?? '')),
     { initialValue: '' },
   );
 
@@ -77,25 +77,27 @@ export class AdminResultsComponent {
   );
 
   private readonly assignments$ = this.categories$.pipe(
-    switchMap((cats) => {
-      if (!cats.length) return of([]);
-      const ids = cats.map((c) => c.categoryId);
-      return this.categoryService.getAssignmentsForCategories(ids).pipe(startWith([]));
+    switchMap((categories) => {
+      if (!categories.length) return of([]);
+      const categoryIds = categories.map((category) => category.categoryId);
+      return this.categoryService.getAssignmentsForCategories(categoryIds).pipe(startWith([]));
     }),
   );
 
   private readonly samples$ = this.categories$.pipe(
-    switchMap((cats) => {
-      if (!cats.length) return of([]);
-      const ids = cats.map((c) => c.categoryId);
-      return this.sampleService.getSamplesForCategories(ids).pipe(startWith([]));
+    switchMap((categories) => {
+      if (!categories.length) return of([]);
+      const categoryIds = categories.map((category) => category.categoryId);
+      return this.sampleService.getSamplesForCategories(categoryIds).pipe(startWith([]));
     }),
   );
 
   private readonly scores$ = this.samples$.pipe(
     switchMap((samples) => {
       if (!samples.length) return of([]);
-      return this.scoreService.getScoresForSampleIds(samples.map((s) => s.sampleId)).pipe(startWith([]));
+      return this.scoreService
+        .getScoresForSampleIds(samples.map((sample) => sample.sampleId))
+        .pipe(startWith([]));
     }),
   );
 
@@ -106,16 +108,19 @@ export class AdminResultsComponent {
   private readonly users = toSignal(this.userService.getAllUsers(), { initialValue: [] as User[] });
 
   readonly judgeNameMap = computed(
-    () => new Map(this.users().map((u) => [u.userId, u.username])),
+    () => new Map(this.users().map((user) => [user.userId, user.username])),
   );
 
   readonly eventJudgeStats = computed(() => {
     const results = this.categoryResults();
     let totalSubmitted = 0;
     let totalExpected = 0;
-    for (const cr of results) {
-      totalExpected += cr.totalJudges * cr.samples.length;
-      totalSubmitted += cr.samples.reduce((acc, sr) => acc + sr.judgesScored, 0);
+    for (const categoryResult of results) {
+      totalExpected += categoryResult.totalJudges * categoryResult.samples.length;
+      totalSubmitted += categoryResult.samples.reduce(
+        (acc, sampleResult) => acc + sampleResult.judgesScored,
+        0,
+      );
     }
     return { totalSubmitted, totalExpected };
   });
@@ -130,7 +135,7 @@ export class AdminResultsComponent {
     ]).pipe(
       map(([categories, samples, scores, assignments, producers]) => {
         const producerMap = new Map(
-          (producers as Producer[]).map((p) => [p.producerId, p.name]),
+          (producers as Producer[]).map((producer) => [producer.producerId, producer.name]),
         );
 
         const scoresBySampleId = new Map<string, Score[]>();
@@ -140,17 +145,21 @@ export class AdminResultsComponent {
           scoresBySampleId.set(score.sampleId, list);
         }
 
-        return categories.map((cat): CategoryResult => {
-          const catSamples = samples.filter((s) => s.categoryId === cat.categoryId);
+        return categories.map((category): CategoryResult => {
+          const categorySamples = samples.filter(
+            (sample) => sample.categoryId === category.categoryId,
+          );
 
           // Judges with a formal assignment record for this category
           const assignedJudgeIds = new Set(
-            assignments.filter((a) => a.categoryId === cat.categoryId).map((a) => a.judgeId),
+            assignments
+              .filter((assignment) => assignment.categoryId === category.categoryId)
+              .map((assignment) => assignment.judgeId),
           );
 
           // Judges who submitted at least one score in this category (may lack an assignment record)
           const scoredJudgeIdsInCategory = new Set<string>();
-          for (const sample of catSamples) {
+          for (const sample of categorySamples) {
             for (const score of scoresBySampleId.get(sample.sampleId) ?? []) {
               scoredJudgeIdsInCategory.add(score.judgeId);
             }
@@ -159,13 +168,13 @@ export class AdminResultsComponent {
           // Union: any judge who is assigned OR who scored counts toward the total
           const allJudgeIds = new Set([...assignedJudgeIds, ...scoredJudgeIdsInCategory]);
           const totalJudges = allJudgeIds.size;
-          const allAssignedJudgeIds = [...allJudgeIds];
+          const allJudgeIdList = [...allJudgeIds];
 
-          const sampleResults: SampleResult[] = catSamples.map((sample): SampleResult => {
+          const sampleResults: SampleResult[] = categorySamples.map((sample): SampleResult => {
             const judgeScores = scoresBySampleId.get(sample.sampleId) ?? [];
-            const n = judgeScores.length || 1;
+            const scoreCount = judgeScores.length || 1;
             const avgField = (field: keyof Score) =>
-              judgeScores.reduce((sum, s) => sum + (s[field] as number), 0) / n;
+              judgeScores.reduce((sum, score) => sum + (score[field] as number), 0) / scoreCount;
 
             const avgColor = avgField('color');
             const avgClarity = avgField('clarity');
@@ -173,8 +182,10 @@ export class AdminResultsComponent {
             const avgAroma = avgField('aroma');
             const avgTaste = avgField('taste');
 
-            const scoredJudgeIds = new Set(judgeScores.map((s) => s.judgeId));
-            const unscoredJudgeIds = allAssignedJudgeIds.filter((jId) => !scoredJudgeIds.has(jId));
+            const scoredJudgeIds = new Set(judgeScores.map((score) => score.judgeId));
+            const unscoredJudgeIds = allJudgeIdList.filter(
+              (judgeId) => !scoredJudgeIds.has(judgeId),
+            );
 
             return {
               sample,
@@ -192,15 +203,19 @@ export class AdminResultsComponent {
             };
           });
 
-          sampleResults.sort((a, b) => b.avgTotal - a.avgTotal);
+          sampleResults.sort((resultA, resultB) => resultB.avgTotal - resultA.avgTotal);
 
           const lockedJudgeIds = new Set(
             assignments
-              .filter((a) => a.categoryId === cat.categoryId && a.status === 'finished')
-              .map((a) => a.judgeId),
+              .filter(
+                (assignment) =>
+                  assignment.categoryId === category.categoryId &&
+                  assignment.status === 'finished',
+              )
+              .map((assignment) => assignment.judgeId),
           );
 
-          return { category: cat, samples: sampleResults, lockedJudgeIds, totalJudges };
+          return { category, samples: sampleResults, lockedJudgeIds, totalJudges };
         });
       }),
     ),
@@ -210,18 +225,44 @@ export class AdminResultsComponent {
   readonly expandedSampleIds = signal<Set<string>>(new Set());
   readonly expandedCategoryIds = signal<Set<string>>(new Set());
 
+  readonly allSamplesExpanded = computed(() => {
+    const allSamples = this.categoryResults().flatMap(
+      (categoryResult) => categoryResult.samples,
+    );
+    return (
+      allSamples.length > 0 &&
+      allSamples.every((sampleResult) =>
+        this.expandedSampleIds().has(sampleResult.sample.sampleId),
+      )
+    );
+  });
+
+  readonly allCategoriesExpanded = computed(() => {
+    const results = this.categoryResults();
+    return (
+      results.length > 0 &&
+      results.every((categoryResult) =>
+        this.expandedCategoryIds().has(categoryResult.category.categoryId),
+      )
+    );
+  });
+
   toggleExpand(sampleId: string): void {
-    this.expandedSampleIds.update((s) => {
-      const next = new Set(s);
+    this.expandedSampleIds.update((expandedSet) => {
+      const next = new Set(expandedSet);
       next.has(sampleId) ? next.delete(sampleId) : next.add(sampleId);
       return next;
     });
   }
 
   expandAllSamples(): void {
-    const categoryIds = this.categoryResults().map((cr) => cr.category.categoryId);
+    const categoryIds = this.categoryResults().map(
+      (categoryResult) => categoryResult.category.categoryId,
+    );
     this.expandedCategoryIds.set(new Set(categoryIds));
-    const sampleIds = this.categoryResults().flatMap((cr) => cr.samples.map((sr) => sr.sample.sampleId));
+    const sampleIds = this.categoryResults().flatMap((categoryResult) =>
+      categoryResult.samples.map((sampleResult) => sampleResult.sample.sampleId),
+    );
     this.expandedSampleIds.set(new Set(sampleIds));
   }
 
@@ -229,34 +270,27 @@ export class AdminResultsComponent {
     this.expandedSampleIds.set(new Set());
   }
 
-  get allSamplesExpanded(): boolean {
-    const allSamples = this.categoryResults().flatMap((cr) => cr.samples);
-    return allSamples.length > 0 && allSamples.every((sr) => this.expandedSampleIds().has(sr.sample.sampleId));
-  }
-
   toggleCategory(categoryId: string): void {
-    this.expandedCategoryIds.update((s) => {
-      const next = new Set(s);
+    this.expandedCategoryIds.update((expandedSet) => {
+      const next = new Set(expandedSet);
       next.has(categoryId) ? next.delete(categoryId) : next.add(categoryId);
       return next;
     });
   }
 
   expandAllCategories(): void {
-    const ids = this.categoryResults().map((cr) => cr.category.categoryId);
-    this.expandedCategoryIds.set(new Set(ids));
+    const categoryIds = this.categoryResults().map(
+      (categoryResult) => categoryResult.category.categoryId,
+    );
+    this.expandedCategoryIds.set(new Set(categoryIds));
   }
 
   collapseAllCategories(): void {
     this.expandedCategoryIds.set(new Set());
   }
 
-  get allCategoriesExpanded(): boolean {
-    const results = this.categoryResults();
-    return (
-      results.length > 0 &&
-      results.every((cr) => this.expandedCategoryIds().has(cr.category.categoryId))
-    );
+  goBack(): void {
+    this.router.navigate(['/admin/categories']);
   }
 
   downloadPdf(): void {
