@@ -223,6 +223,18 @@ export class AdminResultsComponent {
     { initialValue: [] as CategoryResult[] },
   );
 
+  readonly sortAscending = signal(false);
+
+  readonly sortedCategoryResults = computed(() => {
+    const ascending = this.sortAscending();
+    return this.categoryResults().map((categoryResult) => ({
+      ...categoryResult,
+      samples: [...categoryResult.samples].sort((resultA, resultB) =>
+        ascending ? resultA.avgTotal - resultB.avgTotal : resultB.avgTotal - resultA.avgTotal,
+      ),
+    }));
+  });
+
   readonly expandedSampleIds = signal<Set<string>>(new Set());
   readonly expandedCategoryIds = signal<Set<string>>(new Set());
 
@@ -290,6 +302,10 @@ export class AdminResultsComponent {
     this.expandedCategoryIds.set(new Set());
   }
 
+  toggleSortDirection(): void {
+    this.sortAscending.update((ascending) => !ascending);
+  }
+
   goBack(): void {
     this.router.navigate(['/admin/categories']);
   }
@@ -305,7 +321,7 @@ export class AdminResultsComponent {
       eventYear: currentEvent.year,
       totalSubmitted: this.eventJudgeStats().totalSubmitted,
       totalExpected: this.eventJudgeStats().totalExpected,
-      categoryResults: this.categoryResults().map((categoryResult) => ({
+      categoryResults: this.sortedCategoryResults().map((categoryResult) => ({
         categoryName: categoryResult.category.name,
         samples: categoryResult.samples.map((sampleResult, index) => {
           const scoredJudges: PdfJudgeScore[] = sampleResult.scores.map((score) => ({
@@ -333,7 +349,7 @@ export class AdminResultsComponent {
           );
 
           return {
-            rank: index + 1, // samples are already sorted by avgTotal descending
+            rank: index + 1,
             sampleCode: sampleResult.sample.sampleCode,
             producerName: sampleResult.producerName,
             judgesScored: sampleResult.judgesScored,
