@@ -7,14 +7,14 @@
 
     <!-- Page header -->
     <div class="mb-4 flex items-center justify-between">
-      <h1 class="text-xl font-semibold text-text-primary">Proizvođači</h1>
+      <h1 class="text-xl font-semibold text-text-primary">Proizvodjači</h1>
       <button
         type="button"
         (click)="openCreate()"
         class="flex items-center gap-1.5 rounded-[10px] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark active:bg-primary-dark"
       >
         <lucide-icon name="plus" [size]="16" [strokeWidth]="2.5" />
-        Dodaj Proizvođača
+        Dodaj Proizvodjača
       </button>
     </div>
 
@@ -29,7 +29,7 @@
         type="search"
         [value]="searchQuery()"
         (input)="onSearchInput($event)"
-        placeholder="Pretraži Proizvođače..."
+        placeholder="Pretraži Proizvodjače..."
         class="w-full rounded-xl border border-border-default bg-bg-card py-2.5 pl-11 pr-4 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
       />
     </div>
@@ -65,7 +65,7 @@
         @if (searchQuery()) {
           <p class="text-sm text-text-secondary">Nema rezultata za "{{ searchQuery() }}".</p>
         } @else {
-          <p class="text-sm text-text-secondary">Nema producenata. Dodajte prvog Proizvođača.</p>
+          <p class="text-sm text-text-secondary">Nema producenata. Dodajte prvog Proizvodjača.</p>
         }
       </div>
     }
