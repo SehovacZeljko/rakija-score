@@ -1,7 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { of, startWith, switchMap } from 'rxjs';
 
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
@@ -21,7 +20,6 @@ type JudgeFilter = 'unassigned' | 'assigned';
   selector: 'app-admin-judges',
   imports: [
     NgClass,
-    RouterLink,
     LoadingSpinnerComponent,
     InlineSpinnerComponent,
     ActiveFestivalBannerComponent,
@@ -40,7 +38,6 @@ export class AdminJudgesComponent {
   readonly activeFestival = this.ctx.activeFestival;
   readonly adminCurrentEvent = this.ctx.adminCurrentEvent;
   readonly dataReady = this.ctx.dataReady;
-  readonly isEventActive = computed(() => this.adminCurrentEvent()?.status === 'active');
 
   private readonly categories$ = this.ctx.adminCurrentEvent$.pipe(
     switchMap((event) => {

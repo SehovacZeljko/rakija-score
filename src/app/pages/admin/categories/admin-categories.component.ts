@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { of, switchMap } from 'rxjs';
@@ -50,17 +50,11 @@ export class AdminCategoriesComponent {
     return categoryMap;
   });
 
-  readonly hasActiveEvent = computed(() => this.events().some((e) => e.status === 'active'));
-  readonly hasNonFinishedEvent = computed(() =>
-    this.events().some((e) => e.status === 'active' || e.status === 'staging'),
-  );
-
   // Event form state
   readonly showEventForm = signal(false);
   readonly newEventName = signal('');
   readonly newEventYear = signal(new Date().getFullYear());
   readonly isSavingEvent = signal(false);
-  readonly showNewEventWarning = signal(false);
 
   // Event edit state
   readonly editingEventId = signal<string | null>(null);
@@ -69,17 +63,10 @@ export class AdminCategoriesComponent {
   readonly isSavingEventEdit = signal(false);
   readonly editingEventNameValid = computed(() => this.editingEventName().trim().length >= 3);
 
-  constructor() {
-    effect(() => {
-      if (!this.hasNonFinishedEvent()) this.showNewEventWarning.set(false);
-    });
-  }
-
   // Event transition state
   readonly activatingEventId = signal<string | null>(null);
   readonly finishingEventId = signal<string | null>(null);
   readonly revertingEventId = signal<string | null>(null);
-  readonly revertErrorEventId = signal<string | null>(null);
   readonly reopeningEventId = signal<string | null>(null);
 
   // Category form state — stores eventId of the event whose form is open
@@ -136,16 +123,10 @@ export class AdminCategoriesComponent {
     this.newEventName.set('');
     this.newEventYear.set(new Date().getFullYear());
     this.showEventForm.set(false);
-    this.showNewEventWarning.set(false);
   }
 
   onNewEventClick(): void {
-    if (this.hasNonFinishedEvent()) {
-      this.showNewEventWarning.set(true);
-    } else {
-      this.showNewEventWarning.set(false);
-      this.showEventForm.set(true);
-    }
+    this.showEventForm.set(true);
   }
 
   startEventEdit(festivalEvent: FestivalEvent): void {
@@ -215,14 +196,8 @@ export class AdminCategoriesComponent {
 
   async revertToStaging(eventId: string): Promise<void> {
     this.revertingEventId.set(eventId);
-    this.revertErrorEventId.set(null);
     try {
       await this.eventService.revertToStaging(eventId);
-    } catch (error) {
-      if (error instanceof Error && error.message === 'SCORES_EXIST') {
-        this.revertErrorEventId.set(eventId);
-        setTimeout(() => this.revertErrorEventId.set(null), 4000);
-      }
     } finally {
       this.revertingEventId.set(null);
     }

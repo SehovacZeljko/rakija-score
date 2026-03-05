@@ -5,7 +5,6 @@ import {
   collectionData,
   doc,
   getDocs,
-  limit,
   orderBy,
   query,
   serverTimestamp,
@@ -52,22 +51,6 @@ export class FestivalService {
   async setActiveFestival(festivalId: string): Promise<void> {
     const activeQuery = query(this.festivalsRef, where('status', '==', 'active'));
     const snapshot = await getDocs(activeQuery);
-
-    // Block if the current active festival has any non-finished events
-    if (!snapshot.empty) {
-      const activeFestivalIds = snapshot.docs.map((d) => d.id);
-      const eventsRef = collection(this.firestore, 'events');
-      const nonFinishedQuery = query(
-        eventsRef,
-        where('festivalId', 'in', activeFestivalIds),
-        where('status', 'in', ['staging', 'active']),
-        limit(1),
-      );
-      const eventsSnapshot = await getDocs(nonFinishedQuery);
-      if (!eventsSnapshot.empty) {
-        throw new Error('NON_FINISHED_EVENTS_EXIST');
-      }
-    }
 
     const batch = writeBatch(this.firestore);
     snapshot.docs.forEach((d) => batch.update(d.ref, { status: 'inactive' }));

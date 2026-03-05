@@ -37,7 +37,6 @@ export class AdminSamplesComponent {
   readonly activeFestival = this.ctx.activeFestival;
   readonly adminCurrentEvent = this.ctx.adminCurrentEvent;
   readonly dataReady = this.ctx.dataReady;
-  readonly isEventActive = computed(() => this.adminCurrentEvent()?.status === 'active');
 
   private readonly categories$ = this.ctx.adminCurrentEvent$.pipe(
     switchMap((event) => {

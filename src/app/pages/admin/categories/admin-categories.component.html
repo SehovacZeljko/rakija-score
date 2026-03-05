@@ -12,19 +12,12 @@
           type="button"
           (click)="onNewEventClick()"
           class="flex items-center gap-1.5 rounded-[10px] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark active:bg-primary-dark"
-          [class.opacity-50]="hasNonFinishedEvent()"
-          [class.cursor-not-allowed]="hasNonFinishedEvent()"
         >
           <lucide-icon name="plus" [size]="16" [strokeWidth]="2.5" />
           Novi dogadjaj
         </button>
       }
     </div>
-    @if (showNewEventWarning()) {
-      <p class="mt-1.5 text-right text-xs text-status-error">
-        Novi dogadjaj se može dodati tek kada su svi drugi dogadjaji završeni.
-      </p>
-    }
   </div>
 
   <!-- No active festival -->
@@ -200,9 +193,8 @@
                 <button
                   type="button"
                   (click)="activateEvent(event.eventId)"
-                  [disabled]="activatingEventId() !== null || hasActiveEvent()"
+                  [disabled]="activatingEventId() !== null"
                   class="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-40"
-                  [title]="hasActiveEvent() ? 'Završite aktivan dogadjaj prije aktivacije' : ''"
                 >
                   @if (activatingEventId() === event.eventId) {
                     <app-inline-spinner />
@@ -253,15 +245,6 @@
           }
         </div>
 
-        <!-- Revert error -->
-        @if (revertErrorEventId() === event.eventId) {
-          <div class="border-b border-border-default px-4 py-2">
-            <p class="text-xs text-status-error">
-              Ne možete vratiti u pripremu jer postoje ocjene za ovaj dogadjaj.
-            </p>
-          </div>
-        }
-
         <!-- Categories -->
         @for (category of categoriesForEvent(event.eventId); track category.categoryId) {
           <div class="border-b border-border-default px-4 py-3">
@@ -295,11 +278,7 @@
 
         <!-- Add category row -->
         <div class="px-4 py-3">
-          @if (event.status !== 'staging') {
-            <p class="text-xs text-text-muted">
-              Kategorije se mogu dodavati samo dok je dogadjaj u pripremi.
-            </p>
-          } @else if (activeCategoryFormEventId() === event.eventId) {
+          @if (activeCategoryFormEventId() === event.eventId) {
             <div class="flex items-center gap-2">
               <input
                 type="text"

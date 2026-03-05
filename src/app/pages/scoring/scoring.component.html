@@ -12,14 +12,6 @@
 
     <div class="p-4">
 
-      <!-- Locked banner -->
-      @if (isLocked()) {
-        <div class="mb-4 flex items-center gap-2 rounded-xl bg-status-locked/10 px-4 py-3">
-          <lucide-icon name="lock" [size]="16" class="shrink-0 text-status-locked" />
-          <p class="text-sm text-status-locked">Kategorija je zaključana. Ocjena se ne može mijenjati.</p>
-        </div>
-      }
-
       <!-- Sample info card -->
       <div class="mb-4 rounded-xl bg-bg-card px-4 py-3 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
         <div class="flex items-center justify-between">
@@ -80,7 +72,6 @@
               [max]="criterion.max"
               [step]="SCORE_STEP"
               [value]="getCriterionValue(criterion.key)"
-              [disabled]="isLocked()"
               (input)="setPreset(criterion.key, +($any($event.target).value))"
             />
           </div>
@@ -90,8 +81,7 @@
             <button
               type="button"
               (click)="setPreset(criterion.key, criterion.max)"
-              [disabled]="isLocked()"
-              class="text-xs text-accent hover:text-accent-hover disabled:cursor-not-allowed disabled:text-text-muted"
+              class="text-xs text-accent hover:text-accent-hover"
             >
               max {{ criterion.max.toFixed(2) }}
             </button>
@@ -112,7 +102,6 @@
         <textarea
           [value]="comment()"
           (input)="onCommentInput($event)"
-          [disabled]="isLocked()"
           rows="3"
           placeholder="Bilješka o uzorku..."
           class="w-full rounded-xl border border-border-default bg-bg-card px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none disabled:opacity-60"
@@ -127,24 +116,17 @@
 <!-- Fixed bottom action -->
 @if (!isLoading()) {
   <div class="fixed bottom-0 left-0 right-0 border-t border-border-default bg-white px-4 pb-6 pt-3">
-    @if (isLocked()) {
-      <div class="flex items-center justify-center gap-2 rounded-xl bg-bg-surface py-3.5">
-        <lucide-icon name="lock" [size]="16" class="text-status-locked" />
-        <span class="text-sm font-medium text-status-locked">Zaključano</span>
-      </div>
-    } @else {
-      <button
-        type="button"
-        (click)="saveScore()"
-        [disabled]="isSaving()"
-        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        @if (isSaving()) {
-          <app-inline-spinner [size]="16" />
-        } @else {
-          Sačuvaj
-        }
-      </button>
-    }
+    <button
+      type="button"
+      (click)="saveScore()"
+      [disabled]="isSaving()"
+      class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      @if (isSaving()) {
+        <app-inline-spinner [size]="16" />
+      } @else {
+        Sačuvaj
+      }
+    </button>
   </div>
 }

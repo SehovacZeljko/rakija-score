@@ -26,7 +26,6 @@ export class AdminFestivalsComponent {
   readonly newFestivalName = signal('');
   readonly isSaving = signal(false);
   readonly activatingId = signal<string | null>(null);
-  readonly activateError = signal(false);
   readonly editingFestivalId = signal<string | null>(null);
   readonly editingName = signal('');
   readonly isSavingEdit = signal(false);
@@ -86,14 +85,8 @@ export class AdminFestivalsComponent {
 
   async setActive(festivalId: string): Promise<void> {
     this.activatingId.set(festivalId);
-    this.activateError.set(false);
     try {
       await this.festivalService.setActiveFestival(festivalId);
-    } catch (error) {
-      if (error instanceof Error && error.message === 'NON_FINISHED_EVENTS_EXIST') {
-        this.activateError.set(true);
-        setTimeout(() => this.activateError.set(false), 5000);
-      }
     } finally {
       this.activatingId.set(null);
     }

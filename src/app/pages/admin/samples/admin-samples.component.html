@@ -8,7 +8,7 @@
     <!-- Page header -->
     <div class="mb-4 flex items-center justify-between">
       <h1 class="text-xl font-semibold text-text-primary">Uzorci</h1>
-      @if (activeFestival() && adminCurrentEvent() && !isEventActive()) {
+      @if (activeFestival() && adminCurrentEvent()) {
         <button
           type="button"
           (click)="openCreate()"
@@ -34,17 +34,6 @@
       </div>
     } @else {
       <app-active-festival-banner />
-
-      <!-- Active event warning -->
-      @if (isEventActive()) {
-        <div class="mb-4 flex items-center gap-2 rounded-xl bg-status-pending/10 px-4 py-3">
-          <lucide-icon name="lock" [size]="16" class="shrink-0 text-status-pending" />
-          <p class="text-sm text-status-pending">
-            Dogadjaj je aktivan. Uzorci se ne mogu dodavati niti mijenjati dok je ocjenjivanje u
-            toku.
-          </p>
-        </div>
-      }
 
       <!-- Search -->
       <div class="relative mb-3">
@@ -78,8 +67,7 @@
         <button
           type="button"
           (click)="openEdit(sample)"
-          [disabled]="isEventActive()"
-          class="mb-3 w-full rounded-xl bg-bg-card p-4 text-left shadow-[0_1px_4px_rgba(0,0,0,0.08)] transition-shadow hover:shadow-[0_2px_8px_rgba(0,0,0,0.12)] active:shadow-none disabled:cursor-default disabled:opacity-100"
+          class="mb-3 w-full rounded-xl bg-bg-card p-4 text-left shadow-[0_1px_4px_rgba(0,0,0,0.08)] transition-shadow hover:shadow-[0_2px_8px_rgba(0,0,0,0.12)] active:shadow-none"
         >
           <div class="flex items-start justify-between gap-2">
             <div class="min-w-0 flex-1">
