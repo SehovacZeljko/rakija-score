@@ -22,7 +22,7 @@ module.exports = {
         'text-on-primary': '#FFFFFF',
         'text-on-accent': '#1A1A1A',
         // Status
-        'status-success': '#22C55E',
+        'status-success': '#C8D93A',
         'status-pending': '#F59E0B',
         'status-error': '#EF4444',
         'status-info': '#3B82F6',
