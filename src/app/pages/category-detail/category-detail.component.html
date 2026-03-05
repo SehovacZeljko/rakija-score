@@ -1,8 +1,7 @@
 <app-header title="Sudija" [items]="navItems" />
 
-<main class="min-h-screen bg-bg-app pb-[60px] pt-14 md:pb-4">
+<main class="min-h-screen bg-bg-app pb-24 pt-14">
   <div class="p-4">
-
     @if (!dataReady()) {
       <app-loading-spinner />
     }
@@ -27,6 +26,9 @@
         <p class="text-sm text-status-locked">Kategorija je zaključana.</p>
       </div>
     }
+
+    <!-- Samples heading -->
+    <h2 class="mb-3 text-base font-semibold text-text-primary">Uzorci:</h2>
 
     <!-- Samples grid -->
     @if (samples().length === 0) {
@@ -57,40 +59,51 @@
                 {{ (scoreMap().get(sample.sampleId) ?? 0).toFixed(2) }}
               </span>
               @if (isLocked()) {
-                <lucide-icon name="lock" [size]="11" [strokeWidth]="2.5" class="shrink-0 text-status-locked" />
+                <lucide-icon
+                  name="lock"
+                  [size]="11"
+                  [strokeWidth]="2.5"
+                  class="shrink-0 text-status-locked"
+                />
               } @else if (scoreMap().has(sample.sampleId)) {
-                <lucide-icon name="check" [size]="11" [strokeWidth]="2.5" class="shrink-0 text-status-success" />
+                <lucide-icon
+                  name="check"
+                  [size]="11"
+                  [strokeWidth]="2.5"
+                  class="shrink-0 text-status-success"
+                />
               }
             </div>
           </button>
         }
       </div>
     }
-
-    <!-- Lock button -->
-    @if (!isLocked() && isEventActive()) {
-      <div class="mt-6">
-        <button
-          type="button"
-          (click)="lockCategory()"
-          [disabled]="!isAllScored() || isLocking()"
-          class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          @if (isLocking()) {
-            <app-inline-spinner [size]="16" />
-          } @else {
-            Zaključaj kategoriju
-          }
-        </button>
-        @if (!isAllScored() && samples().length > 0) {
-          <p class="mt-2 text-center text-xs text-text-muted">
-            Ocijenite sve uzorke da biste zaključali kategoriju.
-          </p>
-        }
-      </div>
-    }
-
   </div>
 </main>
+
+<!-- Fixed bottom action -->
+@if (!isLocked() && isEventActive()) {
+  <div
+    class="fixed bottom-[60px] left-0 right-0 border-t border-border-default bg-white px-4 pb-4 pt-3 md:bottom-0 md:pb-6"
+  >
+    <button
+      type="button"
+      (click)="lockCategory()"
+      [disabled]="!isAllScored() || isLocking()"
+      class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      @if (isLocking()) {
+        <app-inline-spinner [size]="16" />
+      } @else {
+        Zaključaj kategoriju
+      }
+    </button>
+    @if (!isAllScored() && samples().length > 0) {
+      <p class="mt-2 text-center text-xs text-text-muted">
+        Ocijenite sve uzorke da biste zaključali kategoriju.
+      </p>
+    }
+  </div>
+}
 
 <app-bottom-nav [items]="navItems" />

@@ -53,17 +53,15 @@
           </div>
 
           <!-- Progress bar -->
-          @if (card.sampleCount > 0) {
+          <div
+            class="mt-3 h-1.5 w-full overflow-hidden rounded-full"
+            [class]="trackBgClass(i === activeIndex())"
+          >
             <div
-              class="mt-3 h-1.5 w-full overflow-hidden rounded-full"
-              [class]="trackBgClass(i === activeIndex())"
-            >
-              <div
-                class="h-full rounded-full bg-accent transition-all"
-                [style.width.%]="(card.scoredCount / card.sampleCount) * 100"
-              ></div>
-            </div>
-          }
+              class="h-full rounded-full bg-accent transition-all"
+              [style.width.%]="card.sampleCount > 0 ? (card.scoredCount / card.sampleCount) * 100 : 0"
+            ></div>
+          </div>
         </button>
       </div>
     }
