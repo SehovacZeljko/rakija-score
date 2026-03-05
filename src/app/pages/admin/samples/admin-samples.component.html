@@ -46,6 +46,22 @@
         </div>
       }
 
+      <!-- Search -->
+      <div class="relative mb-3">
+        <lucide-icon
+          name="search"
+          [size]="16"
+          class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
+        />
+        <input
+          type="search"
+          [value]="searchQuery()"
+          (input)="onSearchInput($event)"
+          placeholder="Pretraži po kodu ili proizvođaču..."
+          class="w-full rounded-xl border border-border-default bg-bg-card py-2.5 pl-11 pr-4 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
+        />
+      </div>
+
       <!-- Category filter -->
       <app-select-dropdown
         class="mb-4 block"
@@ -98,7 +114,9 @@
         </button>
       } @empty {
         <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
-          @if (selectedCategoryId()) {
+          @if (searchQuery()) {
+            <p class="text-sm text-text-secondary">Nema rezultata za "{{ searchQuery() }}".</p>
+          } @else if (selectedCategoryId()) {
             <p class="text-sm text-text-secondary">Nema uzoraka u ovoj kategoriji.</p>
           } @else {
             <p class="text-sm text-text-secondary">Nema uzoraka. Dodajte prvi uzorak.</p>

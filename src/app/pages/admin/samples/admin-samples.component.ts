@@ -71,11 +71,29 @@ export class AdminSamplesComponent {
   );
 
   readonly selectedCategoryId = signal<string | null>(null);
+  readonly searchQuery = signal('');
+
   readonly filteredSamples = computed(() => {
     const categoryId = this.selectedCategoryId();
-    const samples = this.allSamples();
-    return categoryId ? samples.filter((sample) => sample.categoryId === categoryId) : samples;
+    const query = this.searchQuery().trim().toLowerCase();
+    let samples = this.allSamples();
+
+    if (categoryId) {
+      samples = samples.filter((sample) => sample.categoryId === categoryId);
+    }
+    if (query) {
+      samples = samples.filter(
+        (sample) =>
+          sample.sampleCode.toLowerCase().includes(query) ||
+          (this.producerMap().get(sample.producerId) ?? '').toLowerCase().includes(query),
+      );
+    }
+    return samples;
   });
+
+  onSearchInput(event: Event): void {
+    this.searchQuery.set((event.target as HTMLInputElement).value);
+  }
 
   readonly mode = signal<'list' | 'create' | 'edit'>('list');
   readonly editingSample = signal<Sample | null>(null);
