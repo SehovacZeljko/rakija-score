@@ -19,19 +19,7 @@
     } @else {
       <!-- Logo mode: bottle icon + "Rakija" -->
       <a [routerLink]="homeRoute" class="flex items-center gap-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="#C8D93A"
-          stroke="#C8D93A"
-          stroke-width="1"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M10 2h4v3l2.5 3.5V20a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2V8.5L10 5V2z" />
-        </svg>
+        <lucide-icon name="scale" [size]="22" class="text-accent" />
         <span class="text-base font-semibold text-white">Rakija</span>
       </a>
 
