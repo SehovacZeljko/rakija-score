@@ -17,29 +17,31 @@
         }
       </div>
     } @else {
-      <!-- Logo mode: bottle icon + "Rakija" -->
-      <a [routerLink]="homeRoute" class="flex items-center gap-2">
-        <lucide-icon name="scale" [size]="22" class="text-status-pending" />
-        <span class="text-base font-semibold text-white">Rakija</span>
-      </a>
+      <!-- Logo mode: logo + optional desktop nav grouped on the left -->
+      <div class="flex min-w-0 flex-1 items-center gap-1">
+        <a [routerLink]="homeRoute" class="flex shrink-0 items-center gap-2 pr-2">
+          <lucide-icon name="scale" [size]="22" class="text-status-pending" />
+          <span class="text-base font-semibold text-white">Rakija</span>
+        </a>
 
-      <!-- Desktop nav links (hidden on mobile) -->
-      @if (items.length > 0) {
-        <nav class="hidden md:flex items-center gap-1">
-          @for (item of items; track item.route) {
-            <a
-              [routerLink]="item.route"
-              routerLinkActive
-              #rla="routerLinkActive"
-              class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10 hover:text-white"
-              [ngClass]="rla.isActive ? ['bg-white/15', 'text-white'] : ['text-white/60']"
-            >
-              <lucide-icon [name]="item.icon" [size]="16" />
-              {{ item.label }}
-            </a>
-          }
-        </nav>
-      }
+        <!-- Desktop nav links (hidden on mobile) -->
+        @if (items.length > 0) {
+          <nav class="hidden md:flex items-center gap-1">
+            @for (item of items; track item.route) {
+              <a
+                [routerLink]="item.route"
+                routerLinkActive
+                #rla="routerLinkActive"
+                class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10 hover:text-white"
+                [ngClass]="rla.isActive ? ['bg-white/15', 'text-white'] : ['text-white/60']"
+              >
+                <lucide-icon [name]="item.icon" [size]="16" />
+                {{ item.label }}
+              </a>
+            }
+          </nav>
+        }
+      </div>
     }
 
     <!-- Burger menu -->
