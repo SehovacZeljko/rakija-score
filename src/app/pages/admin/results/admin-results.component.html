@@ -95,23 +95,35 @@
         <!-- Column headers -->
         @if (cr.samples.length > 0) {
           <div
-            class="flex items-center gap-2 border-b border-border-default bg-bg-surface px-4 py-1.5"
+            class="flex items-center gap-3 border-b border-border-default bg-bg-surface px-4 py-1.5"
           >
+            <!-- checkbox column -->
             <span class="w-5"></span>
-            <span class="w-14 text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
-              >Šifra</span
-            >
-            <span class="flex-1 text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
-              >Proizvođač</span
-            >
+
+            <!-- sifra -->
+            <span class="w-14 text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted">
+              Šifra
+            </span>
+
+            <!-- proizvodjac -->
             <span
-              class="w-10 text-right text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
-              >Sudije</span
+              class="flex-1 text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
             >
+              Proizvođač
+            </span>
+
+            <!-- sudije -->
+            <span
+              class="w-12 text-right text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted"
+            >
+              Sudije
+            </span>
+
+            <!-- prosjek sortable -->
             <button
               type="button"
               (click)="toggleSortDirection()"
-              class="flex w-12 items-center justify-end gap-0.5 text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted transition-colors hover:text-text-secondary"
+              class="flex w-16 items-center justify-end gap-1 text-[10px] font-medium uppercase tracking-[0.05em] text-text-muted transition-colors hover:text-text-secondary"
             >
               <span>Prosjek</span>
               <lucide-icon
@@ -119,7 +131,6 @@
                 [size]="10"
               />
             </button>
-            <span class="w-4"></span>
           </div>
         }
 
@@ -167,14 +178,24 @@
                       {{ judgeNameMap().get(score.judgeId) ?? score.judgeId }}
                     </span>
                     @if (cr.lockedJudgeIds.has(score.judgeId)) {
-                      <lucide-icon name="lock" [size]="12" [strokeWidth]="2.5" class="shrink-0 text-status-success" />
+                      <lucide-icon
+                        name="lock"
+                        [size]="12"
+                        [strokeWidth]="2.5"
+                        class="shrink-0 text-status-success"
+                      />
                     }
                   </div>
                   <!-- Line 2: criteria with icons -->
                   <div class="mt-2 flex items-start gap-4 pl-[21px] text-text-muted">
                     <div class="flex flex-col items-center gap-0.5">
                       <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
-                        <lucide-icon name="droplet" [size]="10" [strokeWidth]="2.5" class="flex-none" />
+                        <lucide-icon
+                          name="droplet"
+                          [size]="10"
+                          [strokeWidth]="2.5"
+                          class="flex-none"
+                        />
                         <span>Bo</span>
                       </div>
                       <span class="text-[10px] font-medium text-text-primary">{{
@@ -194,7 +215,12 @@
 
                     <div class="flex flex-col items-center gap-0.5">
                       <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
-                        <lucide-icon name="star" [size]="10" [strokeWidth]="2.5" class="flex-none" />
+                        <lucide-icon
+                          name="star"
+                          [size]="10"
+                          [strokeWidth]="2.5"
+                          class="flex-none"
+                        />
                         <span>Ti</span>
                       </div>
                       <span class="text-[10px] font-medium text-text-primary">{{
@@ -204,7 +230,12 @@
 
                     <div class="flex flex-col items-center gap-0.5">
                       <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
-                        <lucide-icon name="wind" [size]="10" [strokeWidth]="2.5" class="flex-none" />
+                        <lucide-icon
+                          name="wind"
+                          [size]="10"
+                          [strokeWidth]="2.5"
+                          class="flex-none"
+                        />
                         <span>Mi</span>
                       </div>
                       <span class="text-[10px] font-medium text-text-primary">{{
@@ -214,7 +245,12 @@
 
                     <div class="flex flex-col items-center gap-0.5">
                       <div class="flex items-center gap-1 text-[10px] leading-none uppercase">
-                        <lucide-icon name="coffee" [size]="10" [strokeWidth]="2.5" class="flex-none" />
+                        <lucide-icon
+                          name="coffee"
+                          [size]="10"
+                          [strokeWidth]="2.5"
+                          class="flex-none"
+                        />
                         <span>Uk</span>
                       </div>
                       <span class="text-[10px] font-medium text-text-primary">{{
