@@ -1,7 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
 import { map, of, startWith, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 
@@ -11,6 +10,8 @@ import { SelectDropdownComponent } from '../select-dropdown/select-dropdown.comp
 import { Category } from '../../models/category.model';
 import { FestivalEvent } from '../../models/event.model';
 import { JudgeAssignment } from '../../models/judge-assignment.model';
+import { Sample } from '../../models/sample.model';
+import { Score } from '../../models/score.model';
 import { User } from '../../models/user.model';
 import { CategoryService } from '../../services/category.service';
 import { EventService } from '../../services/event.service';
@@ -21,7 +22,7 @@ import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-event-card',
-  imports: [ContextMenuComponent, InlineSpinnerComponent, RouterLink, LucideAngularModule, DecimalPipe, SelectDropdownComponent],
+  imports: [ContextMenuComponent, InlineSpinnerComponent, LucideAngularModule, DecimalPipe, SelectDropdownComponent],
   templateUrl: './event-card.component.html',
   styleUrl: './event-card.component.scss',
 })
@@ -84,6 +85,27 @@ export class EventCardComponent {
     }
 
     return result;
+  });
+
+  readonly samplesByCategoryId = computed(() => {
+    const map = new Map<string, Sample[]>();
+    for (const sample of this.samples()) {
+      const list = map.get(sample.categoryId) ?? [];
+      list.push(sample);
+      map.set(sample.categoryId, list);
+    }
+    for (const [key, categorySamples] of map) {
+      map.set(key, [...categorySamples].sort((a, b) => a.order - b.order));
+    }
+    return map;
+  });
+
+  readonly scoreMap = computed(() => {
+    const map = new Map<string, Score>();
+    for (const score of this.scores()) {
+      map.set(`${score.judgeId}_${score.sampleId}`, score);
+    }
+    return map;
   });
 
   private readonly producers = toSignal(this.producerService.getAllProducers(), { initialValue: [] });
@@ -233,6 +255,14 @@ export class EventCardComponent {
         destructive: true,
       },
     ];
+  }
+
+  getJudgeScore(judgeId: string, sampleId: string): Score | undefined {
+    return this.scoreMap().get(`${judgeId}_${sampleId}`);
+  }
+
+  scoreTotal(score: Score): number {
+    return score.color + score.clarity + score.typicality + score.aroma + score.taste;
   }
 
   openAddJudges(categoryId: string): void {
