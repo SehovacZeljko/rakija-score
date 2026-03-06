@@ -112,6 +112,10 @@ export class AdminCategoriesComponent {
         festivalId = await this.festivalService.createFestival(this.newFestivalNameForEvent().trim());
       }
 
+      await Promise.all([
+        this.festivalService.setActiveFestival(festivalId),
+        this.eventService.finishAllNonFinishedEvents(festivalId),
+      ]);
       await this.eventService.createEvent(festivalId, eventName, this.newEventYear());
       this.newEventName.set('');
       this.newEventYear.set(new Date().getFullYear());

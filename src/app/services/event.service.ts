@@ -105,4 +105,20 @@ export class EventService {
     await updateDoc(doc(this.firestore, `events/${eventId}`), { status: 'staging' });
   }
 
+  async finishAllNonFinishedEvents(festivalId: string): Promise<void> {
+    const nonFinishedQuery = query(
+      this.eventsRef,
+      where('festivalId', '==', festivalId),
+      where('status', 'in', ['active', 'staging']),
+    );
+    const snapshot = await getDocs(nonFinishedQuery);
+    if (snapshot.empty) return;
+
+    const batch = writeBatch(this.firestore);
+    for (const docSnap of snapshot.docs) {
+      batch.update(docSnap.ref, { status: 'finished', closedAt: serverTimestamp() });
+    }
+    await batch.commit();
+  }
+
 }
