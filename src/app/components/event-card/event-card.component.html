@@ -96,10 +96,11 @@
           @if (categoryStats().get(category.categoryId); as stats) {
             <div class="mt-0.5 flex gap-3 text-xs text-text-muted">
               <span>Uzorci: {{ stats.totalSamples }}</span>
-              <span
-                >Prosječna ocjena:
-                {{ stats.avgGrade !== null ? (stats.avgGrade | number: '1.2-2') : '—' }}</span
-              >
+              <span>Ocjenjeno: {{ stats.gradedSamples }}</span>
+              <span>
+                Prosjek:
+                {{ stats.avgGrade !== null ? (stats.avgGrade | number: '1.2-2') : '—' }}
+              </span>
             </div>
           }
         </div>

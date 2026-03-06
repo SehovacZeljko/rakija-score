@@ -55,7 +55,10 @@ export class EventCardComponent {
   private readonly scores = toSignal(this.scores$, { initialValue: [] });
 
   readonly categoryStats = computed(() => {
-    const result = new Map<string, { totalSamples: number; avgGrade: number | null }>();
+    const result = new Map<
+      string,
+      { totalSamples: number; gradedSamples: number; avgGrade: number | null }
+    >();
 
     const samplesByCategory = new Map<string, string[]>();
     for (const sample of this.samples()) {
@@ -75,12 +78,13 @@ export class EventCardComponent {
               0,
             ) / categoryScores.length
           : null;
-      result.set(categoryId, { totalSamples: sampleIds.length, avgGrade });
+      const gradedSamples = new Set(categoryScores.map((score) => score.sampleId)).size;
+      result.set(categoryId, { totalSamples: sampleIds.length, gradedSamples, avgGrade });
     }
 
     for (const category of this.categories()) {
       if (!result.has(category.categoryId)) {
-        result.set(category.categoryId, { totalSamples: 0, avgGrade: null });
+        result.set(category.categoryId, { totalSamples: 0, gradedSamples: 0, avgGrade: null });
       }
     }
 
