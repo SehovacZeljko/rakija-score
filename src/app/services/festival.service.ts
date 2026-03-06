@@ -5,6 +5,7 @@ import {
   collectionData,
   doc,
   getDocs,
+  limit,
   orderBy,
   query,
   serverTimestamp,
