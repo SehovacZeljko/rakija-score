@@ -1,5 +1,8 @@
+import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject, input, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { map, of, startWith, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { InlineSpinnerComponent } from '../inline-spinner/inline-spinner.component';
@@ -7,20 +10,72 @@ import { Category } from '../../models/category.model';
 import { FestivalEvent } from '../../models/event.model';
 import { CategoryService } from '../../services/category.service';
 import { EventService } from '../../services/event.service';
+import { SampleService } from '../../services/sample.service';
+import { ScoreService } from '../../services/score.service';
 
 @Component({
   selector: 'app-event-card',
-  imports: [InlineSpinnerComponent, RouterLink, LucideAngularModule],
+  imports: [InlineSpinnerComponent, RouterLink, LucideAngularModule, DecimalPipe],
   templateUrl: './event-card.component.html',
   styleUrl: './event-card.component.scss',
 })
 export class EventCardComponent {
   private readonly eventService = inject(EventService);
   private readonly categoryService = inject(CategoryService);
+  private readonly sampleService = inject(SampleService);
+  private readonly scoreService = inject(ScoreService);
 
   readonly event = input.required<FestivalEvent>();
   readonly categories = input.required<Category[]>();
   readonly festivalId = input.required<string>();
+
+  private readonly samples$ = toObservable(this.categories).pipe(
+    map((cats) => cats.map((c) => c.categoryId)),
+    switchMap((ids) => (ids.length ? this.sampleService.getSamplesForCategories(ids) : of([]))),
+    startWith([]),
+  );
+
+  private readonly scores$ = this.samples$.pipe(
+    map((samples) => samples.map((s) => s.sampleId)),
+    switchMap((ids) => (ids.length ? this.scoreService.getScoresForSampleIds(ids) : of([]))),
+    startWith([]),
+  );
+
+  private readonly samples = toSignal(this.samples$, { initialValue: [] });
+  private readonly scores = toSignal(this.scores$, { initialValue: [] });
+
+  readonly categoryStats = computed(() => {
+    const result = new Map<string, { totalSamples: number; avgGrade: number | null }>();
+
+    const samplesByCategory = new Map<string, string[]>();
+    for (const sample of this.samples()) {
+      const list = samplesByCategory.get(sample.categoryId) ?? [];
+      list.push(sample.sampleId);
+      samplesByCategory.set(sample.categoryId, list);
+    }
+
+    for (const [categoryId, sampleIds] of samplesByCategory) {
+      const sampleIdSet = new Set(sampleIds);
+      const categoryScores = this.scores().filter((score) => sampleIdSet.has(score.sampleId));
+      const avgGrade =
+        categoryScores.length > 0
+          ? categoryScores.reduce(
+              (sum, score) =>
+                sum + score.color + score.clarity + score.typicality + score.aroma + score.taste,
+              0,
+            ) / categoryScores.length
+          : null;
+      result.set(categoryId, { totalSamples: sampleIds.length, avgGrade });
+    }
+
+    for (const category of this.categories()) {
+      if (!result.has(category.categoryId)) {
+        result.set(category.categoryId, { totalSamples: 0, avgGrade: null });
+      }
+    }
+
+    return result;
+  });
 
   // Edit mode
   readonly isEditing = signal(false);

@@ -161,13 +161,24 @@
   <!-- Categories -->
   @for (category of categories(); track category.categoryId) {
     <div class="border-b border-border-default px-4 py-3">
-      <div class="flex items-center justify-between">
-        <span class="text-sm text-text-primary">{{ category.name }}</span>
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-sm text-text-primary">{{ category.name }}</span>
+          @if (categoryStats().get(category.categoryId); as stats) {
+            <div class="mt-0.5 flex gap-3 text-xs text-text-muted">
+              <span>Uzorci: {{ stats.totalSamples }}</span>
+              <span
+                >Prosječna ocjena:
+                {{ stats.avgGrade !== null ? (stats.avgGrade | number: '1.2-2') : '—' }}</span
+              >
+            </div>
+          }
+        </div>
         <button
           type="button"
           (click)="deleteCategory(category.categoryId)"
           [disabled]="deletingCategoryId() !== null"
-          class="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-status-error/10 hover:text-status-error disabled:cursor-not-allowed disabled:opacity-40"
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-status-error/10 hover:text-status-error disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="Obriši kategoriju"
         >
           @if (deletingCategoryId() === category.categoryId) {
