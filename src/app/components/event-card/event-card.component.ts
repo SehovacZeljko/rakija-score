@@ -9,11 +9,14 @@ import { InlineSpinnerComponent } from '../inline-spinner/inline-spinner.compone
 import { SelectDropdownComponent } from '../select-dropdown/select-dropdown.component';
 import { Category } from '../../models/category.model';
 import { FestivalEvent } from '../../models/event.model';
+import { JudgeAssignment } from '../../models/judge-assignment.model';
+import { User } from '../../models/user.model';
 import { CategoryService } from '../../services/category.service';
 import { EventService } from '../../services/event.service';
 import { ProducerService } from '../../services/producer.service';
 import { SampleService } from '../../services/sample.service';
 import { ScoreService } from '../../services/score.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-event-card',
@@ -27,10 +30,12 @@ export class EventCardComponent {
   private readonly sampleService = inject(SampleService);
   private readonly scoreService = inject(ScoreService);
   private readonly producerService = inject(ProducerService);
+  private readonly userService = inject(UserService);
 
   readonly event = input.required<FestivalEvent>();
   readonly categories = input.required<Category[]>();
   readonly festivalId = input.required<string>();
+  readonly festivalName = input.required<string>();
 
   private readonly samples$ = toObservable(this.categories).pipe(
     map((cats) => cats.map((c) => c.categoryId)),
@@ -85,6 +90,44 @@ export class EventCardComponent {
     this.producers().map((p) => ({ id: p.producerId, label: p.name })),
   );
 
+  // Judge assignments
+  private readonly assignments$ = toObservable(this.categories).pipe(
+    map((cats) => cats.map((c) => c.categoryId)),
+    switchMap((ids) =>
+      ids.length ? this.categoryService.getAssignmentsForCategories(ids) : of([]),
+    ),
+    startWith([]),
+  );
+  private readonly assignments = toSignal(this.assignments$, { initialValue: [] });
+
+  private readonly allUsers = toSignal(this.userService.getAllUsers(), { initialValue: [] });
+  readonly judgeUsers = computed(() => this.allUsers().filter((u) => u.role !== 'admin'));
+  readonly judgeMap = computed(() => new Map(this.judgeUsers().map((u) => [u.userId, u])));
+
+  readonly assignmentsByCategoryId = computed(() => {
+    const map = new Map<string, JudgeAssignment[]>();
+    for (const assignment of this.assignments()) {
+      const list = map.get(assignment.categoryId) ?? [];
+      list.push(assignment);
+      map.set(assignment.categoryId, list);
+    }
+    return map;
+  });
+
+  availableJudgesForCategory(categoryId: string): User[] {
+    const assigned = new Set(
+      (this.assignmentsByCategoryId().get(categoryId) ?? []).map((a) => a.judgeId),
+    );
+    return this.judgeUsers().filter((u) => !assigned.has(u.userId));
+  }
+
+  // Judge assignment form
+  readonly addingJudgesToCategoryId = signal<string | null>(null);
+  readonly selectedJudgeIds = signal<Set<string>>(new Set());
+  readonly isAssigningJudges = signal(false);
+  readonly removingAssignmentKey = signal<string | null>(null);
+  readonly removeAssignmentErrorKey = signal<string | null>(null);
+
   // Add sample form
   readonly addingSampleToCategoryId = signal<string | null>(null);
   readonly newSampleCode = signal('');
@@ -120,6 +163,50 @@ export class EventCardComponent {
   // Category delete
   readonly deletingCategoryId = signal<string | null>(null);
   readonly deleteErrorCategoryId = signal<string | null>(null);
+
+  openAddJudges(categoryId: string): void {
+    this.selectedJudgeIds.set(new Set());
+    this.addingJudgesToCategoryId.set(categoryId);
+  }
+
+  cancelAddJudges(): void {
+    this.addingJudgesToCategoryId.set(null);
+    this.selectedJudgeIds.set(new Set());
+  }
+
+  toggleJudgeSelection(judgeId: string): void {
+    const current = new Set(this.selectedJudgeIds());
+    current.has(judgeId) ? current.delete(judgeId) : current.add(judgeId);
+    this.selectedJudgeIds.set(current);
+  }
+
+  async assignJudges(categoryId: string): Promise<void> {
+    const judgeIds = [...this.selectedJudgeIds()];
+    if (!judgeIds.length) return;
+    this.isAssigningJudges.set(true);
+    try {
+      await Promise.all(
+        judgeIds.map((judgeId) => this.categoryService.assignJudgeToCategory(judgeId, categoryId)),
+      );
+      this.cancelAddJudges();
+    } finally {
+      this.isAssigningJudges.set(false);
+    }
+  }
+
+  async removeJudgeAssignment(judgeId: string, categoryId: string): Promise<void> {
+    const key = `${judgeId}_${categoryId}`;
+    this.removingAssignmentKey.set(key);
+    this.removeAssignmentErrorKey.set(null);
+    try {
+      await this.categoryService.removeJudgeFromCategory(judgeId, categoryId);
+    } catch {
+      this.removeAssignmentErrorKey.set(key);
+      setTimeout(() => this.removeAssignmentErrorKey.set(null), 3000);
+    } finally {
+      this.removingAssignmentKey.set(null);
+    }
+  }
 
   openAddSample(categoryId: string): void {
     this.newSampleCode.set('');

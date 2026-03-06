@@ -114,6 +114,7 @@
         [event]="event"
         [categories]="categoriesForEvent(event.eventId)"
         [festivalId]="activeFestival()!.festivalId"
+        [festivalName]="activeFestival()!.name"
       />
     } @empty {
       @if (!showEventForm()) {
