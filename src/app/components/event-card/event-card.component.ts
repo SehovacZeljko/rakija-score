@@ -6,16 +6,18 @@ import { map, of, startWith, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { InlineSpinnerComponent } from '../inline-spinner/inline-spinner.component';
+import { SelectDropdownComponent } from '../select-dropdown/select-dropdown.component';
 import { Category } from '../../models/category.model';
 import { FestivalEvent } from '../../models/event.model';
 import { CategoryService } from '../../services/category.service';
 import { EventService } from '../../services/event.service';
+import { ProducerService } from '../../services/producer.service';
 import { SampleService } from '../../services/sample.service';
 import { ScoreService } from '../../services/score.service';
 
 @Component({
   selector: 'app-event-card',
-  imports: [InlineSpinnerComponent, RouterLink, LucideAngularModule, DecimalPipe],
+  imports: [InlineSpinnerComponent, RouterLink, LucideAngularModule, DecimalPipe, SelectDropdownComponent],
   templateUrl: './event-card.component.html',
   styleUrl: './event-card.component.scss',
 })
@@ -24,6 +26,7 @@ export class EventCardComponent {
   private readonly categoryService = inject(CategoryService);
   private readonly sampleService = inject(SampleService);
   private readonly scoreService = inject(ScoreService);
+  private readonly producerService = inject(ProducerService);
 
   readonly event = input.required<FestivalEvent>();
   readonly categories = input.required<Category[]>();
@@ -77,6 +80,25 @@ export class EventCardComponent {
     return result;
   });
 
+  private readonly producers = toSignal(this.producerService.getAllProducers(), { initialValue: [] });
+  readonly producerOptions = computed(() =>
+    this.producers().map((p) => ({ id: p.producerId, label: p.name })),
+  );
+
+  // Add sample form
+  readonly addingSampleToCategoryId = signal<string | null>(null);
+  readonly newSampleCode = signal('');
+  readonly newSampleProducerId = signal<string | null>(null);
+  readonly newSampleYear = signal(new Date().getFullYear());
+  readonly newSampleAlcohol = signal(40);
+  readonly isSavingSample = signal(false);
+
+  readonly newSampleCodeValid = computed(() => {
+    const code = this.newSampleCode().trim();
+    if (code.length < 4) return false;
+    return !this.samples().some((s) => s.sampleCode === code);
+  });
+
   // Edit mode
   readonly isEditing = signal(false);
   readonly editingName = signal('');
@@ -98,6 +120,58 @@ export class EventCardComponent {
   // Category delete
   readonly deletingCategoryId = signal<string | null>(null);
   readonly deleteErrorCategoryId = signal<string | null>(null);
+
+  openAddSample(categoryId: string): void {
+    this.newSampleCode.set('');
+    this.newSampleProducerId.set(null);
+    this.newSampleYear.set(this.event().year);
+    this.newSampleAlcohol.set(40);
+    this.addingSampleToCategoryId.set(categoryId);
+  }
+
+  cancelAddSample(): void {
+    this.addingSampleToCategoryId.set(null);
+    this.newSampleCode.set('');
+    this.newSampleProducerId.set(null);
+    this.newSampleYear.set(new Date().getFullYear());
+    this.newSampleAlcohol.set(40);
+  }
+
+  onNewSampleCodeInput(domEvent: Event): void {
+    this.newSampleCode.set((domEvent.target as HTMLInputElement).value);
+  }
+
+  onNewSampleYearInput(domEvent: Event): void {
+    const val = parseInt((domEvent.target as HTMLInputElement).value, 10);
+    if (!isNaN(val)) this.newSampleYear.set(val);
+  }
+
+  onNewSampleAlcoholInput(domEvent: Event): void {
+    const val = parseFloat((domEvent.target as HTMLInputElement).value);
+    if (!isNaN(val)) this.newSampleAlcohol.set(val);
+  }
+
+  async saveNewSample(categoryId: string): Promise<void> {
+    const producerId = this.newSampleProducerId();
+    if (!this.newSampleCodeValid() || !producerId) return;
+
+    const totalSamples = this.categoryStats().get(categoryId)?.totalSamples ?? 0;
+
+    this.isSavingSample.set(true);
+    try {
+      await this.sampleService.createSample({
+        sampleCode: this.newSampleCode().trim(),
+        producerId,
+        categoryId,
+        year: this.newSampleYear(),
+        alcoholStrength: this.newSampleAlcohol(),
+        order: totalSamples + 1,
+      });
+      this.cancelAddSample();
+    } finally {
+      this.isSavingSample.set(false);
+    }
+  }
 
   startEdit(): void {
     this.editingName.set(this.event().name);
