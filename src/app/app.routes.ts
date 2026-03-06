@@ -54,7 +54,7 @@ export const routes: Routes = [
       import('./pages/admin/admin-layout.component').then((m) => m.AdminLayoutComponent),
     canActivate: [authGuard, adminGuard],
     children: [
-      { path: '', redirectTo: 'festivals', pathMatch: 'full' },
+      { path: '', redirectTo: 'categories', pathMatch: 'full' },
       {
         path: 'festivals',
         loadComponent: () =>
