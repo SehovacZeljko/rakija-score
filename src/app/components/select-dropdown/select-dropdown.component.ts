@@ -38,8 +38,10 @@ export class SelectDropdownComponent implements ControlValueAccessor {
   readonly allOptionLabel = input('Sve');
   readonly allOptionCount = input<number | null>(null);
   readonly invalid = input(false);
+  readonly actionOption = input<string | null>(null);
 
   readonly selectionChange = output<string | null>();
+  readonly actionSelected = output<void>();
 
   readonly internalValue = signal<string | null>(null);
   readonly isOpen = signal(false);
@@ -77,6 +79,12 @@ export class SelectDropdownComponent implements ControlValueAccessor {
 
   close(): void {
     this.isOpen.set(false);
+  }
+
+  selectAction(event: MouseEvent): void {
+    event.stopPropagation();
+    this.isOpen.set(false);
+    this.actionSelected.emit();
   }
 
   select(optionId: string | null, event: MouseEvent): void {

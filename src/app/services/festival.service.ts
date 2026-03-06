@@ -35,7 +35,7 @@ export class FestivalService {
     return collectionData(q) as Observable<Festival[]>;
   }
 
-  async createFestival(name: string): Promise<void> {
+  async createFestival(name: string): Promise<string> {
     const newDocRef = doc(this.festivalsRef);
     await setDoc(newDocRef, {
       festivalId: newDocRef.id,
@@ -43,6 +43,7 @@ export class FestivalService {
       status: 'inactive',
       createdAt: serverTimestamp(),
     });
+    return newDocRef.id;
   }
 
   async updateFestivalName(festivalId: string, name: string): Promise<void> {

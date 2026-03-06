@@ -4,14 +4,16 @@ import { of, switchMap } from 'rxjs';
 
 import { EventCardComponent } from '../../../components/event-card/event-card.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
+import { SelectDropdownComponent } from '../../../components/select-dropdown/select-dropdown.component';
 import { CategoryService } from '../../../services/category.service';
 import { EventService } from '../../../services/event.service';
 import { FestivalContextService } from '../../../services/festival-context.service';
+import { FestivalService } from '../../../services/festival.service';
 import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-admin-categories',
-  imports: [LoadingSpinnerComponent, EventCardComponent, LucideAngularModule],
+  imports: [LoadingSpinnerComponent, EventCardComponent, SelectDropdownComponent, LucideAngularModule],
   templateUrl: './admin-categories.component.html',
   styleUrl: './admin-categories.component.scss',
 })
@@ -19,9 +21,11 @@ export class AdminCategoriesComponent {
   private readonly ctx = inject(FestivalContextService);
   private readonly eventService = inject(EventService);
   private readonly categoryService = inject(CategoryService);
+  private readonly festivalService = inject(FestivalService);
 
   readonly activeFestival = this.ctx.activeFestival;
   readonly dataReady = this.ctx.dataReady;
+  readonly allFestivals = toSignal(this.festivalService.getAllFestivals(), { initialValue: [] });
 
   private readonly events$ = this.ctx.activeFestival$.pipe(
     switchMap((f) => (f ? this.eventService.getEventsForFestival(f.festivalId) : of([]))),
@@ -53,6 +57,13 @@ export class AdminCategoriesComponent {
   readonly newEventName = signal('');
   readonly newEventYear = signal(new Date().getFullYear());
   readonly isSavingEvent = signal(false);
+  readonly selectedFestivalId = signal('');
+  readonly showNewFestivalInput = signal(false);
+  readonly newFestivalNameForEvent = signal('');
+
+  readonly festivalOptions = computed(() =>
+    this.allFestivals().map((festival) => ({ id: festival.festivalId, label: festival.name })),
+  );
 
   readonly sortedEvents = computed(() =>
     [...this.events()].sort(
@@ -73,16 +84,40 @@ export class AdminCategoriesComponent {
     if (!isNaN(val)) this.newEventYear.set(val);
   }
 
+  onFestivalSelected(festivalId: string | null): void {
+    this.showNewFestivalInput.set(false);
+    this.selectedFestivalId.set(festivalId ?? '');
+  }
+
+  onNewFestivalAction(): void {
+    this.showNewFestivalInput.set(true);
+    this.selectedFestivalId.set('');
+  }
+
+  onNewFestivalNameInput(domEvent: Event): void {
+    this.newFestivalNameForEvent.set((domEvent.target as HTMLInputElement).value);
+  }
+
   async createEvent(): Promise<void> {
-    const name = this.newEventName().trim();
-    const festivalId = this.activeFestival()?.festivalId;
-    if (!name || !festivalId) return;
+    const eventName = this.newEventName().trim();
+    if (!eventName) return;
+
+    if (this.showNewFestivalInput() && this.newFestivalNameForEvent().trim().length < 3) return;
+    if (!this.showNewFestivalInput() && !this.selectedFestivalId()) return;
 
     this.isSavingEvent.set(true);
     try {
-      await this.eventService.createEvent(festivalId, name, this.newEventYear());
+      let festivalId = this.selectedFestivalId();
+      if (this.showNewFestivalInput()) {
+        festivalId = await this.festivalService.createFestival(this.newFestivalNameForEvent().trim());
+      }
+
+      await this.eventService.createEvent(festivalId, eventName, this.newEventYear());
       this.newEventName.set('');
       this.newEventYear.set(new Date().getFullYear());
+      this.selectedFestivalId.set('');
+      this.showNewFestivalInput.set(false);
+      this.newFestivalNameForEvent.set('');
       this.showEventForm.set(false);
     } finally {
       this.isSavingEvent.set(false);
@@ -92,10 +127,14 @@ export class AdminCategoriesComponent {
   cancelEventForm(): void {
     this.newEventName.set('');
     this.newEventYear.set(new Date().getFullYear());
+    this.selectedFestivalId.set('');
+    this.showNewFestivalInput.set(false);
+    this.newFestivalNameForEvent.set('');
     this.showEventForm.set(false);
   }
 
   onNewEventClick(): void {
+    this.selectedFestivalId.set(this.activeFestival()?.festivalId ?? '');
     this.showEventForm.set(true);
   }
 }

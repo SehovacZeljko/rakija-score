@@ -58,6 +58,15 @@
           {{ option.label }}
         </button>
       }
+      @if (actionOption()) {
+        <button
+          type="button"
+          (click)="selectAction($event)"
+          class="flex w-full items-center border-t border-border-default px-3 py-2.5 text-left text-sm font-medium text-primary transition-colors hover:bg-bg-surface"
+        >
+          {{ actionOption() }}
+        </button>
+      }
     </div>
   }
 </div>
