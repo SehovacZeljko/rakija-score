@@ -160,9 +160,21 @@ export class EventCardComponent {
   readonly newCategoryName = signal('');
   readonly isSavingCategory = signal(false);
 
+  // Header menu
+  readonly isMenuOpen = signal(false);
+
   // Category delete
   readonly deletingCategoryId = signal<string | null>(null);
   readonly deleteErrorCategoryId = signal<string | null>(null);
+
+  toggleMenu(domEvent: MouseEvent): void {
+    domEvent.stopPropagation();
+    this.isMenuOpen.update((open) => !open);
+  }
+
+  closeMenu(): void {
+    this.isMenuOpen.set(false);
+  }
 
   openAddJudges(categoryId: string): void {
     this.selectedJudgeIds.set(new Set());
