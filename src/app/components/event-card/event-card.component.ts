@@ -261,6 +261,27 @@ export class EventCardComponent {
     return this.scoreMap().get(`${judgeId}_${sampleId}`);
   }
 
+  getJudgeCategoryStats(
+    judgeId: string,
+    categoryId: string,
+  ): { total: number; graded: number; topGrade: number | null; avgGrade: number | null } {
+    const samples = this.samplesByCategoryId().get(categoryId) ?? [];
+    const gradedScores = samples
+      .map((s) => this.scoreMap().get(`${judgeId}_${s.sampleId}`))
+      .filter((score): score is Score => score !== undefined)
+      .map((score) => this.scoreTotal(score));
+
+    return {
+      total: samples.length,
+      graded: gradedScores.length,
+      topGrade: gradedScores.length > 0 ? Math.max(...gradedScores) : null,
+      avgGrade:
+        gradedScores.length > 0
+          ? gradedScores.reduce((sum, g) => sum + g, 0) / gradedScores.length
+          : null,
+    };
+  }
+
   scoreTotal(score: Score): number {
     return score.color + score.clarity + score.typicality + score.aroma + score.taste;
   }
