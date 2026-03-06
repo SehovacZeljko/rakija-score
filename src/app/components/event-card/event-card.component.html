@@ -53,11 +53,18 @@
       </div>
     } @else {
       <!-- Read mode -->
-      <div class="flex items-start justify-between gap-2">
-        <!-- Left: name, year, finished badge, category count -->
+      <div class="flex items-start gap-3">
+        <!-- Image placeholder -->
+        <div
+          class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-bg-surface text-text-muted"
+        >
+          <lucide-icon name="image" [size]="22" />
+        </div>
+
+        <!-- Festival / event info -->
         <div class="min-w-0 flex-1">
-          <p class="mb-0.5 text-xs text-text-muted">{{ festivalName() }}</p>
-          <div class="flex flex-wrap items-center gap-2">
+          <p class="text-xs text-text-muted">{{ festivalName() }}</p>
+          <div class="mt-0.5 flex flex-wrap items-center gap-2">
             <p class="truncate font-semibold text-text-primary">{{ event().name }}</p>
             <span class="text-xs text-text-muted">{{ event().year }}</span>
             @if (event().status === 'finished') {
@@ -68,9 +75,13 @@
               </span>
             }
           </div>
+          <p class="mt-1 text-xs text-text-muted">
+            {{ categories().length }}
+            {{ categories().length === 1 ? 'kategorija' : 'kategorije' }}
+          </p>
         </div>
 
-        <!-- Right: three-dots menu -->
+        <!-- Three-dots menu -->
         <app-context-menu [items]="eventMenuItems()" />
       </div>
     }
