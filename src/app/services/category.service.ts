@@ -116,6 +116,12 @@ export class CategoryService {
     });
   }
 
+  async unlockCategory(judgeId: string, categoryId: string): Promise<void> {
+    await updateDoc(doc(this.firestore, `judgeAssignments/${judgeId}_${categoryId}`), {
+      status: 'active',
+    });
+  }
+
   async removeJudgeFromCategory(judgeId: string, categoryId: string): Promise<void> {
     const samplesSnap = await getDocs(
       query(collection(this.firestore, 'samples'), where('categoryId', '==', categoryId)),

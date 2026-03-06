@@ -74,26 +74,41 @@
 </main>
 
 <!-- Fixed bottom action -->
-@if (!isLocked() && isEventActive()) {
+@if (isEventActive()) {
   <div
     class="fixed bottom-[60px] left-0 right-0 border-t border-border-default bg-white px-4 pb-4 pt-3 md:bottom-0 md:pb-6"
   >
-    <button
-      type="button"
-      (click)="lockCategory()"
-      [disabled]="!isAllScored() || isLocking()"
-      class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-40"
-    >
-      @if (isLocking()) {
-        <app-inline-spinner [size]="16" />
-      } @else {
-        Zaključaj kategoriju
+    @if (isLocked()) {
+      <button
+        type="button"
+        (click)="unlockCategory()"
+        [disabled]="isUnlocking()"
+        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        @if (isUnlocking()) {
+          <app-inline-spinner [size]="16" />
+        } @else {
+          Otključaj kategoriju
+        }
+      </button>
+    } @else {
+      <button
+        type="button"
+        (click)="lockCategory()"
+        [disabled]="!isAllScored() || isLocking()"
+        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        @if (isLocking()) {
+          <app-inline-spinner [size]="16" />
+        } @else {
+          Zaključaj kategoriju
+        }
+      </button>
+      @if (!isAllScored() && samples().length > 0) {
+        <p class="mt-2 text-center text-xs text-text-muted">
+          Ocijenite sve uzorke da biste zaključali kategoriju.
+        </p>
       }
-    </button>
-    @if (!isAllScored() && samples().length > 0) {
-      <p class="mt-2 text-center text-xs text-text-muted">
-        Ocijenite sve uzorke da biste zaključali kategoriju.
-      </p>
     }
   </div>
 }

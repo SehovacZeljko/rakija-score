@@ -172,6 +172,7 @@ export class CategoryDetailComponent {
   });
 
   readonly isLocking = signal(false);
+  readonly isUnlocking = signal(false);
 
   // ── Redirect when event becomes inactive ──────────────────────────────────
   //
@@ -241,6 +242,17 @@ export class CategoryDetailComponent {
       await this.categoryService.lockCategory(uid, this.categoryId());
     } finally {
       this.isLocking.set(false);
+    }
+  }
+
+  async unlockCategory(): Promise<void> {
+    const uid = this.authService.currentUser()?.userId;
+    if (!uid) return;
+    this.isUnlocking.set(true);
+    try {
+      await this.categoryService.unlockCategory(uid, this.categoryId());
+    } finally {
+      this.isUnlocking.set(false);
     }
   }
 

@@ -106,7 +106,9 @@ export class ScoringComponent {
       }
 
       const isEventActive = !!this.ctx.activeEvent();
-      if (!isEventActive) this.isLocked.set(true);
+      const assignment = assignments.find((a) => a.categoryId === this.categoryId);
+      const isCategoryLocked = assignment?.status === 'finished';
+      if (!isEventActive || isCategoryLocked) this.isLocked.set(true);
     } finally {
       this.isLoading.set(false);
     }
