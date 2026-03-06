@@ -1,0 +1,59 @@
+<div class="relative">
+  <button
+    type="button"
+    (click)="toggle($event)"
+    class="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-surface hover:text-text-primary"
+    title="Opcije"
+  >
+    <lucide-icon name="ellipsis" [size]="16" />
+  </button>
+
+  @if (isOpen()) {
+    <!-- Backdrop -->
+    <div class="fixed inset-0 z-10" (click)="close()"></div>
+    <!-- Panel -->
+    <div
+      class="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-xl border border-border-default bg-bg-card shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
+    >
+      @for (item of items(); track item.label; let first = $first) {
+        @if (item.routerLink) {
+          <a
+            [routerLink]="item.routerLink"
+            [queryParams]="item.queryParams"
+            (click)="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2.5 text-sm transition-colors hover:bg-bg-surface"
+            [class.border-t]="!first"
+            [class.border-border-default]="!first"
+            [class.text-text-secondary]="!item.destructive"
+            [class.text-status-error]="!!item.destructive"
+            [class.font-medium]="!!item.destructive"
+          >
+            @if (item.icon) {
+              <lucide-icon [name]="item.icon" [size]="14" class="shrink-0" />
+            }
+            {{ item.label }}
+          </a>
+        } @else {
+          <button
+            type="button"
+            (click)="handleAction(item)"
+            [disabled]="item.disabled"
+            class="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm transition-colors hover:bg-bg-surface disabled:cursor-not-allowed disabled:opacity-40"
+            [class.border-t]="!first"
+            [class.border-border-default]="!first"
+            [class.text-text-secondary]="!item.destructive"
+            [class.text-status-error]="!!item.destructive"
+            [class.font-medium]="!!item.destructive"
+          >
+            @if (item.loading) {
+              <app-inline-spinner [size]="14" />
+            } @else if (item.icon) {
+              <lucide-icon [name]="item.icon" [size]="14" class="shrink-0" />
+            }
+            {{ item.label }}
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

@@ -71,101 +71,7 @@
         </div>
 
         <!-- Right: three-dots menu -->
-        <div class="relative shrink-0">
-          <button
-            type="button"
-            (click)="toggleMenu($event)"
-            class="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-surface hover:text-text-primary"
-            title="Opcije"
-          >
-            <lucide-icon name="ellipsis" [size]="16" />
-          </button>
-
-          @if (isMenuOpen()) {
-            <!-- Backdrop -->
-            <div class="fixed inset-0 z-10" (click)="closeMenu()"></div>
-            <!-- Panel -->
-            <div
-              class="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-xl border border-border-default bg-bg-card shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
-            >
-              <!-- Edit -->
-              <button
-                type="button"
-                (click)="closeMenu(); startEdit()"
-                class="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm text-text-secondary transition-colors hover:bg-bg-surface"
-              >
-                <lucide-icon name="square-pen" [size]="14" class="shrink-0" />
-                Uredi naziv dogadjaja
-              </button>
-              <!-- Results -->
-              <a
-                [routerLink]="['/admin/results', event().eventId]"
-                (click)="closeMenu()"
-                class="flex w-full items-center gap-2.5 border-t border-border-default px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-surface"
-              >
-                <lucide-icon name="bar-chart-2" [size]="14" class="shrink-0" />
-                Rezultati
-              </a>
-              <!-- State actions -->
-              @if (event().status === 'staging') {
-                <button
-                  type="button"
-                  (click)="closeMenu(); activateEvent()"
-                  [disabled]="isActivating()"
-                  class="flex w-full items-center gap-2.5 border-t border-border-default px-3 py-2.5 text-left text-sm text-text-secondary transition-colors hover:bg-bg-surface disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  @if (isActivating()) {
-                    <app-inline-spinner [size]="14" />
-                  } @else {
-                    <lucide-icon name="play" [size]="14" class="shrink-0" />
-                  }
-                  Aktiviraj
-                </button>
-              } @else if (event().status === 'active') {
-                <button
-                  type="button"
-                  (click)="closeMenu(); revertToStaging()"
-                  [disabled]="isReverting() || isFinishing()"
-                  class="flex w-full items-center gap-2.5 border-t border-border-default px-3 py-2.5 text-left text-sm text-text-secondary transition-colors hover:bg-bg-surface disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  @if (isReverting()) {
-                    <app-inline-spinner [size]="14" />
-                  } @else {
-                    <lucide-icon name="undo-2" [size]="14" class="shrink-0" />
-                  }
-                  Vrati u pripremu
-                </button>
-                <button
-                  type="button"
-                  (click)="closeMenu(); finishEvent()"
-                  [disabled]="isFinishing() || isReverting()"
-                  class="flex w-full items-center gap-2.5 border-t border-border-default px-3 py-2.5 text-left text-sm font-medium text-status-error transition-colors hover:bg-bg-surface disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  @if (isFinishing()) {
-                    <app-inline-spinner [size]="14" />
-                  } @else {
-                    <lucide-icon name="circle-check" [size]="14" class="shrink-0" />
-                  }
-                  Završi ocjenjivanje
-                </button>
-              } @else if (event().status === 'finished') {
-                <button
-                  type="button"
-                  (click)="closeMenu(); reopenEvent()"
-                  [disabled]="isReopening()"
-                  class="flex w-full items-center gap-2.5 border-t border-border-default px-3 py-2.5 text-left text-sm text-text-secondary transition-colors hover:bg-bg-surface disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  @if (isReopening()) {
-                    <app-inline-spinner [size]="14" />
-                  } @else {
-                    <lucide-icon name="rotate-ccw" [size]="14" class="shrink-0" />
-                  }
-                  Ponovo otvori
-                </button>
-              }
-            </div>
-          }
-        </div>
+        <app-context-menu [items]="eventMenuItems()" />
       </div>
     }
   </div>
@@ -192,16 +98,6 @@
               <span class="text-[11px] font-semibold uppercase tracking-wide text-text-muted"
                 >Sudije</span
               >
-              @if (addingJudgesToCategoryId() !== category.categoryId) {
-                <button
-                  type="button"
-                  (click)="openAddJudges(category.categoryId)"
-                  class="flex h-5 w-5 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-primary/10 hover:text-primary"
-                  aria-label="Dodaj sudiju"
-                >
-                  <lucide-icon name="user-plus" [size]="12" [strokeWidth]="2" />
-                </button>
-              }
             </div>
 
             <!-- Assigned judges — inline chips -->
@@ -309,30 +205,7 @@
             }
           </div>
         </div>
-        <div class="flex shrink-0 items-center gap-1">
-          <button
-            type="button"
-            (click)="openAddSample(category.categoryId)"
-            [disabled]="addingSampleToCategoryId() !== null"
-            class="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-primary/10 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
-            aria-label="Dodaj uzorak"
-          >
-            <lucide-icon name="plus" [size]="16" [strokeWidth]="2.5" />
-          </button>
-          <button
-            type="button"
-            (click)="deleteCategory(category.categoryId)"
-            [disabled]="deletingCategoryId() !== null"
-            class="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-status-error/10 hover:text-status-error disabled:cursor-not-allowed disabled:opacity-40"
-            aria-label="Obriši kategoriju"
-          >
-            @if (deletingCategoryId() === category.categoryId) {
-              <app-inline-spinner [size]="16" />
-            } @else {
-              <lucide-icon name="trash-2" [size]="16" />
-            }
-          </button>
-        </div>
+        <app-context-menu [items]="getCategoryMenuItems(category.categoryId)" />
       </div>
 
       <!-- Inline add sample form -->

@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { map, of, startWith, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 
+import { ContextMenuComponent, ContextMenuItem } from '../context-menu/context-menu.component';
 import { InlineSpinnerComponent } from '../inline-spinner/inline-spinner.component';
 import { SelectDropdownComponent } from '../select-dropdown/select-dropdown.component';
 import { Category } from '../../models/category.model';
@@ -20,7 +21,7 @@ import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-event-card',
-  imports: [InlineSpinnerComponent, RouterLink, LucideAngularModule, DecimalPipe, SelectDropdownComponent],
+  imports: [ContextMenuComponent, InlineSpinnerComponent, RouterLink, LucideAngularModule, DecimalPipe, SelectDropdownComponent],
   templateUrl: './event-card.component.html',
   styleUrl: './event-card.component.scss',
 })
@@ -160,20 +161,78 @@ export class EventCardComponent {
   readonly newCategoryName = signal('');
   readonly isSavingCategory = signal(false);
 
-  // Header menu
-  readonly isMenuOpen = signal(false);
+  // Header menu items
+  readonly eventMenuItems = computed((): ContextMenuItem[] => {
+    const status = this.event().status;
+    const items: ContextMenuItem[] = [
+      { label: 'Uredi naziv dogadjaja', icon: 'square-pen', action: () => this.startEdit() },
+      {
+        label: 'Rezultati',
+        icon: 'bar-chart-2',
+        routerLink: ['/admin/results', this.event().eventId],
+      },
+    ];
+
+    if (status === 'staging') {
+      items.push({
+        label: 'Aktiviraj',
+        icon: 'play',
+        action: () => this.activateEvent(),
+        loading: this.isActivating(),
+        disabled: this.isActivating(),
+      });
+    } else if (status === 'active') {
+      items.push({
+        label: 'Vrati u pripremu',
+        icon: 'undo-2',
+        action: () => this.revertToStaging(),
+        loading: this.isReverting(),
+        disabled: this.isReverting() || this.isFinishing(),
+      });
+      items.push({
+        label: 'Završi ocjenjivanje',
+        icon: 'circle-check',
+        action: () => this.finishEvent(),
+        loading: this.isFinishing(),
+        disabled: this.isFinishing() || this.isReverting(),
+        destructive: true,
+      });
+    } else if (status === 'finished') {
+      items.push({
+        label: 'Ponovo otvori',
+        icon: 'rotate-ccw',
+        action: () => this.reopenEvent(),
+        loading: this.isReopening(),
+        disabled: this.isReopening(),
+      });
+    }
+
+    return items;
+  });
 
   // Category delete
   readonly deletingCategoryId = signal<string | null>(null);
   readonly deleteErrorCategoryId = signal<string | null>(null);
 
-  toggleMenu(domEvent: MouseEvent): void {
-    domEvent.stopPropagation();
-    this.isMenuOpen.update((open) => !open);
-  }
-
-  closeMenu(): void {
-    this.isMenuOpen.set(false);
+  getCategoryMenuItems(categoryId: string): ContextMenuItem[] {
+    return [
+      { label: 'Dodaj uzorak', icon: 'plus', action: () => this.openAddSample(categoryId) },
+      {
+        label: 'Uredi uzorke',
+        icon: 'list',
+        routerLink: ['/admin/samples'],
+        queryParams: { categoryId },
+      },
+      { label: 'Dodaj sudiju', icon: 'user-plus', action: () => this.openAddJudges(categoryId) },
+      {
+        label: 'Ukloni kategoriju',
+        icon: 'trash-2',
+        action: () => this.deleteCategory(categoryId),
+        loading: this.deletingCategoryId() === categoryId,
+        disabled: this.deletingCategoryId() !== null,
+        destructive: true,
+      },
+    ];
   }
 
   openAddJudges(categoryId: string): void {
