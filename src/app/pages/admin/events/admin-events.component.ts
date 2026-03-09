@@ -12,12 +12,12 @@ import { FestivalService } from '../../../services/festival.service';
 import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
-  selector: 'app-admin-categories',
+  selector: 'app-admin-events',
   imports: [LoadingSpinnerComponent, EventCardComponent, SelectDropdownComponent, LucideAngularModule],
-  templateUrl: './admin-categories.component.html',
-  styleUrl: './admin-categories.component.scss',
+  templateUrl: './admin-events.component.html',
+  styleUrl: './admin-events.component.scss',
 })
-export class AdminCategoriesComponent {
+export class AdminEventsComponent {
   private readonly ctx = inject(FestivalContextService);
   private readonly eventService = inject(EventService);
   private readonly categoryService = inject(CategoryService);

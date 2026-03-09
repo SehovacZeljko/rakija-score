@@ -54,7 +54,7 @@ export const routes: Routes = [
       import('./pages/admin/admin-layout.component').then((m) => m.AdminLayoutComponent),
     canActivate: [authGuard, adminGuard],
     children: [
-      { path: '', redirectTo: 'categories', pathMatch: 'full' },
+      { path: '', redirectTo: 'events', pathMatch: 'full' },
       {
         path: 'festivals',
         loadComponent: () =>
@@ -63,10 +63,10 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'categories',
+        path: 'events',
         loadComponent: () =>
-          import('./pages/admin/categories/admin-categories.component').then(
-            (m) => m.AdminCategoriesComponent,
+          import('./pages/admin/events/admin-events.component').then(
+            (m) => m.AdminEventsComponent,
           ),
       },
       {

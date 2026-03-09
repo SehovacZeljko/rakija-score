@@ -12,7 +12,7 @@ import { HeaderComponent } from '../../components/header/header.component';
 })
 export class AdminLayoutComponent {
   readonly navItems: NavItem[] = [
-    { route: '/admin/categories', label: 'Dogadjaji', icon: 'layers' },
+    { route: '/admin/events', label: 'Dogadjaji', icon: 'layers' },
     { route: '/admin/producers', label: 'Proizvodjači', icon: 'briefcase' },
     { route: '/admin/samples', label: 'Uzorci', icon: 'list' },
     { route: '/admin/judges', label: 'Sudije', icon: 'users' },

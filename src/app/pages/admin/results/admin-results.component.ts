@@ -307,7 +307,7 @@ export class AdminResultsComponent {
   }
 
   goBack(): void {
-    this.router.navigate(['/admin/categories']);
+    this.router.navigate(['/admin/events']);
   }
 
   downloadPdf(): void {
