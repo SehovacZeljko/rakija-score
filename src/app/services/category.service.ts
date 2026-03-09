@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject, runInInjectionContext } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -22,17 +22,18 @@ import { JudgeAssignment } from '../models/judge-assignment.model';
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
   private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
   private readonly categoriesRef = collection(this.firestore, 'categories');
 
   getCategoriesForEvent(eventId: string): Observable<Category[]> {
     const q = query(this.categoriesRef, where('eventId', '==', eventId));
-    return collectionData(q) as Observable<Category[]>;
+    return runInInjectionContext(this.injector, () => collectionData(q) as Observable<Category[]>);
   }
 
   getCategoriesForEvents(eventIds: string[]): Observable<Category[]> {
     if (eventIds.length === 0) return of([]);
     const q = query(this.categoriesRef, where('eventId', 'in', eventIds));
-    return collectionData(q) as Observable<Category[]>;
+    return runInInjectionContext(this.injector, () => collectionData(q) as Observable<Category[]>);
   }
 
   async createCategory(eventId: string, name: string): Promise<void> {
@@ -75,13 +76,13 @@ export class CategoryService {
       collection(this.firestore, 'judgeAssignments'),
       where('judgeId', '==', judgeId),
     );
-    return collectionData(q) as Observable<JudgeAssignment[]>;
+    return runInInjectionContext(this.injector, () => collectionData(q) as Observable<JudgeAssignment[]>);
   }
 
   getCategoriesByIds(categoryIds: string[]): Observable<Category[]> {
     if (categoryIds.length === 0) return of([]);
     const q = query(this.categoriesRef, where(documentId(), 'in', categoryIds.slice(0, 30)));
-    return collectionData(q) as Observable<Category[]>;
+    return runInInjectionContext(this.injector, () => collectionData(q) as Observable<Category[]>);
   }
 
   getAssignmentsForCategories(categoryIds: string[]): Observable<JudgeAssignment[]> {
@@ -95,7 +96,7 @@ export class CategoryService {
         collection(this.firestore, 'judgeAssignments'),
         where('categoryId', 'in', chunk),
       );
-      return collectionData(q) as Observable<JudgeAssignment[]>;
+      return runInInjectionContext(this.injector, () => collectionData(q) as Observable<JudgeAssignment[]>);
     });
     return combineLatest(queries).pipe(map((results) => results.flat()));
   }

@@ -1,4 +1,4 @@
-import { Injectable, Signal, computed, inject } from '@angular/core';
+import { Injectable, Injector, Signal, computed, inject, runInInjectionContext } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import {
@@ -20,14 +20,17 @@ import { User } from '../models/user.model';
 export class AuthService {
   private readonly auth = inject(Auth);
   private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
   private readonly router = inject(Router);
 
   readonly currentUser$: Observable<User | null> = authState(this.auth).pipe(
     switchMap((firebaseUser) => {
       if (!firebaseUser) return of(null);
-      return (
-        docData(doc(this.firestore, `users/${firebaseUser.uid}`)) as Observable<User | undefined>
-      ).pipe(map((user) => user ?? null));
+      return runInInjectionContext(this.injector, () =>
+        (docData(doc(this.firestore, `users/${firebaseUser.uid}`)) as Observable<User | undefined>).pipe(
+          map((user) => user ?? null),
+        ),
+      );
     }),
   );
 

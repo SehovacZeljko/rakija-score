@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject, runInInjectionContext } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -21,18 +21,21 @@ import { Festival } from '../models/festival.model';
 @Injectable({ providedIn: 'root' })
 export class FestivalService {
   private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
   private readonly festivalsRef = collection(this.firestore, 'festivals');
 
   getActiveFestival(): Observable<Festival | null> {
     const q = query(this.festivalsRef, where('status', '==', 'active'), limit(1));
-    return (collectionData(q) as Observable<Festival[]>).pipe(
-      map((festivals) => festivals[0] ?? null),
+    return runInInjectionContext(this.injector, () =>
+      (collectionData(q) as Observable<Festival[]>).pipe(
+        map((festivals) => festivals[0] ?? null),
+      ),
     );
   }
 
   getAllFestivals(): Observable<Festival[]> {
     const q = query(this.festivalsRef, orderBy('createdAt', 'desc'));
-    return collectionData(q) as Observable<Festival[]>;
+    return runInInjectionContext(this.injector, () => collectionData(q) as Observable<Festival[]>);
   }
 
   async createFestival(name: string): Promise<string> {

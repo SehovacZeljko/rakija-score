@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject, runInInjectionContext } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -20,32 +20,41 @@ export type SampleData = Omit<Sample, 'sampleId' | 'createdAt'>;
 @Injectable({ providedIn: 'root' })
 export class SampleService {
   private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
   private readonly samplesRef = collection(this.firestore, 'samples');
 
   getSampleById(sampleId: string): Observable<Sample | null> {
-    return (
-      docData(doc(this.firestore, `samples/${sampleId}`)) as Observable<Sample | undefined>
-    ).pipe(map((s) => s ?? null));
+    return runInInjectionContext(this.injector, () =>
+      (docData(doc(this.firestore, `samples/${sampleId}`)) as Observable<Sample | undefined>).pipe(
+        map((s) => s ?? null),
+      ),
+    );
   }
 
   getAllSamples(): Observable<Sample[]> {
-    return (collectionData(this.samplesRef) as Observable<Sample[]>).pipe(
-      map((samples) => samples.sort((a, b) => a.order - b.order)),
+    return runInInjectionContext(this.injector, () =>
+      (collectionData(this.samplesRef) as Observable<Sample[]>).pipe(
+        map((samples) => samples.sort((a, b) => a.order - b.order)),
+      ),
     );
   }
 
   getSamplesForCategories(categoryIds: string[]): Observable<Sample[]> {
     if (categoryIds.length === 0) return of([]);
     const q = query(this.samplesRef, where('categoryId', 'in', categoryIds.slice(0, 30)));
-    return (collectionData(q) as Observable<Sample[]>).pipe(
-      map((samples) => samples.sort((a, b) => a.order - b.order)),
+    return runInInjectionContext(this.injector, () =>
+      (collectionData(q) as Observable<Sample[]>).pipe(
+        map((samples) => samples.sort((a, b) => a.order - b.order)),
+      ),
     );
   }
 
   getSamplesForCategory(categoryId: string): Observable<Sample[]> {
     const q = query(this.samplesRef, where('categoryId', '==', categoryId));
-    return (collectionData(q) as Observable<Sample[]>).pipe(
-      map((samples) => samples.sort((a, b) => a.order - b.order)),
+    return runInInjectionContext(this.injector, () =>
+      (collectionData(q) as Observable<Sample[]>).pipe(
+        map((samples) => samples.sort((a, b) => a.order - b.order)),
+      ),
     );
   }
 

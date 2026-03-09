@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject, runInInjectionContext } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -17,11 +17,14 @@ export type ProducerData = Omit<Producer, 'producerId' | 'createdAt'>;
 @Injectable({ providedIn: 'root' })
 export class ProducerService {
   private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
   private readonly producersRef = collection(this.firestore, 'producers');
 
   getAllProducers(): Observable<Producer[]> {
-    return (collectionData(this.producersRef) as Observable<Producer[]>).pipe(
-      map((producers) => producers.sort((a, b) => a.name.localeCompare(b.name))),
+    return runInInjectionContext(this.injector, () =>
+      (collectionData(this.producersRef) as Observable<Producer[]>).pipe(
+        map((producers) => producers.sort((a, b) => a.name.localeCompare(b.name))),
+      ),
     );
   }
 

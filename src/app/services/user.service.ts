@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject, runInInjectionContext } from '@angular/core';
 import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 import { Observable, map } from 'rxjs';
 
@@ -7,10 +7,13 @@ import { User } from '../models/user.model';
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
 
   getAllUsers(): Observable<User[]> {
-    return (collectionData(collection(this.firestore, 'users')) as Observable<User[]>).pipe(
-      map((users) => users.sort((a, b) => a.username.localeCompare(b.username))),
+    return runInInjectionContext(this.injector, () =>
+      (collectionData(collection(this.firestore, 'users')) as Observable<User[]>).pipe(
+        map((users) => users.sort((a, b) => a.username.localeCompare(b.username))),
+      ),
     );
   }
 }

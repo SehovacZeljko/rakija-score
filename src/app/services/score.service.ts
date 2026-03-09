@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject, runInInjectionContext } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -28,12 +28,15 @@ export interface ScoreData {
 @Injectable({ providedIn: 'root' })
 export class ScoreService {
   private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
   private readonly scoresRef = collection(this.firestore, 'scores');
 
   getScore(judgeId: string, sampleId: string): Observable<Score | null> {
     const docRef = doc(this.firestore, `scores/${judgeId}_${sampleId}`);
-    return (docData(docRef) as Observable<Score | undefined>).pipe(
-      map((score) => score ?? null),
+    return runInInjectionContext(this.injector, () =>
+      (docData(docRef) as Observable<Score | undefined>).pipe(
+        map((score) => score ?? null),
+      ),
     );
   }
 
@@ -53,13 +56,13 @@ export class ScoreService {
 
   getScoresForJudge(judgeId: string): Observable<Score[]> {
     const q = query(this.scoresRef, where('judgeId', '==', judgeId));
-    return collectionData(q) as Observable<Score[]>;
+    return runInInjectionContext(this.injector, () => collectionData(q) as Observable<Score[]>);
   }
 
   getScoresByDocIds(docIds: string[]): Observable<Score[]> {
     if (docIds.length === 0) return of([]);
     const q = query(this.scoresRef, where(documentId(), 'in', docIds.slice(0, 30)));
-    return collectionData(q) as Observable<Score[]>;
+    return runInInjectionContext(this.injector, () => collectionData(q) as Observable<Score[]>);
   }
 
   getScoresForSampleIds(sampleIds: string[]): Observable<Score[]> {
@@ -70,7 +73,7 @@ export class ScoreService {
     }
     const queries = chunks.map((chunk) => {
       const q = query(this.scoresRef, where('sampleId', 'in', chunk));
-      return collectionData(q) as Observable<Score[]>;
+      return runInInjectionContext(this.injector, () => collectionData(q) as Observable<Score[]>);
     });
     return combineLatest(queries).pipe(map((results) => results.flat()));
   }
