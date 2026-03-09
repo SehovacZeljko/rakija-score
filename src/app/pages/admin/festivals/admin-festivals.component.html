@@ -1,8 +1,7 @@
 <div class="p-4">
   @if (!dataReady()) {
     <app-loading-spinner />
-  }
-
+  } @else {
   <!-- Page header -->
   <div class="mb-4 flex items-center justify-between">
     <h1 class="text-xl font-semibold text-text-primary">Festivali</h1>
@@ -146,4 +145,5 @@
   } @empty {
     <p class="mt-8 text-center text-sm text-text-muted">Nema festivala. Dodajte prvi festival.</p>
   }
+  } <!-- end @else dataReady -->
 </div>

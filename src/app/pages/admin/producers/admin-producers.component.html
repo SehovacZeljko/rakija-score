@@ -3,7 +3,7 @@
   <div class="p-4">
     @if (!dataReady()) {
       <app-loading-spinner />
-    }
+    } @else {
 
     <!-- Page header -->
     <div class="mb-4 flex items-center justify-between">
@@ -69,6 +69,7 @@
         }
       </div>
     }
+    } <!-- end @else dataReady -->
   </div>
 }
 
