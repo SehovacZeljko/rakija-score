@@ -34,7 +34,14 @@
       @if (!newFestivalNameValid() && newFestivalName().trim().length > 0) {
         <p class="mt-1 text-xs text-status-error">Naziv mora imati najmanje 3 slova.</p>
       }
-      <div class="mt-3 flex gap-2">
+      <div class="mt-3 flex justify-end gap-2">
+        <button
+          type="button"
+          (click)="cancelCreate()"
+          class="rounded-[10px] bg-bg-surface px-5 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
+        >
+          Otkaži
+        </button>
         <button
           type="button"
           (click)="createFestival()"
@@ -46,13 +53,6 @@
           } @else {
             Sačuvaj
           }
-        </button>
-        <button
-          type="button"
-          (click)="cancelCreate()"
-          class="rounded-[10px] bg-bg-surface px-5 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
-        >
-          Otkaži
         </button>
       </div>
     </div>
@@ -79,7 +79,14 @@
         @if (!editingNameValid()) {
           <p class="mt-1 text-xs text-status-error">Naziv mora imati najmanje 3 slova.</p>
         }
-        <div class="mt-3 flex gap-2">
+        <div class="mt-3 flex justify-end gap-2">
+          <button
+            type="button"
+            (click)="cancelEdit()"
+            class="rounded-[10px] bg-bg-surface px-5 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
+          >
+            Otkaži
+          </button>
           <button
             type="button"
             (click)="saveEdit(festival.festivalId)"
@@ -91,13 +98,6 @@
             } @else {
               Sačuvaj
             }
-          </button>
-          <button
-            type="button"
-            (click)="cancelEdit()"
-            class="rounded-[10px] bg-bg-surface px-5 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
-          >
-            Otkaži
           </button>
         </div>
       } @else {

@@ -291,7 +291,14 @@
               <p class="px-3 py-2 text-xs text-text-muted">Sve sudije su već dodijeljene.</p>
             }
           </div>
-          <div class="flex gap-2 border-t border-border-default px-3 py-2">
+          <div class="flex justify-end gap-2 border-t border-border-default px-3 py-2">
+            <button
+              type="button"
+              (click)="cancelAddJudges()"
+              class="rounded-lg bg-bg-card px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-border-default"
+            >
+              Otkaži
+            </button>
             <button
               type="button"
               (click)="assignJudges(category.categoryId)"
@@ -299,13 +306,6 @@
               class="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
               {{ isAssigningJudges() ? '...' : 'Dodijeli (' + selectedJudgeIds().size + ')' }}
-            </button>
-            <button
-              type="button"
-              (click)="cancelAddJudges()"
-              class="rounded-lg bg-bg-card px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-border-default"
-            >
-              Otkaži
             </button>
           </div>
         </div>
@@ -376,7 +376,14 @@
           </div>
 
           <!-- Actions -->
-          <div class="flex gap-2">
+          <div class="flex justify-end gap-2">
+            <button
+              type="button"
+              (click)="cancelAddSample()"
+              class="rounded-lg bg-bg-surface px-4 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
+            >
+              Otkaži
+            </button>
             <button
               type="button"
               (click)="saveNewSample(category.categoryId)"
@@ -384,13 +391,6 @@
               class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
               {{ isSavingSample() ? '...' : 'Dodaj uzorak' }}
-            </button>
-            <button
-              type="button"
-              (click)="cancelAddSample()"
-              class="rounded-lg bg-bg-surface px-4 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
-            >
-              Otkaži
             </button>
           </div>
         </div>

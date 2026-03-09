@@ -318,6 +318,24 @@ Letter spacing for uppercase labels (captions): `0.05em`
 - Text: `text-on-primary` (`#FFFFFF`)
 - Border radius: `12px`
 
+### Two-Button Pairs (Confirm + Cancel)
+
+Whenever a form or inline panel has two buttons — one that confirms/saves and one that cancels — follow this layout consistently:
+
+- **Cancel button on the LEFT**, confirm/save button on the **RIGHT**
+- The button row must be **right-aligned**: use `flex justify-end gap-3` (or `gap-2` for compact panels) on the container
+- Do **not** use `flex-1` on either button — let them size to their content
+- This applies to all contexts: full-page forms, inline card panels, and any future modal dialogs
+
+```html
+<div class="mt-4 flex justify-end gap-3">
+  <button type="button" (click)="cancel()" class="... bg-bg-surface ...">Otkaži</button>
+  <button type="button" (click)="save()" class="... bg-primary ...">Sačuvaj</button>
+</div>
+```
+
+---
+
 ### Primary Button (e.g., Submit Evaluation)
 - Background: `primary` (`#3D1A24`)
 - Text: `#FFFFFF`, weight `600`
