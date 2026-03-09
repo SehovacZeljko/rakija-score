@@ -155,6 +155,12 @@ export class EventCardComponent {
   readonly isAssigningJudges = signal(false);
   readonly removingAssignmentKey = signal<string | null>(null);
   readonly removeAssignmentErrorKey = signal<string | null>(null);
+  readonly pendingRemoval = signal<{
+    judgeId: string;
+    categoryId: string;
+    judgeName: string;
+    categoryName: string;
+  } | null>(null);
 
   // Add sample form
   readonly addingSampleToCategoryId = signal<string | null>(null);
@@ -326,6 +332,21 @@ export class EventCardComponent {
     } finally {
       this.isAssigningJudges.set(false);
     }
+  }
+
+  requestRemoval(judgeId: string, categoryId: string, judgeName: string, categoryName: string): void {
+    this.pendingRemoval.set({ judgeId, categoryId, judgeName, categoryName });
+  }
+
+  cancelRemoval(): void {
+    this.pendingRemoval.set(null);
+  }
+
+  async confirmRemoval(): Promise<void> {
+    const pending = this.pendingRemoval();
+    if (!pending) return;
+    this.pendingRemoval.set(null);
+    await this.removeJudgeAssignment(pending.judgeId, pending.categoryId);
   }
 
   async removeJudgeAssignment(judgeId: string, categoryId: string): Promise<void> {

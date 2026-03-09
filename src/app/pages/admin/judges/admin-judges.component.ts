@@ -116,6 +116,12 @@ export class AdminJudgesComponent {
 
   readonly removingKey = signal<string | null>(null);
   readonly removeErrorKey = signal<string | null>(null);
+  readonly pendingRemoval = signal<{
+    judgeId: string;
+    categoryId: string;
+    judgeName: string;
+    categoryName: string;
+  } | null>(null);
 
   readonly assignmentsByUserId = computed(() => {
     const assignmentMap = new Map<string, JudgeAssignment[]>();
@@ -209,6 +215,21 @@ export class AdminJudgesComponent {
     } finally {
       this.isAssigning.set(false);
     }
+  }
+
+  requestRemoval(judgeId: string, categoryId: string, judgeName: string, categoryName: string): void {
+    this.pendingRemoval.set({ judgeId, categoryId, judgeName, categoryName });
+  }
+
+  cancelRemoval(): void {
+    this.pendingRemoval.set(null);
+  }
+
+  async confirmRemoval(): Promise<void> {
+    const pending = this.pendingRemoval();
+    if (!pending) return;
+    this.pendingRemoval.set(null);
+    await this.removeAssignment(pending.judgeId, pending.categoryId);
   }
 
   async removeAssignment(judgeId: string, categoryId: string): Promise<void> {

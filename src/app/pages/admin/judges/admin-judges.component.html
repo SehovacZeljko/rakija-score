@@ -132,7 +132,7 @@
                 @if (assignment.status !== 'finished') {
                   <button
                     type="button"
-                    (click)="removeAssignment(user.userId, assignment.categoryId)"
+                    (click)="requestRemoval(user.userId, assignment.categoryId, user.username, categoryMap().get(assignment.categoryId) ?? assignment.categoryId)"
                     [disabled]="removingKey() !== null"
                     class="ml-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-status-error/10 hover:text-status-error disabled:cursor-not-allowed disabled:opacity-40"
                     aria-label="Ukloni dodjelu"
@@ -226,3 +226,38 @@
     }
   }
 </div>
+
+@if (pendingRemoval(); as removal) {
+  <div
+    class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 px-4"
+    (click)="cancelRemoval()"
+  >
+    <div
+      class="w-full max-w-sm rounded-xl bg-bg-card p-6 shadow-[0_4px_24px_rgba(0,0,0,0.18)]"
+      (click)="$event.stopPropagation()"
+    >
+      <p class="text-sm text-text-primary">
+        Da li ste sigurni da želite ukloniti sudiju
+        <strong>{{ removal.judgeName }}</strong>
+        iz kategorije
+        <strong>{{ removal.categoryName }}</strong>?
+      </p>
+      <div class="mt-5 flex justify-end gap-3">
+        <button
+          type="button"
+          (click)="cancelRemoval()"
+          class="rounded-lg bg-bg-surface px-4 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
+        >
+          Otkaži
+        </button>
+        <button
+          type="button"
+          (click)="confirmRemoval()"
+          class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
+        >
+          Ukloni
+        </button>
+      </div>
+    </div>
+  </div>
+}
