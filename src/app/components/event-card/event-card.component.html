@@ -87,6 +87,36 @@
     }
   </div>
 
+  <!-- Add category form (top) -->
+  @if (showCategoryFormAtTop()) {
+    <div class="border-b border-border-default px-4 py-3">
+      <div class="flex items-center gap-2">
+        <input
+          type="text"
+          [value]="newCategoryName()"
+          (input)="onCategoryNameInput($event)"
+          placeholder="Naziv kategorije"
+          class="flex-1 rounded-lg border border-border-default bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none"
+        />
+        <button
+          type="button"
+          (click)="createCategory()"
+          [disabled]="isSavingCategory() || !newCategoryName().trim()"
+          class="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ isSavingCategory() ? '...' : 'Dodaj' }}
+        </button>
+        <button
+          type="button"
+          (click)="cancelCategoryForm()"
+          class="rounded-lg bg-bg-surface px-3 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
+        >
+          Otkaži
+        </button>
+      </div>
+    </div>
+  }
+
   <!-- Categories -->
   @for (category of categories(); track category.categoryId) {
     <div class="border-b-4 border-bg-surface px-1 py-3">

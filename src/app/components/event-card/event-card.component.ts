@@ -192,6 +192,7 @@ export class EventCardComponent {
 
   // Category form
   readonly showCategoryForm = signal(false);
+  readonly showCategoryFormAtTop = signal(false);
   readonly newCategoryName = signal('');
   readonly isSavingCategory = signal(false);
 
@@ -205,6 +206,7 @@ export class EventCardComponent {
         icon: 'bar-chart-2',
         routerLink: ['/admin/results', this.event().eventId],
       },
+      { label: 'Dodaj kategoriju', icon: 'plus', action: () => this.openCategoryFormAtTop() },
     ];
 
     if (status === 'staging') {
@@ -498,12 +500,20 @@ export class EventCardComponent {
 
   openCategoryForm(): void {
     this.newCategoryName.set('');
+    this.showCategoryFormAtTop.set(false);
     this.showCategoryForm.set(true);
+  }
+
+  openCategoryFormAtTop(): void {
+    this.newCategoryName.set('');
+    this.showCategoryForm.set(false);
+    this.showCategoryFormAtTop.set(true);
   }
 
   cancelCategoryForm(): void {
     this.newCategoryName.set('');
     this.showCategoryForm.set(false);
+    this.showCategoryFormAtTop.set(false);
   }
 
   onCategoryNameInput(domEvent: Event): void {
@@ -518,6 +528,7 @@ export class EventCardComponent {
       await this.categoryService.createCategory(this.event().eventId, name);
       this.newCategoryName.set('');
       this.showCategoryForm.set(false);
+      this.showCategoryFormAtTop.set(false);
     } finally {
       this.isSavingCategory.set(false);
     }
