@@ -91,8 +91,10 @@ export class EventService {
 
     // 2. Finish all non-finished events in OTHER festivals
     for (const fId of allFestivalIds.filter((id) => id !== festivalId)) {
-      const snapshot = await getDocs(
-        query(this.eventsRef, where('festivalId', '==', fId), where('status', 'in', ['active', 'staging'])),
+      const snapshot = await runInInjectionContext(this.injector, () =>
+        getDocs(
+          query(this.eventsRef, where('festivalId', '==', fId), where('status', 'in', ['active', 'staging'])),
+        ),
       );
       for (const docSnap of snapshot.docs) {
         batch.update(docSnap.ref, { status: 'finished', closedAt: serverTimestamp() });
@@ -100,8 +102,10 @@ export class EventService {
     }
 
     // 3. Finish all other non-finished events in the SAME festival
-    const sameFestivalSnapshot = await getDocs(
-      query(this.eventsRef, where('festivalId', '==', festivalId), where('status', 'in', ['active', 'staging'])),
+    const sameFestivalSnapshot = await runInInjectionContext(this.injector, () =>
+      getDocs(
+        query(this.eventsRef, where('festivalId', '==', festivalId), where('status', 'in', ['active', 'staging'])),
+      ),
     );
     for (const docSnap of sameFestivalSnapshot.docs) {
       if (docSnap.id !== eventId) {

@@ -124,16 +124,18 @@ export class CategoryService {
   }
 
   async removeJudgeFromCategory(judgeId: string, categoryId: string): Promise<void> {
-    const samplesSnap = await getDocs(
-      query(collection(this.firestore, 'samples'), where('categoryId', '==', categoryId)),
+    const samplesSnap = await runInInjectionContext(this.injector, () =>
+      getDocs(query(collection(this.firestore, 'samples'), where('categoryId', '==', categoryId))),
     );
 
     if (!samplesSnap.empty) {
       const scoreIds = samplesSnap.docs.map((d) => `${judgeId}_${d.data()['sampleId']}`);
       for (let i = 0; i < scoreIds.length; i += 30) {
         const chunk = scoreIds.slice(i, i + 30);
-        const scoresSnap = await getDocs(
-          query(collection(this.firestore, 'scores'), where(documentId(), 'in', chunk), limit(1)),
+        const scoresSnap = await runInInjectionContext(this.injector, () =>
+          getDocs(
+            query(collection(this.firestore, 'scores'), where(documentId(), 'in', chunk), limit(1)),
+          ),
         );
         if (!scoresSnap.empty) throw new Error('UNASSIGN_BLOCKED');
       }
