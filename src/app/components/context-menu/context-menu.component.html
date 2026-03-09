@@ -13,7 +13,10 @@
     <div class="fixed inset-0 z-10" (click)="close()"></div>
     <!-- Panel -->
     <div
-      class="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-xl border border-border-default bg-bg-card shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
+      class="absolute right-0 z-[60] w-52 overflow-hidden rounded-xl border border-border-default bg-bg-card shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
+      [class.bottom-full]="opensUpward()"
+      [class.mb-1]="opensUpward()"
+      [class.mt-1]="!opensUpward()"
     >
       @for (item of items(); track item.label; let first = $first) {
         @if (item.routerLink) {

@@ -25,9 +25,13 @@ export class ContextMenuComponent {
   readonly items = input.required<ContextMenuItem[]>();
 
   readonly isOpen = signal(false);
+  readonly opensUpward = signal(false);
 
   toggle(domEvent: MouseEvent): void {
     domEvent.stopPropagation();
+    const button = domEvent.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    this.opensUpward.set(rect.bottom > window.innerHeight - 200);
     this.isOpen.update((open) => !open);
   }
 
