@@ -151,7 +151,7 @@ export class EventService {
       where('festivalId', '==', festivalId),
       where('status', 'in', ['active', 'staging']),
     );
-    const snapshot = await getDocs(nonFinishedQuery);
+    const snapshot = await runInInjectionContext(this.injector, () => getDocs(nonFinishedQuery));
     if (snapshot.empty) return;
 
     const batch = writeBatch(this.firestore);

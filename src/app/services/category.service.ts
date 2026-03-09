@@ -48,8 +48,8 @@ export class CategoryService {
   }
 
   async canDeleteCategory(categoryId: string): Promise<boolean> {
-    const samplesSnap = await getDocs(
-      query(collection(this.firestore, 'samples'), where('categoryId', '==', categoryId)),
+    const samplesSnap = await runInInjectionContext(this.injector, () =>
+      getDocs(query(collection(this.firestore, 'samples'), where('categoryId', '==', categoryId))),
     );
     if (samplesSnap.empty) return true;
 
@@ -57,8 +57,10 @@ export class CategoryService {
 
     for (let i = 0; i < sampleIds.length; i += 30) {
       const chunk = sampleIds.slice(i, i + 30);
-      const scoresSnap = await getDocs(
-        query(collection(this.firestore, 'scores'), where('sampleId', 'in', chunk), limit(1)),
+      const scoresSnap = await runInInjectionContext(this.injector, () =>
+        getDocs(
+          query(collection(this.firestore, 'scores'), where('sampleId', 'in', chunk), limit(1)),
+        ),
       );
       if (!scoresSnap.empty) return false;
     }

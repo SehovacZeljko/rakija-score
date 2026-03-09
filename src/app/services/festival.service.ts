@@ -55,7 +55,7 @@ export class FestivalService {
 
   async setActiveFestival(festivalId: string): Promise<void> {
     const activeQuery = query(this.festivalsRef, where('status', '==', 'active'));
-    const snapshot = await getDocs(activeQuery);
+    const snapshot = await runInInjectionContext(this.injector, () => getDocs(activeQuery));
 
     const batch = writeBatch(this.firestore);
     snapshot.docs.forEach((d) => batch.update(d.ref, { status: 'inactive' }));
