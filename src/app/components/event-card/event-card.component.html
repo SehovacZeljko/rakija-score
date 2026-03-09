@@ -173,9 +173,9 @@
               class="w-full rounded-lg border bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
               [class.border-border-default]="!newSampleCode().trim() || newSampleCodeValid()"
               [class.focus:border-border-focus]="!newSampleCode().trim() || newSampleCodeValid()"
-              [class.border-status-error]="newSampleCode().trim() && !newSampleCodeValid()"
+              [class.border-status-error]="newSampleCode().trim() && !newSampleCodeValid() && !isSavingSample()"
             />
-            @if (newSampleCode().trim() && !newSampleCodeValid()) {
+            @if (newSampleCode().trim() && !newSampleCodeValid() && !isSavingSample()) {
               <p class="mt-1 text-xs text-status-error">
                 @if (newSampleCode().trim().length < 4) {
                   Šifra mora imati najmanje 4 karaktera.
