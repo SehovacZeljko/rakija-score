@@ -20,14 +20,6 @@
     </div>
   </div>
 
-  <!-- Active festival badge -->
-  @if (activeFestival()) {
-    <div class="mb-4 flex items-center gap-2">
-      <span class="text-sm font-medium text-text-primary">Festival:</span>
-      <span class="text-sm font-medium text-text-primary">{{ activeFestival()!.name }}</span>
-    </div>
-  }
-
   <!-- New event form -->
   @if (showEventForm()) {
     <div class="mb-4 rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
@@ -107,27 +99,21 @@
     </div>
   }
 
-  <!-- Events list (for active festival) -->
-  @if (activeFestival()) {
-    @for (event of sortedEvents(); track event.eventId) {
-      <app-event-card
-        [event]="event"
-        [categories]="categoriesForEvent(event.eventId)"
-        [festivalId]="activeFestival()!.festivalId"
-        [festivalName]="activeFestival()!.name"
-      />
-    } @empty {
-      @if (!showEventForm()) {
-        <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
-          <p class="text-sm text-text-secondary">Nema dogadjaja za ovaj festival.</p>
-          <p class="mt-1 text-xs text-text-muted">Dodajte prvi dogadjaj.</p>
-        </div>
-      }
+  <!-- Events list (all festivals) -->
+  @for (event of sortedEvents(); track event.eventId) {
+    <app-event-card
+      [event]="event"
+      [categories]="categoriesForEvent(event.eventId)"
+      [festivalId]="event.festivalId"
+      [festivalName]="festivalNameMap().get(event.festivalId) ?? ''"
+      [allFestivalIds]="allFestivalIds()"
+    />
+  } @empty {
+    @if (!showEventForm()) {
+      <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+        <p class="text-sm text-text-secondary">Nema dogadjaja.</p>
+        <p class="mt-1 text-xs text-text-muted">Dodajte prvi dogadjaj.</p>
+      </div>
     }
-  } @else if (!showEventForm()) {
-    <div class="rounded-xl bg-bg-card p-6 text-center shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
-      <p class="text-sm text-text-secondary">Nema aktivnog festivala.</p>
-      <p class="mt-1 text-xs text-text-muted">Postavite aktivan festival u sekciji Festivali.</p>
-    </div>
   }
 </div>

@@ -69,8 +69,50 @@ export class EventService {
     });
   }
 
-  async activateEvent(festivalId: string, eventId: string): Promise<void> {
-    await updateDoc(doc(this.firestore, `events/${eventId}`), { status: 'active' });
+  private async buildGlobalTransitionBatch(
+    festivalId: string,
+    eventId: string,
+    allFestivalIds: string[],
+    targetStatus: 'active' | 'staging',
+  ): Promise<ReturnType<typeof writeBatch>> {
+    const batch = writeBatch(this.firestore);
+
+    // 1. Set target festival active, all others inactive
+    for (const fId of allFestivalIds) {
+      batch.update(doc(this.firestore, `festivals/${fId}`), {
+        status: fId === festivalId ? 'active' : 'inactive',
+      });
+    }
+
+    // 2. Finish all non-finished events in OTHER festivals
+    for (const fId of allFestivalIds.filter((id) => id !== festivalId)) {
+      const snapshot = await getDocs(
+        query(this.eventsRef, where('festivalId', '==', fId), where('status', 'in', ['active', 'staging'])),
+      );
+      for (const docSnap of snapshot.docs) {
+        batch.update(docSnap.ref, { status: 'finished', closedAt: serverTimestamp() });
+      }
+    }
+
+    // 3. Finish all other non-finished events in the SAME festival
+    const sameFestivalSnapshot = await getDocs(
+      query(this.eventsRef, where('festivalId', '==', festivalId), where('status', 'in', ['active', 'staging'])),
+    );
+    for (const docSnap of sameFestivalSnapshot.docs) {
+      if (docSnap.id !== eventId) {
+        batch.update(docSnap.ref, { status: 'finished', closedAt: serverTimestamp() });
+      }
+    }
+
+    // 4. Set target event to targetStatus
+    batch.update(doc(this.firestore, `events/${eventId}`), { status: targetStatus, closedAt: null });
+
+    return batch;
+  }
+
+  async activateEvent(festivalId: string, eventId: string, allFestivalIds: string[]): Promise<void> {
+    const batch = await this.buildGlobalTransitionBatch(festivalId, eventId, allFestivalIds, 'active');
+    await batch.commit();
   }
 
   async finishEvent(eventId: string): Promise<void> {
@@ -80,24 +122,13 @@ export class EventService {
     });
   }
 
-  async reopenEvent(festivalId: string, eventId: string): Promise<void> {
-    const nonFinishedQuery = query(
-      this.eventsRef,
-      where('festivalId', '==', festivalId),
-      where('status', 'in', ['active', 'staging']),
-    );
-    const snapshot = await getDocs(nonFinishedQuery);
+  async reopenEvent(festivalId: string, eventId: string, allFestivalIds: string[]): Promise<void> {
+    const batch = await this.buildGlobalTransitionBatch(festivalId, eventId, allFestivalIds, 'active');
+    await batch.commit();
+  }
 
-    const batch = writeBatch(this.firestore);
-
-    // Finish all other non-finished events before reopening
-    for (const docSnap of snapshot.docs) {
-      if (docSnap.id !== eventId) {
-        batch.update(docSnap.ref, { status: 'finished', closedAt: serverTimestamp() });
-      }
-    }
-
-    batch.update(doc(this.firestore, `events/${eventId}`), { status: 'active', closedAt: null });
+  async revertFinishedToStaging(festivalId: string, eventId: string, allFestivalIds: string[]): Promise<void> {
+    const batch = await this.buildGlobalTransitionBatch(festivalId, eventId, allFestivalIds, 'staging');
     await batch.commit();
   }
 

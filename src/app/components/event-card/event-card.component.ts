@@ -38,6 +38,7 @@ export class EventCardComponent {
   readonly categories = input.required<Category[]>();
   readonly festivalId = input.required<string>();
   readonly festivalName = input.required<string>();
+  readonly allFestivalIds = input.required<string[]>();
 
   private readonly samples$ = toObservable(this.categories).pipe(
     map((cats) => cats.map((c) => c.categoryId)),
@@ -225,11 +226,18 @@ export class EventCardComponent {
       });
     } else if (status === 'finished') {
       items.push({
+        label: 'Vrati u pripremu',
+        icon: 'undo-2',
+        action: () => this.revertFinishedToStaging(),
+        loading: this.isReverting(),
+        disabled: this.isReverting() || this.isReopening(),
+      });
+      items.push({
         label: 'Ponovo otvori',
         icon: 'rotate-ccw',
         action: () => this.reopenEvent(),
         loading: this.isReopening(),
-        disabled: this.isReopening(),
+        disabled: this.isReopening() || this.isReverting(),
       });
     }
 
@@ -423,7 +431,7 @@ export class EventCardComponent {
   async activateEvent(): Promise<void> {
     this.isActivating.set(true);
     try {
-      await this.eventService.activateEvent(this.festivalId(), this.event().eventId);
+      await this.eventService.activateEvent(this.festivalId(), this.event().eventId, this.allFestivalIds());
     } finally {
       this.isActivating.set(false);
     }
@@ -450,9 +458,18 @@ export class EventCardComponent {
   async reopenEvent(): Promise<void> {
     this.isReopening.set(true);
     try {
-      await this.eventService.reopenEvent(this.festivalId(), this.event().eventId);
+      await this.eventService.reopenEvent(this.festivalId(), this.event().eventId, this.allFestivalIds());
     } finally {
       this.isReopening.set(false);
+    }
+  }
+
+  async revertFinishedToStaging(): Promise<void> {
+    this.isReverting.set(true);
+    try {
+      await this.eventService.revertFinishedToStaging(this.festivalId(), this.event().eventId, this.allFestivalIds());
+    } finally {
+      this.isReverting.set(false);
     }
   }
 

@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { of, switchMap } from 'rxjs';
+import { combineLatest, map, of, startWith, switchMap } from 'rxjs';
 
 import { EventCardComponent } from '../../../components/event-card/event-card.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
@@ -27,8 +27,14 @@ export class AdminCategoriesComponent {
   readonly dataReady = this.ctx.dataReady;
   readonly allFestivals = toSignal(this.festivalService.getAllFestivals(), { initialValue: [] });
 
-  private readonly events$ = this.ctx.activeFestival$.pipe(
-    switchMap((f) => (f ? this.eventService.getEventsForFestival(f.festivalId) : of([]))),
+  private readonly events$ = this.festivalService.getAllFestivals().pipe(
+    switchMap((festivals) => {
+      if (!festivals.length) return of([]);
+      return combineLatest(
+        festivals.map((festival) => this.eventService.getEventsForFestival(festival.festivalId)),
+      ).pipe(map((eventArrays) => eventArrays.flat()));
+    }),
+    startWith([]),
   );
 
   readonly events = toSignal(this.events$, { initialValue: [] });
@@ -64,6 +70,12 @@ export class AdminCategoriesComponent {
   readonly festivalOptions = computed(() =>
     this.allFestivals().map((festival) => ({ id: festival.festivalId, label: festival.name })),
   );
+
+  readonly festivalNameMap = computed(() =>
+    new Map(this.allFestivals().map((festival) => [festival.festivalId, festival.name])),
+  );
+
+  readonly allFestivalIds = computed(() => this.allFestivals().map((festival) => festival.festivalId));
 
   readonly sortedEvents = computed(() =>
     [...this.events()].sort(
