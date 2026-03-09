@@ -104,7 +104,7 @@
             </div>
           }
         </div>
-        <app-context-menu [items]="getCategoryMenuItems(category.categoryId)" />
+        <app-context-menu [items]="getCategoryMenuItems(category.categoryId, category.name)" />
       </div>
 
       <!-- Add judges panel -->
@@ -272,7 +272,14 @@
                   }
                   <button
                     type="button"
-                    (click)="requestRemoval(assignment.judgeId, category.categoryId, judge.username, category.name)"
+                    (click)="
+                      requestRemoval(
+                        assignment.judgeId,
+                        category.categoryId,
+                        judge.username,
+                        category.name
+                      )
+                    "
                     [disabled]="removingAssignmentKey() !== null"
                     class="flex items-center justify-center rounded text-text-muted transition-colors hover:text-status-error disabled:cursor-not-allowed disabled:opacity-40"
                     aria-label="Ukloni sudiju"
@@ -449,36 +456,25 @@
 </div>
 
 @if (pendingRemoval(); as removal) {
-  <div
-    class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 px-4"
-    (click)="cancelRemoval()"
-  >
-    <div
-      class="w-full max-w-sm rounded-xl bg-bg-card p-6 shadow-[0_4px_24px_rgba(0,0,0,0.18)]"
-      (click)="$event.stopPropagation()"
-    >
-      <p class="text-sm text-text-primary">
-        Da li ste sigurni da želite ukloniti sudiju
-        <strong>{{ removal.judgeName }}</strong>
-        iz kategorije
-        <strong>{{ removal.categoryName }}</strong>?
-      </p>
-      <div class="mt-5 flex justify-end gap-3">
-        <button
-          type="button"
-          (click)="cancelRemoval()"
-          class="rounded-lg bg-bg-surface px-4 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
-        >
-          Otkaži
-        </button>
-        <button
-          type="button"
-          (click)="confirmRemoval()"
-          class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
-        >
-          Ukloni
-        </button>
-      </div>
-    </div>
-  </div>
+  <app-confirm-dialog
+    [message]="
+      'Da li ste sigurni da želite ukloniti sudiju ' +
+      removal.judgeName +
+      ' iz kategorije ' +
+      removal.categoryName +
+      '?'
+    "
+    confirmLabel="Ukloni"
+    (confirmed)="confirmRemoval()"
+    (cancelled)="cancelRemoval()"
+  />
+}
+
+@if (pendingCategoryDeletion(); as deletion) {
+  <app-confirm-dialog
+    [message]="'Da li ste sigurni da želite obrisati kategoriju ' + deletion.categoryName + '?'"
+    confirmLabel="Obriši"
+    (confirmed)="confirmCategoryDeletion()"
+    (cancelled)="cancelCategoryDeletion()"
+  />
 }

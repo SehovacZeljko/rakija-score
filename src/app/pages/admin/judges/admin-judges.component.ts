@@ -4,6 +4,7 @@ import { NgClass } from '@angular/common';
 import { of, startWith, switchMap } from 'rxjs';
 
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
+import { ConfirmDialogComponent } from '../../../components/confirm-dialog/confirm-dialog.component';
 import { InlineSpinnerComponent } from '../../../components/inline-spinner/inline-spinner.component';
 import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner.component';
 import { Category } from '../../../models/category.model';
@@ -23,6 +24,7 @@ type JudgeFilter = 'unassigned' | 'assigned';
     LoadingSpinnerComponent,
     InlineSpinnerComponent,
     ActiveFestivalBannerComponent,
+    ConfirmDialogComponent,
     LucideAngularModule,
   ],
   templateUrl: './admin-judges.component.html',

@@ -1,29 +1,27 @@
-@if (isOpen) {
+<div
+  class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 px-4"
+  (click)="cancelled.emit()"
+>
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
-    (click)="cancelled.emit()"
+    class="w-full max-w-sm rounded-xl bg-bg-card p-6 shadow-[0_4px_24px_rgba(0,0,0,0.18)]"
+    (click)="$event.stopPropagation()"
   >
-    <div
-      class="w-full max-w-sm rounded-xl bg-bg-card p-6 shadow-[0_4px_24px_rgba(0,0,0,0.18)]"
-      (click)="$event.stopPropagation()"
-    >
-      <p class="text-sm text-text-primary">{{ message }}</p>
-      <div class="mt-5 flex justify-end gap-3">
-        <button
-          type="button"
-          (click)="cancelled.emit()"
-          class="rounded-lg bg-bg-surface px-4 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
-        >
-          Otkaži
-        </button>
-        <button
-          type="button"
-          (click)="confirmed.emit()"
-          class="rounded-lg bg-status-error px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
-        >
-          Ukloni
-        </button>
-      </div>
+    <p class="text-sm text-text-primary">{{ message() }}</p>
+    <div class="mt-5 flex justify-end gap-3">
+      <button
+        type="button"
+        (click)="cancelled.emit()"
+        class="rounded-lg bg-bg-surface px-4 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
+      >
+        Otkaži
+      </button>
+      <button
+        type="button"
+        (click)="confirmed.emit()"
+        class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
+      >
+        {{ confirmLabel() }}
+      </button>
     </div>
   </div>
-}
+</div>

@@ -4,6 +4,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { map, of, startWith, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { ContextMenuComponent, ContextMenuItem } from '../context-menu/context-menu.component';
 import { InlineSpinnerComponent } from '../inline-spinner/inline-spinner.component';
 import { SelectDropdownComponent } from '../select-dropdown/select-dropdown.component';
@@ -22,7 +23,7 @@ import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-event-card',
-  imports: [ContextMenuComponent, InlineSpinnerComponent, LucideAngularModule, DecimalPipe, SelectDropdownComponent],
+  imports: [ConfirmDialogComponent, ContextMenuComponent, InlineSpinnerComponent, LucideAngularModule, DecimalPipe, SelectDropdownComponent],
   templateUrl: './event-card.component.html',
   styleUrl: './event-card.component.scss',
 })
@@ -253,8 +254,9 @@ export class EventCardComponent {
   // Category delete
   readonly deletingCategoryId = signal<string | null>(null);
   readonly deleteErrorCategoryId = signal<string | null>(null);
+  readonly pendingCategoryDeletion = signal<{ categoryId: string; categoryName: string } | null>(null);
 
-  getCategoryMenuItems(categoryId: string): ContextMenuItem[] {
+  getCategoryMenuItems(categoryId: string, categoryName: string): ContextMenuItem[] {
     return [
       { label: 'Dodaj uzorak', icon: 'plus', action: () => this.openAddSample(categoryId) },
       {
@@ -267,7 +269,7 @@ export class EventCardComponent {
       {
         label: 'Ukloni kategoriju',
         icon: 'trash-2',
-        action: () => this.deleteCategory(categoryId),
+        action: () => this.requestCategoryDeletion(categoryId, categoryName),
         loading: this.deletingCategoryId() === categoryId,
         disabled: this.deletingCategoryId() !== null,
         destructive: true,
@@ -519,6 +521,21 @@ export class EventCardComponent {
     } finally {
       this.isSavingCategory.set(false);
     }
+  }
+
+  requestCategoryDeletion(categoryId: string, categoryName: string): void {
+    this.pendingCategoryDeletion.set({ categoryId, categoryName });
+  }
+
+  cancelCategoryDeletion(): void {
+    this.pendingCategoryDeletion.set(null);
+  }
+
+  async confirmCategoryDeletion(): Promise<void> {
+    const pending = this.pendingCategoryDeletion();
+    if (!pending) return;
+    this.pendingCategoryDeletion.set(null);
+    await this.deleteCategory(pending.categoryId);
   }
 
   async deleteCategory(categoryId: string): Promise<void> {
