@@ -134,10 +134,18 @@ export class ScoringComponent {
     sig.set(Math.min(criterion.max, Math.max(criterion.min, value)));
   }
 
-  getProgressPercent(criterion: ScoringCriterion): number {
-    const value = this.getCriterionValue(criterion.key);
-    const range = criterion.max - criterion.min;
-    return range > 0 ? ((value - criterion.min) / range) * 100 : 0;
+  roundToStep(value: number, step: number, min: number, max: number): number {
+    const rounded = Math.round(value / step) * step;
+    const clamped = Math.min(max, Math.max(min, rounded));
+    return Math.round(clamped * 100) / 100;
+  }
+
+  onManualInput(key: string, event: Event, criterion: ScoringCriterion): void {
+    const raw = parseFloat((event.target as HTMLInputElement).value);
+    if (isNaN(raw)) return;
+    const rounded = this.roundToStep(raw, this.SCORE_STEP, criterion.min, criterion.max);
+    this.writableSignals[key]?.set(rounded);
+    (event.target as HTMLInputElement).value = rounded.toFixed(2);
   }
 
   onCommentInput(event: Event): void {

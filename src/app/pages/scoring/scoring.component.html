@@ -31,60 +31,73 @@
 
       <!-- Scoring criteria -->
       @for (criterion of SCORING_CRITERIA; track criterion.key) {
-        <div class="mb-3 rounded-xl bg-bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
+        <div class="mb-2 flex items-center justify-between rounded-xl bg-bg-card px-4 py-3 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
 
-          <!-- Header row: icon + label + current value -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-text-secondary">
-                @switch (criterion.key) {
-                  @case ('color') {
-                    <lucide-icon name="droplet" [size]="18" />
-                  }
-                  @case ('clarity') {
-                    <lucide-icon name="eye" [size]="18" />
-                  }
-                  @case ('typicality') {
-                    <lucide-icon name="star" [size]="18" />
-                  }
-                  @case ('aroma') {
-                    <lucide-icon name="wind" [size]="18" />
-                  }
-                  @case ('taste') {
-                    <lucide-icon name="coffee" [size]="18" />
-                  }
+          <!-- Left: icon + label + max -->
+          <div class="flex min-w-0 items-center gap-2">
+            <span class="shrink-0 text-text-secondary">
+              @switch (criterion.key) {
+                @case ('color') {
+                  <lucide-icon name="droplet" [size]="18" />
                 }
-              </span>
-              <span class="text-sm font-medium text-text-primary">{{ criterion.labelSr }}</span>
-            </div>
-            <span class="text-base font-bold text-text-primary">
-              {{ getCriterionValue(criterion.key).toFixed(2) }}<span class="text-xs font-normal text-text-muted"> / {{ criterion.max.toFixed(2) }}</span>
+                @case ('clarity') {
+                  <lucide-icon name="eye" [size]="18" />
+                }
+                @case ('typicality') {
+                  <lucide-icon name="star" [size]="18" />
+                }
+                @case ('aroma') {
+                  <lucide-icon name="wind" [size]="18" />
+                }
+                @case ('taste') {
+                  <lucide-icon name="coffee" [size]="18" />
+                }
+              }
             </span>
+            <span class="truncate text-sm font-medium text-text-primary">{{ criterion.labelSr }}</span>
+            <span class="shrink-0 text-xs text-text-muted">/ {{ criterion.max.toFixed(2) }}</span>
           </div>
 
-          <!-- Slider -->
-          <div class="mt-3">
+          <!-- Right: min | − | input | + | max -->
+          <div class="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              (click)="setPreset(criterion.key, criterion.min)"
+              [disabled]="isLocked() || getCriterionValue(criterion.key) <= criterion.min"
+              class="flex h-8 w-10 items-center justify-center rounded-lg bg-bg-surface text-xs font-bold text-text-secondary transition active:scale-95 disabled:opacity-40"
+            >min</button>
+
+            <button
+              type="button"
+              (click)="adjust(criterion.key, -SCORE_STEP)"
+              [disabled]="isLocked() || getCriterionValue(criterion.key) <= criterion.min"
+              class="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-surface text-lg font-bold text-text-primary transition active:scale-95 disabled:opacity-40"
+            >−</button>
+
             <input
-              type="range"
-              class="criterion-slider w-full"
-              [style.--progress]="getProgressPercent(criterion) + '%'"
+              type="number"
+              [value]="getCriterionValue(criterion.key).toFixed(2)"
               [min]="criterion.min"
               [max]="criterion.max"
               [step]="SCORE_STEP"
-              [value]="getCriterionValue(criterion.key)"
-              (input)="setPreset(criterion.key, +($any($event.target).value))"
+              [disabled]="isLocked()"
+              (change)="onManualInput(criterion.key, $event, criterion)"
+              class="w-16 rounded-lg border border-border-default bg-bg-card px-1 py-1 text-center text-sm font-bold text-text-primary focus:border-border-focus focus:outline-none disabled:opacity-60"
             />
-          </div>
 
-          <!-- Max preset -->
-          <div class="mt-1.5 flex justify-end">
+            <button
+              type="button"
+              (click)="adjust(criterion.key, SCORE_STEP)"
+              [disabled]="isLocked() || getCriterionValue(criterion.key) >= criterion.max"
+              class="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-surface text-lg font-bold text-text-primary transition active:scale-95 disabled:opacity-40"
+            >+</button>
+
             <button
               type="button"
               (click)="setPreset(criterion.key, criterion.max)"
-              class="text-xs text-accent hover:text-accent-hover"
-            >
-              max {{ criterion.max.toFixed(2) }}
-            </button>
+              [disabled]="isLocked() || getCriterionValue(criterion.key) >= criterion.max"
+              class="flex h-8 w-10 items-center justify-center rounded-lg bg-bg-surface text-xs font-bold text-text-secondary transition active:scale-95 disabled:opacity-40"
+            >max</button>
           </div>
 
         </div>
