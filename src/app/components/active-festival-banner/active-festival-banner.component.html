@@ -1,16 +1,23 @@
 @if (ctx.activeFestival(); as festival) {
   <div class="mb-4 rounded-xl bg-bg-card px-4 py-3 shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
-    <div class="flex items-center gap-2">
-      <span class="truncate text-sm font-semibold text-text-primary"
-        >Festival: {{ festival.name }}</span
+    <div class="flex items-center gap-3">
+      <!-- Image placeholder -->
+      <div
+        class="flex h-[65px] w-[65px] shrink-0 items-center justify-center rounded-xl bg-bg-surface text-text-muted"
       >
-    </div>
-    @if (ctx.adminCurrentEvent(); as event) {
-      <div class="mt-1 flex items-center gap-2">
-        <p class="text-xs text-text-secondary">Dogadjaj: {{ event.name }} · {{ event.year }}</p>
+        <lucide-icon name="image" [size]="22" />
       </div>
-    } @else {
-      <p class="mt-1 text-xs text-status-error">Nema aktivnog dogadjaja.</p>
-    }
+
+      <!-- Festival / event info -->
+      <div class="min-w-0 flex-1">
+        <p class="text-xs text-text-muted">{{ festival.name }}</p>
+        @if (ctx.adminCurrentEvent(); as event) {
+          <p class="mt-0.5 font-semibold text-text-primary">{{ event.name }}</p>
+          <p class="text-xs text-text-muted">{{ event.year }}</p>
+        } @else {
+          <p class="mt-0.5 text-xs text-status-error">Nema aktivnog dogadjaja.</p>
+        }
+      </div>
+    </div>
   </div>
 }
