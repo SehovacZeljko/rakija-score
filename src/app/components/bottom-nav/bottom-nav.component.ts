@@ -1,15 +1,16 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
 
 export interface NavItem {
   route: string;
   label: string;
-  icon: 'home' | 'calendar' | 'layers' | 'briefcase' | 'list' | 'users';
+  icon: string;
 }
 
 @Component({
   selector: 'app-bottom-nav',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, LucideAngularModule],
   templateUrl: './bottom-nav.component.html',
   styleUrl: './bottom-nav.component.scss',
 })
