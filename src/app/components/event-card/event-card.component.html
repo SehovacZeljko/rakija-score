@@ -67,7 +67,9 @@
           <div class="mt-0.5 flex flex-wrap items-center gap-2">
             <p class="truncate font-semibold text-text-primary">{{ event().name }}</p>
             <span class="text-xs text-text-muted">{{ event().year }}</span>
-            @if (event().status === 'finished') {
+            @if (isActivating() || isFinishing() || isReverting() || isReopening()) {
+              <app-inline-spinner [size]="12" />
+            } @else if (event().status === 'finished') {
               <span
                 class="shrink-0 rounded-[6px] bg-bg-surface px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.05em] text-status-locked"
               >
@@ -122,7 +124,12 @@
     <div class="border-b-4 border-bg-surface px-1 py-3">
       <div class="flex items-start justify-between">
         <div class="min-w-0 flex-1">
-          <span class="text-sm text-text-primary">{{ category.name }}</span>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-text-primary">{{ category.name }}</span>
+            @if (navigatingToCategoryId() === category.categoryId) {
+              <app-inline-spinner [size]="12" />
+            }
+          </div>
           @if (categoryStats().get(category.categoryId); as stats) {
             <div class="mt-0.5 flex gap-3 text-xs text-text-muted">
               <span>Uzorci: {{ stats.totalSamples }}</span>

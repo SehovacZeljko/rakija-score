@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import { map, of, startWith, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 
@@ -29,6 +30,7 @@ import { UserService } from '../../services/user.service';
 })
 export class EventCardComponent {
   private readonly eventService = inject(EventService);
+  private readonly router = inject(Router);
   private readonly categoryService = inject(CategoryService);
   private readonly sampleService = inject(SampleService);
   private readonly scoreService = inject(ScoreService);
@@ -253,6 +255,9 @@ export class EventCardComponent {
     return items;
   });
 
+  // Navigate to samples
+  readonly navigatingToCategoryId = signal<string | null>(null);
+
   // Category delete
   readonly deletingCategoryId = signal<string | null>(null);
   readonly deleteErrorCategoryId = signal<string | null>(null);
@@ -264,8 +269,9 @@ export class EventCardComponent {
       {
         label: 'Uredi uzorke',
         icon: 'list',
-        routerLink: ['/admin/samples'],
-        queryParams: { categoryId },
+        action: () => this.navigateToSamples(categoryId),
+        loading: this.navigatingToCategoryId() === categoryId,
+        disabled: this.navigatingToCategoryId() !== null,
       },
       { label: 'Dodaj sudiju', icon: 'user-plus', action: () => this.openAddJudges(categoryId) },
       {
@@ -306,6 +312,21 @@ export class EventCardComponent {
 
   scoreTotal(score: Score): number {
     return score.color + score.clarity + score.typicality + score.aroma + score.taste;
+  }
+
+  async navigateToSamples(categoryId: string): Promise<void> {
+    this.navigatingToCategoryId.set(categoryId);
+    try {
+      await this.eventService.switchContextToEvent(
+        this.festivalId(),
+        this.event().eventId,
+        this.allFestivalIds(),
+        this.event().status,
+      );
+      await this.router.navigate(['/admin/samples'], { queryParams: { categoryId } });
+    } finally {
+      this.navigatingToCategoryId.set(null);
+    }
   }
 
   openAddJudges(categoryId: string): void {

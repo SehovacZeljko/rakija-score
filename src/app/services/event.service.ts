@@ -141,6 +141,17 @@ export class EventService {
     await batch.commit();
   }
 
+  async switchContextToEvent(
+    festivalId: string,
+    eventId: string,
+    allFestivalIds: string[],
+    currentStatus: 'staging' | 'active' | 'finished',
+  ): Promise<void> {
+    const targetStatus = currentStatus === 'active' ? 'active' : 'staging';
+    const batch = await this.buildGlobalTransitionBatch(festivalId, eventId, allFestivalIds, targetStatus);
+    await batch.commit();
+  }
+
   async revertToStaging(eventId: string): Promise<void> {
     await updateDoc(doc(this.firestore, `events/${eventId}`), { status: 'staging' });
   }
