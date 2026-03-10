@@ -37,6 +37,16 @@ export class EventCardComponent {
   private readonly producerService = inject(ProducerService);
   private readonly userService = inject(UserService);
 
+  readonly expandedSampleIds = signal(new Set<string>());
+
+  toggleSampleCode(sampleId: string): void {
+    this.expandedSampleIds.update((set) => {
+      const next = new Set(set);
+      next.has(sampleId) ? next.delete(sampleId) : next.add(sampleId);
+      return next;
+    });
+  }
+
   readonly event = input.required<FestivalEvent>();
   readonly categories = input.required<Category[]>();
   readonly festivalId = input.required<string>();

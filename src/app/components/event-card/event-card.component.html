@@ -425,9 +425,12 @@
                     class="grid grid-cols-[1.25rem_1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_3rem] items-center gap-x-1 md:gap-x-4 border-t border-border-default px-3 py-1.5 text-xs"
                   >
                     <span class="text-text-muted">{{ rowIndex + 1 }}</span>
-                    <span class="min-w-0 truncate font-medium text-text-primary">{{
-                      sample.sampleCode
-                    }}</span>
+                    <span
+                      class="min-w-0 cursor-pointer font-medium text-text-primary"
+                      [class.truncate]="!expandedSampleIds().has(sample.sampleId)"
+                      (click)="toggleSampleCode(sample.sampleId)"
+                      [title]="sample.sampleCode"
+                    >{{ sample.sampleCode }}</span>
                     <span class="text-right text-text-secondary">{{
                       score.color | number: '1.2-2'
                     }}</span>
@@ -452,9 +455,12 @@
                     class="grid grid-cols-[1.25rem_1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_3rem] items-center gap-x-1 md:gap-x-4 border-t border-border-default px-3 py-1.5 text-xs"
                   >
                     <span class="text-text-muted">{{ rowIndex + 1 }}</span>
-                    <span class="min-w-0 truncate font-medium text-text-primary">{{
-                      sample.sampleCode
-                    }}</span>
+                    <span
+                      class="min-w-0 cursor-pointer font-medium text-text-primary"
+                      [class.truncate]="!expandedSampleIds().has(sample.sampleId)"
+                      (click)="toggleSampleCode(sample.sampleId)"
+                      [title]="sample.sampleCode"
+                    >{{ sample.sampleCode }}</span>
                     <span class="col-span-6 text-right italic text-text-muted"
                       >nije ocjenio/la</span
                     >
