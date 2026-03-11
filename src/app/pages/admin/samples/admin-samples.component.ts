@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, AfterViewChecked, ElementRef, ViewChildren, QueryList } from '@angular/core';
+import { Component, computed, inject, signal, AfterViewChecked, ElementRef, HostListener, ViewChildren, QueryList } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import { of, startWith, switchMap } from 'rxjs';
 import JsBarcode from 'jsbarcode';
+import jsPDF from 'jspdf';
 
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
 import { InlineSpinnerComponent } from '../../../components/inline-spinner/inline-spinner.component';
@@ -97,6 +98,8 @@ export class AdminSamplesComponent implements AfterViewChecked {
   }
 
   readonly mode = signal<'list' | 'create' | 'edit' | 'barcodes'>('list');
+  readonly isExportMenuOpen = signal(false);
+  readonly isGeneratingPdf = signal(false);
   private barcodesRendered = false;
   readonly editingSample = signal<Sample | null>(null);
   readonly isSaving = signal(false);
@@ -157,7 +160,99 @@ export class AdminSamplesComponent implements AfterViewChecked {
   }
 
   printBarcodes(): void {
+    this.isExportMenuOpen.set(false);
     window.print();
+  }
+
+  async generatePdf(): Promise<void> {
+    this.isExportMenuOpen.set(false);
+    this.isGeneratingPdf.set(true);
+
+    try {
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      // Layout constants (A4: 210×297mm)
+      const margin = 10;
+      const pad = 2; // inner padding inside each cell border
+      const cols = 4;
+      const gapX = 4;
+      const gapY = 5;
+      const availableWidth = 210 - margin * 2; // 190mm
+      const cellWidth = (availableWidth - gapX * (cols - 1)) / cols; // ~43.5mm
+      const barcodeHeight = 16; // mm
+      const codeTextOffset = 5;  // mm below barcode top (inside padding)
+      const categoryTextOffset = 9; // mm below barcode top (inside padding)
+      const cellHeight = pad + barcodeHeight + categoryTextOffset + pad + 2; // ~31mm
+
+      let col = 0;
+      let x = margin;
+      let y = margin;
+
+      for (const sample of this.filteredSamples()) {
+        // New page if cell would overflow
+        if (y + cellHeight > 297 - margin) {
+          pdf.addPage();
+          col = 0;
+          x = margin;
+          y = margin;
+        }
+
+        // Border box around the entire label
+        pdf.setDrawColor(200, 200, 200);
+        pdf.setLineWidth(0.3);
+        pdf.roundedRect(x, y, cellWidth, cellHeight, 1.5, 1.5, 'S');
+
+        // Render barcode to off-screen canvas via JsBarcode
+        const barcodeCanvas = document.createElement('canvas');
+        JsBarcode(barcodeCanvas, sample.sampleCode, {
+          format: 'CODE128',
+          width: 3,
+          height: 80,
+          displayValue: false,
+          margin: 0,
+        });
+        const innerX = x + pad;
+        const innerY = y + pad;
+        const innerWidth = cellWidth - pad * 2;
+
+        const barcodeAspect = barcodeCanvas.width / barcodeCanvas.height;
+        const barcodeDrawHeight = innerWidth / barcodeAspect;
+        pdf.addImage(barcodeCanvas.toDataURL('image/png'), 'PNG', innerX, innerY, innerWidth, Math.min(barcodeDrawHeight, barcodeHeight));
+
+        // Sample code (bold)
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(sample.sampleCode, x + cellWidth / 2, innerY + barcodeHeight + codeTextOffset, { align: 'center' });
+
+        // Category name (normal, full text, wrapped within cell width)
+        pdf.setFontSize(6.5);
+        pdf.setFont('helvetica', 'normal');
+        const categoryName = this.categoryMap().get(sample.categoryId) ?? '—';
+        pdf.text(categoryName, x + cellWidth / 2, innerY + barcodeHeight + categoryTextOffset, {
+          align: 'center',
+          maxWidth: innerWidth,
+        });
+
+        // Advance grid position
+        col++;
+        if (col >= cols) {
+          col = 0;
+          x = margin;
+          y += cellHeight + gapY;
+        } else {
+          x += cellWidth + gapX;
+        }
+      }
+
+      pdf.save('barkodovi.pdf');
+    } finally {
+      this.isGeneratingPdf.set(false);
+    }
+  }
+
+  @HostListener('document:click')
+  closeExportMenu(): void {
+    this.isExportMenuOpen.set(false);
   }
 
   ngAfterViewChecked(): void {
