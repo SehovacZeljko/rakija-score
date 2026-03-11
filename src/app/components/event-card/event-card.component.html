@@ -5,7 +5,7 @@
   [class.border-border-default]="event().status === 'finished'"
 >
   <!-- Event header -->
-  <div class="border-b border-border-default px-1 pt-1 pb-3">
+  <div class="border-b border-border-default p-3">
     @if (isEditing()) {
       <!-- Edit mode -->
       <div class="flex gap-2">
@@ -291,7 +291,7 @@
         @if (judgeMap().get(assignment.judgeId); as judge) {
           <div class="mt-3 rounded-lg border border-border-default">
             <!-- Judge header -->
-            <div class="flex items-stretch gap-2 px-1 py-2">
+            <div class="flex items-stretch gap-2 p-2">
               <!-- Image placeholder -->
               <div
                 class="flex w-14 shrink-0 items-center justify-center rounded-lg bg-bg-surface text-text-muted"
