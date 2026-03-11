@@ -171,6 +171,19 @@ export class AdminSamplesComponent implements AfterViewChecked {
     try {
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
+      // Event header
+      const event = this.adminCurrentEvent();
+      if (event) {
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`${event.name} ${event.year}`, 105, 14, { align: 'center' });
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(120, 120, 120);
+        pdf.text('Barkodovi uzoraka', 105, 20, { align: 'center' });
+        pdf.setTextColor(0, 0, 0);
+      }
+
       // Layout constants (A4: 210×297mm)
       const margin = 10;
       const pad = 2; // inner padding inside each cell border
@@ -186,7 +199,7 @@ export class AdminSamplesComponent implements AfterViewChecked {
 
       let col = 0;
       let x = margin;
-      let y = margin;
+      let y = event ? 26 : margin;
 
       for (const sample of this.filteredSamples()) {
         // New page if cell would overflow
@@ -244,7 +257,8 @@ export class AdminSamplesComponent implements AfterViewChecked {
         }
       }
 
-      pdf.save('barkodovi.pdf');
+      const eventSlug = event ? `_${event.name}_${event.year}`.replace(/\s+/g, '-') : '';
+      pdf.save(`barkodovi${eventSlug}.pdf`);
     } finally {
       this.isGeneratingPdf.set(false);
     }
