@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
-import { of, startWith, switchMap } from 'rxjs';
+import { map, of, startWith, switchMap } from 'rxjs';
 
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
 import { ConfirmDialogComponent } from '../../../components/confirm-dialog/confirm-dialog.component';
@@ -41,22 +41,34 @@ export class AdminJudgesComponent {
   readonly adminCurrentEvent = this.ctx.adminCurrentEvent;
   readonly dataReady = this.ctx.dataReady;
 
-  private readonly categories$ = this.ctx.adminCurrentEvent$.pipe(
+  private readonly judgesContext$ = this.ctx.adminCurrentEvent$.pipe(
     switchMap((event) => {
-      if (!event) return of([]);
-      return this.categoryService.getCategoriesForEvents([event.eventId]).pipe(startWith([]));
+      if (!event) {
+        return of({ categories: [] as Category[], assignments: [] as JudgeAssignment[], ready: true });
+      }
+      return this.categoryService.getCategoriesForEvents([event.eventId]).pipe(
+        switchMap((categories) => {
+          const categoryIds = categories.map((category) => category.categoryId);
+          if (categoryIds.length === 0) {
+            return of({ categories, assignments: [] as JudgeAssignment[], ready: true });
+          }
+          return this.categoryService.getAssignmentsForCategories(categoryIds).pipe(
+            map((assignments) => ({ categories, assignments, ready: true })),
+          );
+        }),
+        startWith({ categories: [] as Category[], assignments: [] as JudgeAssignment[], ready: false }),
+      );
     }),
   );
 
-  private readonly assignments$ = this.categories$.pipe(
-    switchMap((categories) => {
-      const categoryIds = categories.map((category) => category.categoryId);
-      return this.categoryService.getAssignmentsForCategories(categoryIds).pipe(startWith([]));
-    }),
-  );
+  private readonly judgesContext = toSignal(this.judgesContext$, {
+    initialValue: { categories: [] as Category[], assignments: [] as JudgeAssignment[], ready: false },
+  });
 
-  readonly categories = toSignal(this.categories$, { initialValue: [] });
-  readonly assignments = toSignal(this.assignments$, { initialValue: [] });
+  readonly categories = computed(() => this.judgesContext().categories);
+  readonly assignments = computed(() => this.judgesContext().assignments);
+  readonly isLoadingAssignments = computed(() => !this.judgesContext().ready);
+
   readonly users = toSignal(this.userService.getAllUsers(), { initialValue: [] });
 
   readonly categoryMap = computed(

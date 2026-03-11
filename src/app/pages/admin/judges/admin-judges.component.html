@@ -19,6 +19,10 @@
   } @else {
     <app-active-festival-banner />
 
+    @if (isLoadingAssignments()) {
+      <app-loading-spinner />
+    } @else {
+
     <!-- Search -->
     <div class="relative mb-3">
       <lucide-icon
@@ -223,6 +227,8 @@
           Sljedeća →
         </button>
       </div>
+    }
+
     }
   }
 </div>
