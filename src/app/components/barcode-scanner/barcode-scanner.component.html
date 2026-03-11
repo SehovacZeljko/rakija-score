@@ -1,0 +1,80 @@
+<!-- Full-screen overlay -->
+<div class="fixed inset-0 z-[100] flex flex-col bg-black">
+
+  <!-- Header bar -->
+  <div class="flex items-center justify-between bg-primary px-4 py-3">
+    <div class="mx-auto w-full max-w-5xl flex items-center justify-between">
+      <p class="text-base font-semibold text-white">Skeniraj barkod</p>
+      <button
+        type="button"
+        (click)="close()"
+        class="flex h-9 w-9 items-center justify-center rounded-full text-white transition-colors active:bg-primary-light"
+        aria-label="Zatvori"
+      >
+        <lucide-icon name="x" [size]="22" strokeWidth="2" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Camera area -->
+  <div class="relative flex-1 overflow-hidden">
+
+    @if (hasPermission() === false) {
+      <!-- Permission denied -->
+      <div class="flex h-full items-center justify-center px-8 text-center">
+        <div>
+          <lucide-icon name="camera-off" [size]="48" class="mb-4 text-text-muted" strokeWidth="1.5" />
+          <p class="text-base font-semibold text-white">Nema pristupa kameri</p>
+          <p class="mt-2 text-sm text-gray-400">Dozvolite pristup kameri u podešavanjima pregledača i pokušajte ponovo.</p>
+        </div>
+      </div>
+    } @else if (hasCameras() === false) {
+      <!-- No cameras -->
+      <div class="flex h-full items-center justify-center px-8 text-center">
+        <div>
+          <lucide-icon name="camera-off" [size]="48" class="mb-4 text-text-muted" strokeWidth="1.5" />
+          <p class="text-base font-semibold text-white">Kamera nije pronađena</p>
+          <p class="mt-2 text-sm text-gray-400">Uređaj nema dostupnu kameru.</p>
+        </div>
+      </div>
+    } @else {
+      <!-- Scanner fills entire camera area -->
+      <zxing-scanner
+        [autostart]="true"
+        [formats]="formats"
+        (scanSuccess)="onScanSuccess($event)"
+        (scanFailure)="onScanFailure()"
+        (permissionResponse)="onPermissionResponse($event)"
+        (camerasFound)="onCamerasFound()"
+        (camerasNotFound)="onCamerasNotFound()"
+      />
+
+      <!-- Viewfinder frame overlay -->
+      <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div class="viewfinder-frame"></div>
+      </div>
+
+      <!-- Processing indicator -->
+      @if (isProcessing()) {
+        <div class="absolute inset-0 flex items-center justify-center bg-black/50">
+          <div class="rounded-xl bg-white px-6 py-4 text-center shadow-lg">
+            <p class="text-sm font-medium text-text-primary">Tražim uzorak...</p>
+          </div>
+        </div>
+      }
+    }
+
+  </div>
+
+  <!-- Hint + last detected -->
+  @if (hasPermission() !== false && hasCameras() !== false) {
+    <div class="px-4 pb-8 pt-4 text-center">
+      @if (lastDetected()) {
+        <p class="text-sm font-medium text-accent">Detektovano: {{ lastDetected() }}</p>
+      } @else {
+        <p class="text-sm text-gray-400">Usmjerite kameru prema barkodu na boci</p>
+      }
+    </div>
+  }
+
+</div>

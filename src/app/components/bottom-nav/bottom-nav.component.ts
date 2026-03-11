@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 
@@ -16,4 +16,6 @@ export interface NavItem {
 })
 export class BottomNavComponent {
   @Input({ required: true }) items: NavItem[] = [];
+  @Input() showScan = false;
+  @Output() scanClick = new EventEmitter<void>();
 }

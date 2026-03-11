@@ -21,6 +21,7 @@ import { HeaderComponent } from '../../components/header/header.component';
 import { InlineSpinnerComponent } from '../../components/inline-spinner/inline-spinner.component';
 import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner.component';
 import { AuthService } from '../../services/auth.service';
+import { BarcodeScanService } from '../../services/barcode-scan.service';
 import { CategoryService } from '../../services/category.service';
 import { FestivalContextService } from '../../services/festival-context.service';
 import { SampleService } from '../../services/sample.service';
@@ -45,6 +46,7 @@ export class CategoryDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly barcodeScanService = inject(BarcodeScanService);
   private readonly categoryService = inject(CategoryService);
   private readonly ctx = inject(FestivalContextService);
   private readonly sampleService = inject(SampleService);
@@ -264,5 +266,10 @@ export class CategoryDetailComponent {
     if (categoryId !== this.categoryId()) {
       this.router.navigate(['/category', categoryId]);
     }
+  }
+
+  openScanner(): void {
+    const categoryIds = this.allAssignments().map((assignment) => assignment.categoryId);
+    this.barcodeScanService.open(categoryIds);
   }
 }

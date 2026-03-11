@@ -9,14 +9,26 @@
     <div class="mb-4 flex items-center justify-between">
       <h1 class="text-xl font-semibold text-text-primary">Uzorci</h1>
       @if (activeFestival() && adminCurrentEvent()) {
-        <button
-          type="button"
-          (click)="openCreate()"
-          class="flex items-center gap-1.5 rounded-[10px] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark active:bg-primary-dark"
-        >
-          <lucide-icon name="plus" [size]="16" [strokeWidth]="2.5" />
-          Novi uzorak
-        </button>
+        <div class="flex items-center gap-2">
+          @if (allSamples().length > 0) {
+            <button
+              type="button"
+              (click)="openBarcodes()"
+              class="flex items-center gap-1.5 rounded-[10px] bg-bg-surface px-4 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-border-default"
+            >
+              <lucide-icon name="barcode" [size]="16" [strokeWidth]="2" />
+              Barkodovi
+            </button>
+          }
+          <button
+            type="button"
+            (click)="openCreate()"
+            class="flex items-center gap-1.5 rounded-[10px] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark active:bg-primary-dark"
+          >
+            <lucide-icon name="plus" [size]="16" [strokeWidth]="2.5" />
+            Novi uzorak
+          </button>
+        </div>
       }
     </div>
 
@@ -112,6 +124,47 @@
         </div>
       }
     }
+  </div>
+}
+
+<!-- BARCODES VIEW -->
+@if (mode() === 'barcodes') {
+  <div class="p-4">
+    <!-- Header -->
+    <div class="no-print mb-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          (click)="mode.set('list')"
+          class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-bg-surface"
+          aria-label="Nazad"
+        >
+          <lucide-icon name="chevron-left" [size]="20" />
+        </button>
+        <h1 class="text-xl font-semibold text-text-primary">Barkodovi uzoraka</h1>
+      </div>
+      <button
+        type="button"
+        (click)="printBarcodes()"
+        class="flex items-center gap-1.5 rounded-[10px] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
+      >
+        <lucide-icon name="download" [size]="16" [strokeWidth]="2" />
+        Štampaj
+      </button>
+    </div>
+
+    <!-- Barcode grid -->
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+      @for (sample of filteredSamples(); track sample.sampleId) {
+        <div class="flex flex-col items-center rounded-xl border border-border-default bg-bg-card p-3">
+          <svg #barcodeEl [attr.data-code]="sample.sampleCode"></svg>
+          <p class="mt-1 text-base font-bold tracking-widest text-text-primary">{{ sample.sampleCode }}</p>
+          <p class="mt-0.5 max-w-full truncate text-center text-xs text-text-muted">
+            {{ categoryMap().get(sample.categoryId) ?? '—' }}
+          </p>
+        </div>
+      }
+    </div>
   </div>
 }
 

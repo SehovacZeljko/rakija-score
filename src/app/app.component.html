@@ -2,3 +2,6 @@
   <router-outlet />
 </div>
 <app-toast />
+@if (scanService.isOpen()) {
+  <app-barcode-scanner />
+}

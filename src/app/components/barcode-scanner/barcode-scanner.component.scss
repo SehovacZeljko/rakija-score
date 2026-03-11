@@ -1,0 +1,20 @@
+/* Pierce into the zxing-scanner host and its internal video element */
+::ng-deep zxing-scanner {
+  display: block;
+  position: absolute;
+  inset: 0;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.viewfinder-frame {
+  width: 240px;
+  height: 140px;
+  border: 2px solid #c8d93a;
+  border-radius: 8px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+}

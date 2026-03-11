@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, AfterViewChecked, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -9,6 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { of, startWith, switchMap } from 'rxjs';
+import JsBarcode from 'jsbarcode';
 
 import { ActiveFestivalBannerComponent } from '../../../components/active-festival-banner/active-festival-banner.component';
 import { InlineSpinnerComponent } from '../../../components/inline-spinner/inline-spinner.component';
@@ -27,7 +28,8 @@ import { LucideAngularModule } from 'lucide-angular';
   templateUrl: './admin-samples.component.html',
   styleUrl: './admin-samples.component.scss',
 })
-export class AdminSamplesComponent {
+export class AdminSamplesComponent implements AfterViewChecked {
+  @ViewChildren('barcodeEl') barcodeElements!: QueryList<ElementRef<SVGElement>>;
   private readonly ctx = inject(FestivalContextService);
   private readonly categoryService = inject(CategoryService);
   private readonly producerService = inject(ProducerService);
@@ -94,7 +96,8 @@ export class AdminSamplesComponent {
     this.searchQuery.set((event.target as HTMLInputElement).value);
   }
 
-  readonly mode = signal<'list' | 'create' | 'edit'>('list');
+  readonly mode = signal<'list' | 'create' | 'edit' | 'barcodes'>('list');
+  private barcodesRendered = false;
   readonly editingSample = signal<Sample | null>(null);
   readonly isSaving = signal(false);
 
@@ -146,6 +149,31 @@ export class AdminSamplesComponent {
       );
       return isDuplicate ? { duplicateCode: true } : null;
     };
+  }
+
+  openBarcodes(): void {
+    this.barcodesRendered = false;
+    this.mode.set('barcodes');
+  }
+
+  printBarcodes(): void {
+    window.print();
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.mode() === 'barcodes' && !this.barcodesRendered && this.barcodeElements?.length) {
+      this.barcodeElements.forEach((ref) => {
+        const sampleCode = ref.nativeElement.dataset['code'] ?? '';
+        JsBarcode(ref.nativeElement, sampleCode, {
+          format: 'CODE128',
+          width: 2,
+          height: 60,
+          displayValue: false,
+          margin: 0,
+        });
+      });
+      this.barcodesRendered = true;
+    }
   }
 
   cancel(): void {
