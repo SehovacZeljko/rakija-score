@@ -159,6 +159,7 @@
                   [class.border-primary]="selectedJudgeIds().has(judge.userId)"
                   [class.bg-primary]="selectedJudgeIds().has(judge.userId)"
                   [class.border-border-default]="!selectedJudgeIds().has(judge.userId)"
+                  [class.bg-white]="!selectedJudgeIds().has(judge.userId)"
                 >
                   @if (selectedJudgeIds().has(judge.userId)) {
                     <lucide-icon name="check" [size]="10" [strokeWidth]="3" class="text-white" />
