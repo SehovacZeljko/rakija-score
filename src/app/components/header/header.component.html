@@ -44,6 +44,18 @@
       </div>
     }
 
+    <!-- Scan button (desktop only — mobile uses bottom nav) -->
+    @if (showScan) {
+      <button
+        type="button"
+        (click)="scanClick.emit()"
+        aria-label="Skeniraj barkod"
+        class="mr-1 hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white transition-colors hover:bg-primary-light active:bg-primary-dark md:flex"
+      >
+        <lucide-icon name="scan-barcode" [size]="20" />
+      </button>
+    }
+
     <!-- Burger menu -->
     <div class="relative">
       <button

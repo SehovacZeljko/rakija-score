@@ -14,23 +14,22 @@
           [class.opacity-100]="rla.isActive"
           [class.opacity-0]="!rla.isActive"
         ></span>
-
         <lucide-icon [name]="item.icon" [size]="20" strokeWidth="2" />
-
         <span class="text-[9px] font-medium uppercase tracking-[0.05em]">{{ item.label }}</span>
       </a>
     }
-  </div>
 
-  @if (showScan) {
-    <!-- FAB scan button — centered above the nav bar -->
-    <button
-      type="button"
-      (click)="scanClick.emit()"
-      class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-accent shadow-[0_4px_12px_rgba(200,217,58,0.4)] transition-colors active:bg-accent-hover"
-      aria-label="Skeniraj barkod"
-    >
-      <lucide-icon name="scan-barcode" [size]="24" strokeWidth="2" class="text-text-on-accent" />
-    </button>
-  }
+    @if (showScan) {
+      <button
+        type="button"
+        (click)="scanClick.emit()"
+        class="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-muted transition-colors active:text-primary"
+        aria-label="Skeniraj barkod"
+      >
+        <span class="h-1 w-1 rounded-full opacity-0"></span>
+        <lucide-icon name="scan-barcode" [size]="20" strokeWidth="2" />
+        <span class="text-[9px] font-medium uppercase tracking-[0.05em]">Skeniraj</span>
+      </button>
+    }
+  </div>
 </nav>

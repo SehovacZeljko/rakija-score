@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, inject, signal } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, inject, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
@@ -17,6 +17,8 @@ export class HeaderComponent {
   @Input() items: NavItem[] = [];
   @Input() backRoute: string | null = null;
   @Input() subtitle: string = '';
+  @Input() showScan = false;
+  @Output() scanClick = new EventEmitter<void>();
 
   protected readonly authService = inject(AuthService);
   private readonly elementRef = inject(ElementRef);
