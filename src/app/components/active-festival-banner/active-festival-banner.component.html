@@ -11,10 +11,10 @@
       <!-- Festival / event info -->
       <div class="min-w-0 flex-1">
         <p class="text-xs text-text-muted">{{ festival.name }}</p>
-        @if (ctx.adminCurrentEvent(); as event) {
+        @if (ctx.activeEvent(); as event) {
           <p class="mt-0.5 font-semibold text-text-primary">{{ event.name }}</p>
           <p class="text-xs text-text-muted">{{ event.year }}</p>
-        } @else {
+        } @else if (ctx.dataReady()) {
           <p class="mt-0.5 text-xs text-status-error">Nema aktivnog dogadjaja.</p>
         }
       </div>

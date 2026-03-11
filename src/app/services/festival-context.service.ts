@@ -49,7 +49,7 @@ export class FestivalContextService {
   readonly adminCurrentEvent = toSignal(this.adminCurrentEvent$, { initialValue: null });
 
   readonly dataReady = toSignal(
-    this.activeFestival$.pipe(
+    this.activeEvent$.pipe(
       take(1),
       map(() => true),
     ),
