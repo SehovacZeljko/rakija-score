@@ -79,6 +79,13 @@ export class SampleService {
     );
   }
 
+  getSampleByCodeGlobal(sampleCode: string): Observable<Sample | null> {
+    const q = query(this.samplesRef, where('sampleCode', '==', sampleCode));
+    return runInInjectionContext(this.injector, () =>
+      (collectionData(q) as Observable<Sample[]>).pipe(map((samples) => samples[0] ?? null)),
+    );
+  }
+
   async createSample(data: SampleData): Promise<void> {
     const newDocRef = doc(this.samplesRef);
     await setDoc(newDocRef, {

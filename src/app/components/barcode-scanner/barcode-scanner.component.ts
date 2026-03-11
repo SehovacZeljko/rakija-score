@@ -66,13 +66,15 @@ export class BarcodeScannerComponent {
 
     try {
       const categoryIds = this.scanService.assignedCategoryIds();
-      const sample = await firstValueFrom(this.sampleService.getSampleByCode(scannedCode, categoryIds));
+      const sample = await firstValueFrom(this.sampleService.getSampleByCodeGlobal(scannedCode));
 
-      if (sample) {
-        this.scanService.close();
-        await this.router.navigate(['/scoring', sample.categoryId, sample.sampleId]);
-      } else {
+      if (!sample) {
         this.toastService.show(`Uzorak "${scannedCode}" nije pronađen`, 'error');
+      } else if (!categoryIds.includes(sample.categoryId)) {
+        this.toastService.show('Niste dodijeljeni ovoj kategoriji', 'error');
+      } else {
+        await this.router.navigate(['/scoring', sample.categoryId, sample.sampleId]);
+        this.scanService.close();
       }
     } finally {
       this.isProcessing.set(false);

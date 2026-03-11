@@ -274,7 +274,7 @@ export class CategoryDetailComponent {
   }
 
   openScanner(): void {
-    const categoryIds = this.allAssignments().map((assignment) => assignment.categoryId);
+    const categoryIds = this.categoryCards().map((card) => card.categoryId);
     this.barcodeScanService.open(categoryIds);
   }
 }

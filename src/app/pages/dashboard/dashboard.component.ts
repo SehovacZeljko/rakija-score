@@ -123,7 +123,7 @@ export class DashboardComponent {
   }
 
   openScanner(): void {
-    const categoryIds = this.assignments().map((assignment) => assignment.categoryId);
+    const categoryIds = this.categoryCards().map((card) => card.categoryId);
     this.barcodeScanService.open(categoryIds);
   }
 }
