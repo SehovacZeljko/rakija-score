@@ -49,6 +49,15 @@ export class SampleService {
     );
   }
 
+  getSamplesForProducer(producerId: string): Observable<Sample[]> {
+    const q = query(this.samplesRef, where('producerId', '==', producerId));
+    return runInInjectionContext(this.injector, () =>
+      (collectionData(q) as Observable<Sample[]>).pipe(
+        map((samples) => samples.sort((a, b) => a.order - b.order)),
+      ),
+    );
+  }
+
   getSamplesForCategory(categoryId: string): Observable<Sample[]> {
     const q = query(this.samplesRef, where('categoryId', '==', categoryId));
     return runInInjectionContext(this.injector, () =>

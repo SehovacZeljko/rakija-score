@@ -23,6 +23,12 @@ export class EventService {
   private readonly injector = inject(Injector);
   private readonly eventsRef = collection(this.firestore, 'events');
 
+  getAllEvents(): Observable<FestivalEvent[]> {
+    return runInInjectionContext(this.injector, () =>
+      collectionData(this.eventsRef) as Observable<FestivalEvent[]>,
+    );
+  }
+
   getEventById(eventId: string): Observable<FestivalEvent | null> {
     const docRef = doc(this.firestore, `events/${eventId}`);
     return runInInjectionContext(this.injector, () =>
