@@ -164,18 +164,11 @@
                       <span class="shrink-0 text-xs font-bold text-text-primary">{{ festivalEvent.year }}</span>
                       <span class="truncate text-xs text-text-secondary">{{ festivalEvent.name }}</span>
                     </div>
-                    <span
-                      class="shrink-0 rounded-[6px] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.05em]"
-                      [class.bg-accent]="festivalEvent.status === 'active'"
-                      [class.text-text-on-accent]="festivalEvent.status === 'active'"
-                      [class.bg-bg-surface]="festivalEvent.status !== 'active'"
-                      [class.text-text-secondary]="festivalEvent.status === 'staging'"
-                      [class.text-text-muted]="festivalEvent.status === 'finished'"
-                    >
-                      @if (festivalEvent.status === 'active') { Aktivan }
-                      @else if (festivalEvent.status === 'staging') { U pripremi }
-                      @else { Završen }
-                    </span>
+                    @if (festivalEvent.status === 'active') {
+                      <span class="h-2 w-2 shrink-0 rounded-full bg-status-success" title="Aktivan"></span>
+                    } @else if (festivalEvent.status === 'staging') {
+                      <span class="h-2 w-2 shrink-0 rounded-full bg-status-pending" title="U pripremi"></span>
+                    }
                   </div>
                 }
               </div>
