@@ -294,13 +294,13 @@
             <div class="flex items-stretch gap-2 p-2">
               <!-- Image placeholder -->
               <div
-                class="flex w-14 shrink-0 items-center justify-center rounded-lg bg-bg-surface text-text-muted"
+                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-bg-surface text-text-muted"
               >
                 <lucide-icon name="user" [size]="13" />
               </div>
 
               <!-- Right: name row + stat boxes -->
-              <div class="min-w-0 flex-1">
+              <div class="flex min-w-0 flex-1 flex-col justify-between">
                 <!-- Row 1: name + lock + X -->
                 <div class="flex items-center gap-1.5">
                   <span class="flex-1 truncate text-xs font-semibold text-text-primary">{{
@@ -338,7 +338,7 @@
                   getJudgeCategoryStats(assignment.judgeId, category.categoryId);
                   as judgeStats
                 ) {
-                  <div class="mt-1.5 flex gap-1.5">
+                  <div class="flex gap-1.5">
                     <div class="rounded-md bg-bg-surface px-2 py-1 text-center">
                       <p class="text-[10px] text-text-muted">Uzorci</p>
                       <p class="text-xs font-semibold text-text-primary">{{ judgeStats.total }}</p>
