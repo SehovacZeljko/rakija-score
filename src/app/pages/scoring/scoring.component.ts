@@ -66,14 +66,17 @@ export class ScoringComponent {
   // Redirect to dashboard when the event becomes inactive while on this page.
   // Track whether an active event was ever seen so we don't redirect on initial
   // load (before Firestore resolves the signal from its null initial value).
-  private hasSeenActiveEvent = false;
+  private seenEventId: string | null = null;
 
   constructor() {
     effect(() => {
       const activeEvent = this.ctx.activeEvent();
       if (activeEvent) {
-        this.hasSeenActiveEvent = true;
-      } else if (this.hasSeenActiveEvent) {
+        if (this.seenEventId !== null && this.seenEventId !== activeEvent.eventId) {
+          void this.router.navigate(['/dashboard']);
+        }
+        this.seenEventId = activeEvent.eventId;
+      } else if (this.seenEventId !== null) {
         void this.router.navigate(['/dashboard']);
       }
     });

@@ -176,20 +176,25 @@ export class CategoryDetailComponent {
   readonly isLocking = signal(false);
   readonly isUnlocking = signal(false);
 
-  // ── Redirect when event becomes inactive ──────────────────────────────────
+  // ── Redirect when event becomes inactive or switches ──────────────────────
   //
-  // Judges can be on this page when an admin finishes or deactivates the event.
-  // Track whether an active event was ever seen so we don't redirect on initial
-  // load (when the signal is still null before Firestore resolves).
+  // Two cases require a redirect to dashboard:
+  //   1. activeEvent becomes null  (admin finished/reverted the current event)
+  //   2. activeEvent changes to a different eventId  (admin activated a new event)
+  // seenEventId stays null on initial load while Firestore resolves, preventing
+  // a spurious redirect before the first real value arrives.
 
-  private hasSeenActiveEvent = false;
+  private seenEventId: string | null = null;
 
   constructor() {
     effect(() => {
       const activeEvent = this.ctx.activeEvent();
       if (activeEvent) {
-        this.hasSeenActiveEvent = true;
-      } else if (this.hasSeenActiveEvent) {
+        if (this.seenEventId !== null && this.seenEventId !== activeEvent.eventId) {
+          void this.router.navigate(['/dashboard']);
+        }
+        this.seenEventId = activeEvent.eventId;
+      } else if (this.seenEventId !== null) {
         void this.router.navigate(['/dashboard']);
       }
     });
