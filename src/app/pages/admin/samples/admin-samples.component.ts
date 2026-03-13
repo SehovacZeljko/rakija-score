@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, AfterViewChecked, ElementRef, HostListener, ViewChildren, QueryList } from '@angular/core';
+import { Component, computed, inject, signal, AfterViewChecked, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -98,7 +98,6 @@ export class AdminSamplesComponent implements AfterViewChecked {
   }
 
   readonly mode = signal<'list' | 'create' | 'edit' | 'barcodes'>('list');
-  readonly isExportMenuOpen = signal(false);
   readonly isGeneratingPdf = signal(false);
   private barcodesRendered = false;
   readonly editingSample = signal<Sample | null>(null);
@@ -159,13 +158,7 @@ export class AdminSamplesComponent implements AfterViewChecked {
     this.mode.set('barcodes');
   }
 
-  printBarcodes(): void {
-    this.isExportMenuOpen.set(false);
-    window.print();
-  }
-
   async generatePdf(): Promise<void> {
-    this.isExportMenuOpen.set(false);
     this.isGeneratingPdf.set(true);
 
     try {
@@ -262,11 +255,6 @@ export class AdminSamplesComponent implements AfterViewChecked {
     } finally {
       this.isGeneratingPdf.set(false);
     }
-  }
-
-  @HostListener('document:click')
-  closeExportMenu(): void {
-    this.isExportMenuOpen.set(false);
   }
 
   ngAfterViewChecked(): void {

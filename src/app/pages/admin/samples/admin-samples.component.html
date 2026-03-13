@@ -143,44 +143,15 @@
         </button>
         <h1 class="text-xl font-semibold text-text-primary">Barkodovi uzoraka</h1>
       </div>
-      <!-- Export dropdown -->
-      <div class="relative">
-        <button
-          type="button"
-          (click)="$event.stopPropagation(); isExportMenuOpen.set(!isExportMenuOpen())"
-          class="flex items-center gap-1.5 rounded-[10px] bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
-        >
-          <lucide-icon name="download" [size]="16" [strokeWidth]="2" />
-          Izvezi
-          <lucide-icon name="chevron-down" [size]="14" [strokeWidth]="2" />
-        </button>
-
-        @if (isExportMenuOpen()) {
-          <div class="absolute right-0 z-[60] mt-1 w-52 overflow-hidden rounded-xl border border-border-default bg-bg-card shadow-[0_4px_16px_rgba(0,0,0,0.12)]">
-            <button
-              type="button"
-              (click)="printBarcodes()"
-              class="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm text-text-secondary transition-colors hover:bg-bg-surface"
-            >
-              <lucide-icon name="printer" [size]="14" class="shrink-0" />
-              Štampaj
-            </button>
-            <button
-              type="button"
-              (click)="generatePdf()"
-              [disabled]="isGeneratingPdf()"
-              class="flex w-full items-center gap-2.5 border-t border-border-default px-3 py-2.5 text-left text-sm text-text-secondary transition-colors hover:bg-bg-surface disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              @if (isGeneratingPdf()) {
-                <app-inline-spinner [size]="14" />
-              } @else {
-                <lucide-icon name="file-text" [size]="14" class="shrink-0" />
-              }
-              Generiši PDF
-            </button>
-          </div>
-        }
-      </div>
+      <button
+        type="button"
+        (click)="generatePdf()"
+        [disabled]="isGeneratingPdf()"
+        class="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-text-on-primary transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <lucide-icon name="download" [size]="14" />
+        Izvezi PDF
+      </button>
     </div>
 
     <!-- Barcode grid -->
