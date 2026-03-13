@@ -530,9 +530,9 @@
 @if (pendingRemoval(); as removal) {
   <app-confirm-dialog
     [message]="
-      'Da li ste sigurni da želite ukloniti sudiju ' +
+      'Da li ste sigurni da želite ukloniti sudiju <strong>' +
       removal.judgeName +
-      ' iz kategorije ' +
+      '</strong> iz kategorije ' +
       removal.categoryName +
       '?'
     "

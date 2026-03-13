@@ -6,7 +6,7 @@
     class="w-full max-w-sm rounded-xl bg-bg-card p-6 shadow-[0_4px_24px_rgba(0,0,0,0.18)]"
     (click)="$event.stopPropagation()"
   >
-    <p class="text-sm text-text-primary">{{ message() }}</p>
+    <p class="text-sm text-text-primary" [innerHTML]="message()"></p>
     <div class="mt-5 flex justify-end gap-3">
       <button
         type="button"
