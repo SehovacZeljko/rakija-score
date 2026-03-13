@@ -426,7 +426,7 @@
             @if (expandedJudgeKeys().has(assignment.judgeId + '_' + category.categoryId) && (samplesByCategoryId().get(category.categoryId) ?? []).length > 0) {
               <!-- Table header -->
               <div
-                class="grid grid-cols-[1.25rem_1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_3rem] gap-x-1 md:gap-x-4 border-t border-border-default bg-bg-surface px-3 py-1.5"
+                class="grid grid-cols-[1.25rem_1fr_2rem_2rem_2rem_2rem_2rem_2.75rem] gap-x-1 md:gap-x-4 border-t border-border-default bg-bg-surface px-3 py-1.5"
               >
                 <span class="text-[10px] font-semibold text-text-muted">#</span>
                 <span class="min-w-0 truncate text-[10px] font-semibold text-text-muted"
@@ -467,7 +467,7 @@
               ) {
                 @if (getJudgeScore(assignment.judgeId, sample.sampleId); as score) {
                   <div
-                    class="grid grid-cols-[1.25rem_1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_3rem] items-center gap-x-1 md:gap-x-4 border-t border-border-default px-3 py-1.5 text-xs"
+                    class="grid grid-cols-[1.25rem_1fr_2rem_2rem_2rem_2rem_2rem_2.75rem] items-center gap-x-1 md:gap-x-4 border-t border-border-default px-3 py-1.5 text-xs"
                   >
                     <span class="text-text-muted">{{ rowIndex + 1 }}</span>
                     <span
@@ -497,7 +497,7 @@
                   </div>
                 } @else {
                   <div
-                    class="grid grid-cols-[1.25rem_1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_3rem] items-center gap-x-1 md:gap-x-4 border-t border-border-default px-3 py-1.5 text-xs"
+                    class="grid grid-cols-[1.25rem_1fr_2rem_2rem_2rem_2rem_2rem_2.75rem] items-center gap-x-1 md:gap-x-4 border-t border-border-default px-3 py-1.5 text-xs"
                   >
                     <span class="text-text-muted">{{ rowIndex + 1 }}</span>
                     <span
