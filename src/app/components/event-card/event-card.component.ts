@@ -38,6 +38,17 @@ export class EventCardComponent {
   private readonly userService = inject(UserService);
 
   readonly expandedSampleIds = signal(new Set<string>());
+  readonly expandedJudgeKeys = signal<Set<string>>(new Set());
+
+  readonly allJudgesExpanded = computed(() => {
+    const allAssignments = [...this.assignmentsByCategoryId().values()].flat();
+    return (
+      allAssignments.length > 0 &&
+      allAssignments.every((assignment) =>
+        this.expandedJudgeKeys().has(`${assignment.judgeId}_${assignment.categoryId}`),
+      )
+    );
+  });
 
   toggleSampleCode(sampleId: string): void {
     this.expandedSampleIds.update((set) => {
@@ -45,6 +56,52 @@ export class EventCardComponent {
       next.has(sampleId) ? next.delete(sampleId) : next.add(sampleId);
       return next;
     });
+  }
+
+  toggleJudgeExpand(judgeId: string, categoryId: string): void {
+    const key = `${judgeId}_${categoryId}`;
+    this.expandedJudgeKeys.update((set) => {
+      const next = new Set(set);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  }
+
+  allJudgesInCategoryExpanded(categoryId: string): boolean {
+    const assignments = this.assignmentsByCategoryId().get(categoryId) ?? [];
+    return (
+      assignments.length > 0 &&
+      assignments.every((assignment) =>
+        this.expandedJudgeKeys().has(`${assignment.judgeId}_${categoryId}`),
+      )
+    );
+  }
+
+  toggleAllJudgesInCategory(categoryId: string): void {
+    const assignments = this.assignmentsByCategoryId().get(categoryId) ?? [];
+    const allExpanded = this.allJudgesInCategoryExpanded(categoryId);
+    this.expandedJudgeKeys.update((set) => {
+      const next = new Set(set);
+      for (const assignment of assignments) {
+        const key = `${assignment.judgeId}_${categoryId}`;
+        allExpanded ? next.delete(key) : next.add(key);
+      }
+      return next;
+    });
+  }
+
+  toggleAllJudges(): void {
+    if (this.allJudgesExpanded()) {
+      this.expandedJudgeKeys.set(new Set());
+    } else {
+      const allKeys = new Set<string>();
+      for (const [categoryId, assignments] of this.assignmentsByCategoryId()) {
+        for (const assignment of assignments) {
+          allKeys.add(`${assignment.judgeId}_${categoryId}`);
+        }
+      }
+      this.expandedJudgeKeys.set(allKeys);
+    }
   }
 
   readonly event = input.required<FestivalEvent>();
