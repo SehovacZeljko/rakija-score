@@ -12,7 +12,7 @@ import {
   verifyPasswordResetCode,
 } from '@angular/fire/auth';
 import { Firestore, doc, docData, setDoc, updateDoc, serverTimestamp } from '@angular/fire/firestore';
-import { Observable, of, switchMap, map } from 'rxjs';
+import { Observable, of, switchMap, map, take } from 'rxjs';
 
 import { User } from '../models/user.model';
 
@@ -36,10 +36,15 @@ export class AuthService {
 
   readonly currentUser: Signal<User | null>;
   readonly isAuthenticated: Signal<boolean>;
+  readonly authInitialized: Signal<boolean>;
 
   constructor() {
     this.currentUser = toSignal(this.currentUser$, { initialValue: null });
     this.isAuthenticated = computed(() => !!this.currentUser());
+    this.authInitialized = toSignal(
+      this.currentUser$.pipe(take(1), map(() => true)),
+      { initialValue: false },
+    );
   }
 
   async login(email: string, password: string): Promise<void> {

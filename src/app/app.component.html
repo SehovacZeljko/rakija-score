@@ -1,5 +1,11 @@
 <div class="mx-auto w-full max-w-5xl">
-  <router-outlet />
+  @if (ctx.dataReady()) {
+    <router-outlet />
+  } @else {
+    <div class="flex h-screen items-center justify-center">
+      <app-loading-spinner />
+    </div>
+  }
 </div>
 <app-toast />
 @if (scanService.isOpen()) {
